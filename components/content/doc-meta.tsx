@@ -1,6 +1,3 @@
-import Link from "next/link";
-
-import { slugify } from "@/lib/content/source";
 import type { Doc } from "@/lib/content/types";
 
 const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -40,24 +37,5 @@ export function DocMeta({ doc }: { doc: Doc }) {
         </>
       ) : null}
     </div>
-  );
-}
-
-export function TagList({ tags }: { tags: string[] }) {
-  if (!tags.length) return null;
-
-  return (
-    <ul className="flex flex-wrap gap-2">
-      {tags.map((tag) => (
-        <li key={tag}>
-          <Link
-            href={`/tags/${slugify(tag)}`}
-            className="inline-flex rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground/25 hover:text-foreground"
-          >
-            {tag}
-          </Link>
-        </li>
-      ))}
-    </ul>
   );
 }

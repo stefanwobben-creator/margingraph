@@ -8,6 +8,14 @@ const absolute = (path: string) =>
   path.startsWith("http") ? path : `${site.url}${path}`;
 
 /**
+ * Next only applies the file-based `opengraph-image` convention to pages that
+ * do not return an `openGraph` object of their own. Every content page does,
+ * so the default has to be attached explicitly here or those pages ship with
+ * no social card at all.
+ */
+const DEFAULT_OG_IMAGE = `${site.url}/opengraph-image`;
+
+/**
  * The single place metadata is built. Every route calls this — there is no
  * second implementation, so a change to the OpenGraph shape happens once.
  */
@@ -35,7 +43,7 @@ export function buildMetadata({
   noIndex?: boolean;
 }): Metadata {
   const url = absolute(path);
-  const images = image ? [{ url: absolute(image) }] : undefined;
+  const images = [{ url: image ? absolute(image) : DEFAULT_OG_IMAGE }];
 
   return {
     title,
@@ -57,7 +65,7 @@ export function buildMetadata({
       card: "summary_large_image",
       title: `${title} — ${site.name}`,
       description,
-      images: images?.map((item) => item.url),
+      images: images.map((item) => item.url),
     },
   };
 }

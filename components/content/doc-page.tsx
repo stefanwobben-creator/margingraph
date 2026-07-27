@@ -1,6 +1,8 @@
 import { Breadcrumbs, type Crumb } from "@/components/content/breadcrumbs";
-import { DocMeta, TagList } from "@/components/content/doc-meta";
+import { DocMeta } from "@/components/content/doc-meta";
 import { DocPager, RelatedDocs } from "@/components/content/doc-navigation";
+import { JsonLd } from "@/components/content/json-ld";
+import { TaxonomyLinks } from "@/components/content/taxonomy-links";
 import { TableOfContents } from "@/components/content/table-of-contents";
 import { Container } from "@/components/layout/container";
 import { Faq } from "@/components/mdx/faq-block";
@@ -11,7 +13,7 @@ import {
   breadcrumbJsonLd,
   faqJsonLd,
 } from "@/lib/content/seo";
-import { getRelated, getSiblings } from "@/lib/content/source";
+import { getRelated, getSiblings, slugify } from "@/lib/content/source";
 import type { Doc } from "@/lib/content/types";
 
 /**
@@ -31,21 +33,11 @@ export async function DocPage({ doc }: { doc: Doc }) {
     { name: doc.frontmatter.title, path: doc.href },
   ];
 
-  const schemas = [
-    articleJsonLd(doc),
-    breadcrumbJsonLd(trail),
-    faqJsonLd(faq),
-  ].filter(Boolean);
-
   return (
     <>
-      {schemas.map((schema, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
+      <JsonLd
+        schemas={[articleJsonLd(doc), breadcrumbJsonLd(trail), faqJsonLd(faq)]}
+      />
 
       <article className="py-14 sm:py-20">
         <Container>
@@ -71,7 +63,12 @@ export async function DocPage({ doc }: { doc: Doc }) {
 
               {doc.frontmatter.tags?.length ? (
                 <div className="mt-14 border-t border-border pt-8">
-                  <TagList tags={doc.frontmatter.tags} />
+                  <TaxonomyLinks
+                    items={doc.frontmatter.tags.map((tag) => ({
+                      label: tag,
+                      href: `/tags/${slugify(tag)}`,
+                    }))}
+                  />
                 </div>
               ) : null}
 

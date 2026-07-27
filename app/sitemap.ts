@@ -1,12 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { collectionList } from "@/lib/content/collections";
-import {
-  getCategories,
-  getDocs,
-  getTags,
-  slugify,
-} from "@/lib/content/source";
+import { getCategories, getDocs, getTags } from "@/lib/content/source";
 import { site } from "@/lib/site";
 
 /**
@@ -41,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (collection.categoryPages) {
       for (const category of getCategories(collection.id)) {
         entries.push({
-          url: `${site.url}${collection.basePath}/category/${slugify(category.name)}`,
+          url: `${site.url}${collection.basePath}/category/${category.slug}`,
           changeFrequency: "monthly",
           priority: 0.5,
         });
@@ -51,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   for (const tag of getTags()) {
     entries.push({
-      url: `${site.url}/tags/${slugify(tag.name)}`,
+      url: `${site.url}/tags/${tag.slug}`,
       changeFrequency: "monthly",
       priority: 0.4,
     });

@@ -19,17 +19,16 @@ npm run lint     # eslint
 app/                  routes — thin files that delegate to the engine
 ├── layout.tsx        html shell, fonts, metadata, header/footer
 ├── page.tsx          homepage
-├── decision/ blog/ guides/ reports/   generated from /content
+├── decision/ blog/ guides/           generated from /content
 ├── tags/[tag]/       global tag pages
 ├── feed.xml/         RSS
 ├── sitemap.ts        generated from the content tree
 └── robots.ts
 
 content/              every page except the homepage — see content/README.md
-├── decisions/  →  /decision/{slug}
-├── blog/       →  /blog/{slug}
-├── guides/     →  /guides/{slug}
-└── reports/    →  /reports/{slug}
+├── decisions/  →  /decision/{slug}   commercial pages
+├── blog/       →  /blog/{slug}       informational supply
+└── guides/     →  /guides/{slug}
 
 lib/content/          the engine
 ├── types.ts          the Doc contract

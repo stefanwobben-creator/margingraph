@@ -67,6 +67,14 @@ function requireDate(value: unknown, field: string, file: string): string {
   return date;
 }
 
+function requireOptionalPrice(value: unknown, file: string): number | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    throw new ContentError(file, `"price" must be a non-negative number`);
+  }
+  return value;
+}
+
 export function parseFrontmatter(raw: unknown, file: string): Frontmatter {
   if (typeof raw !== "object" || raw === null) {
     throw new ContentError(file, "frontmatter block is missing");
@@ -117,6 +125,7 @@ export function parseFrontmatter(raw: unknown, file: string): Frontmatter {
         : requireString(data.canonical, "canonical", file),
     draft: data.draft === undefined ? undefined : Boolean(data.draft),
     featured: data.featured === undefined ? undefined : Boolean(data.featured),
+    price: requireOptionalPrice(data.price, file),
     faq: faq as Frontmatter["faq"],
     related: optionalStringArray(data.related, "related", file),
   };

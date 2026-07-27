@@ -6,21 +6,36 @@ import matter from "gray-matter";
 import { collections, docHref } from "@/lib/content/collections";
 import { ContentError, parseFrontmatter } from "@/lib/content/schema";
 import { extractHeadings } from "@/lib/content/toc";
-import type {
-  CollectionId,
-  Doc,
-  DocSummary,
-} from "@/lib/content/types";
+import type { CollectionId, Doc, DocSummary } from "@/lib/content/types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const WORDS_PER_MINUTE = 220;
 
 /**
- * Everything is read once per process and cached. At 5,000 documents this
- * matters: `generateStaticParams` and every page render would otherwise hit
- * the filesystem again.
+ * The content index.
+ *
+ * Built once per process. Everything that would otherwise be a scan — related
+ * documents, tag pages, category pages — is a map lookup instead.
+ *
+ * This matters at scale: naive `filter` over all documents inside a function
+ * called once per page is O(n²). At 5,000 documents that is 25 million
+ * comparisons per build. With the maps below it is linear.
  */
-let cache: Map<CollectionId, Doc[]> | null = null;
+type Index = {
+  byCollection: Map<CollectionId, Doc[]>;
+  bySlug: Map<string, Doc>;
+  all: Doc[];
+  byTag: Map<string, Doc[]>;
+  tagNames: Map<string, string>;
+  byCategory: Map<string, Doc[]>;
+  categoryNames: Map<string, string>;
+  /** Position of each doc inside its collection, for previous/next. */
+  position: Map<string, number>;
+};
+
+let index: Index | null = null;
+
+const key = (collection: CollectionId, slug: string) => `${collection}/${slug}`;
 
 function slugFromFilename(file: string): string {
   return file.replace(/\.mdx?$/, "");
@@ -34,41 +49,52 @@ function countWords(body: string): number {
     .filter(Boolean).length;
 }
 
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function readCollection(id: CollectionId): Doc[] {
   const dir = path.join(CONTENT_DIR, collections[id].dir);
   if (!fs.existsSync(dir)) return [];
 
-  const files = fs
+  const docs = fs
     .readdirSync(dir)
-    .filter((file) => file.endsWith(".mdx") || file.endsWith(".md"));
+    .filter((file) => file.endsWith(".mdx") || file.endsWith(".md"))
+    .map((file) => {
+      const raw = fs.readFileSync(path.join(dir, file), "utf8");
+      const { data, content } = matter(raw);
+      const relative = `content/${id}/${file}`;
+      const frontmatter = parseFrontmatter(data, relative);
+      const slug = frontmatter.slug ?? slugFromFilename(file);
 
-  const docs = files.map((file) => {
-    const raw = fs.readFileSync(path.join(dir, file), "utf8");
-    const { data, content } = matter(raw);
-    const relative = `content/${id}/${file}`;
-    const frontmatter = parseFrontmatter(data, relative);
-    const slug = frontmatter.slug ?? slugFromFilename(file);
+      if (!/^[a-z0-9-]+$/.test(slug)) {
+        throw new ContentError(
+          relative,
+          `slug "${slug}" must be lowercase letters, numbers and hyphens only`,
+        );
+      }
 
-    if (!/^[a-z0-9-]+$/.test(slug)) {
-      throw new ContentError(
-        relative,
-        `slug "${slug}" must be lowercase letters, numbers and hyphens only`,
-      );
-    }
+      const wordCount = countWords(content);
 
-    const wordCount = countWords(content);
-
-    return {
-      collection: id,
-      slug,
-      href: docHref(id, slug),
-      frontmatter,
-      body: content,
-      headings: extractHeadings(content),
-      wordCount,
-      readingMinutes: Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
-    } satisfies Doc;
-  });
+      return {
+        collection: id,
+        slug,
+        href: docHref(id, slug),
+        frontmatter,
+        body: content,
+        headings: extractHeadings(content),
+        wordCount,
+        readingMinutes: Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
+      } satisfies Doc;
+    })
+    // Drafts never exist beyond this point — not in listings, routes, feeds or
+    // preview deployments.
+    .filter((doc) => doc.frontmatter.draft !== true);
 
   const seen = new Set<string>();
   for (const doc of docs) {
@@ -81,37 +107,83 @@ function readCollection(id: CollectionId): Doc[] {
     seen.add(doc.slug);
   }
 
-  // Newest first. Ties broken by slug so ordering is deterministic.
+  // Newest first. Ties broken by slug so ordering is deterministic across builds.
   return docs.sort((a, b) => {
     const diff = b.frontmatter.date.localeCompare(a.frontmatter.date);
     return diff !== 0 ? diff : a.slug.localeCompare(b.slug);
   });
 }
 
-function load(): Map<CollectionId, Doc[]> {
-  if (cache) return cache;
-  cache = new Map();
+function build(): Index {
+  const byCollection = new Map<CollectionId, Doc[]>();
+  const bySlug = new Map<string, Doc>();
+  const byTag = new Map<string, Doc[]>();
+  const tagNames = new Map<string, string>();
+  const byCategory = new Map<string, Doc[]>();
+  const categoryNames = new Map<string, string>();
+  const position = new Map<string, number>();
+  const all: Doc[] = [];
+
   for (const id of Object.keys(collections) as CollectionId[]) {
-    cache.set(id, readCollection(id));
+    const docs = readCollection(id);
+    byCollection.set(id, docs);
+
+    docs.forEach((doc, order) => {
+      all.push(doc);
+      bySlug.set(key(doc.collection, doc.slug), doc);
+      position.set(key(doc.collection, doc.slug), order);
+
+      for (const tag of doc.frontmatter.tags ?? []) {
+        const tagSlug = slugify(tag);
+        if (!tagSlug) continue;
+        tagNames.set(tagSlug, tag);
+        const bucket = byTag.get(tagSlug);
+        if (bucket) bucket.push(doc);
+        else byTag.set(tagSlug, [doc]);
+      }
+
+      const category = doc.frontmatter.category;
+      if (category) {
+        const categoryKey = `${doc.collection}/${slugify(category)}`;
+        categoryNames.set(categoryKey, category);
+        const bucket = byCategory.get(categoryKey);
+        if (bucket) bucket.push(doc);
+        else byCategory.set(categoryKey, [doc]);
+      }
+    });
   }
-  return cache;
+
+  return {
+    byCollection,
+    bySlug,
+    all,
+    byTag,
+    tagNames,
+    byCategory,
+    categoryNames,
+    position,
+  };
 }
 
-/** Drafts are excluded from every listing and every route, in every environment. */
-function isPublished(doc: Doc): boolean {
-  return doc.frontmatter.draft !== true;
+function getIndex(): Index {
+  if (!index) index = build();
+  return index;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Reads                                                                       */
+/* -------------------------------------------------------------------------- */
 
 export function getDocs(id: CollectionId): Doc[] {
-  return load().get(id)!.filter(isPublished);
+  return getIndex().byCollection.get(id) ?? [];
 }
 
 export function getAllDocs(): Doc[] {
-  return [...load().values()].flat().filter(isPublished);
+  return getIndex().all;
 }
 
 export function getDoc(id: CollectionId, slug: string): Doc | undefined {
-  return getDocs(id).find((doc) => doc.slug === slug);
+  return getIndex().bySlug.get(key(id, slug));
 }
 
 export function toSummary(doc: Doc): DocSummary {
@@ -127,6 +199,7 @@ export function toSummary(doc: Doc): DocSummary {
     category: doc.frontmatter.category,
     tags: doc.frontmatter.tags ?? [],
     featured: doc.frontmatter.featured === true,
+    price: doc.frontmatter.price,
   };
 }
 
@@ -135,52 +208,51 @@ export function getSummaries(id: CollectionId): DocSummary[] {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Taxonomy                                                                    */
+/* Taxonomy — all map lookups, no scans                                        */
 /* -------------------------------------------------------------------------- */
 
-export function getCategories(id: CollectionId): { name: string; count: number }[] {
-  const counts = new Map<string, number>();
-  for (const doc of getDocs(id)) {
-    const category = doc.frontmatter.category;
-    if (!category) continue;
-    counts.set(category, (counts.get(category) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .map(([name, count]) => ({ name, count }))
+export function getCategories(
+  id: CollectionId,
+): { name: string; slug: string; count: number }[] {
+  const { byCategory, categoryNames } = getIndex();
+  const prefix = `${id}/`;
+
+  return [...byCategory.entries()]
+    .filter(([categoryKey]) => categoryKey.startsWith(prefix))
+    .map(([categoryKey, docs]) => ({
+      name: categoryNames.get(categoryKey)!,
+      slug: categoryKey.slice(prefix.length),
+      count: docs.length,
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function getDocsByCategory(id: CollectionId, category: string): Doc[] {
-  return getDocs(id).filter(
-    (doc) => slugify(doc.frontmatter.category ?? "") === category,
-  );
+  return getIndex().byCategory.get(`${id}/${category}`) ?? [];
 }
 
-export function getTags(): { name: string; count: number }[] {
-  const counts = new Map<string, number>();
-  for (const doc of getAllDocs()) {
-    for (const tag of doc.frontmatter.tags ?? []) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1);
-    }
-  }
-  return [...counts.entries()]
-    .map(([name, count]) => ({ name, count }))
+export function getCategoryName(id: CollectionId, category: string): string {
+  return getIndex().categoryNames.get(`${id}/${category}`) ?? category;
+}
+
+export function getTags(): { name: string; slug: string; count: number }[] {
+  const { byTag, tagNames } = getIndex();
+
+  return [...byTag.entries()]
+    .map(([slug, docs]) => ({
+      name: tagNames.get(slug)!,
+      slug,
+      count: docs.length,
+    }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
 
 export function getDocsByTag(tag: string): Doc[] {
-  return getAllDocs().filter((doc) =>
-    (doc.frontmatter.tags ?? []).some((item) => slugify(item) === tag),
-  );
+  return getIndex().byTag.get(tag) ?? [];
 }
 
-export function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+export function getTagName(tag: string): string {
+  return getIndex().tagNames.get(tag) ?? tag;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -193,68 +265,87 @@ export function getSiblings(doc: Doc): {
   next?: DocSummary;
 } {
   const docs = getDocs(doc.collection);
-  const index = docs.findIndex((item) => item.slug === doc.slug);
+  const order = getIndex().position.get(key(doc.collection, doc.slug));
+  if (order === undefined) return {};
+
   return {
-    // The list is newest-first, so "next" is the newer neighbour.
-    next: index > 0 ? toSummary(docs[index - 1]) : undefined,
+    // The list is newest-first, so the earlier index is the newer neighbour.
+    next: order > 0 ? toSummary(docs[order - 1]) : undefined,
     previous:
-      index >= 0 && index < docs.length - 1
-        ? toSummary(docs[index + 1])
-        : undefined,
+      order < docs.length - 1 ? toSummary(docs[order + 1]) : undefined,
   };
 }
 
 /**
- * Explicit `related` entries first, then filled up automatically by shared
- * tags and category. Explicit always wins, so an author can override.
+ * Explicit `related` entries first, then filled up from documents that share a
+ * tag or category. Candidates come from the tag and category maps rather than
+ * from a scan of every document.
  */
 export function getRelated(doc: Doc, limit = 3): DocSummary[] {
-  const all = getAllDocs().filter(
-    (item) => !(item.collection === doc.collection && item.slug === doc.slug),
-  );
-  const picked: Doc[] = [];
+  const self = key(doc.collection, doc.slug);
+  const picked = new Map<string, Doc>();
 
   for (const reference of doc.frontmatter.related ?? []) {
-    const [maybeCollection, maybeSlug] = reference.includes("/")
-      ? reference.split("/")
-      : [undefined, reference];
-    const match = all.find(
-      (item) =>
-        item.slug === maybeSlug &&
-        (maybeCollection === undefined ||
-          item.collection === maybeCollection ||
-          collections[item.collection].basePath === `/${maybeCollection}`),
-    );
-    if (match && !picked.includes(match)) picked.push(match);
+    const match = resolveReference(reference);
+    if (match && key(match.collection, match.slug) !== self) {
+      picked.set(key(match.collection, match.slug), match);
+    }
+    if (picked.size >= limit) break;
   }
 
-  if (picked.length < limit) {
-    const tags = new Set(doc.frontmatter.tags ?? []);
-    const scored = all
-      .filter((item) => !picked.includes(item))
-      .map((item) => {
-        const shared = (item.frontmatter.tags ?? []).filter((tag) =>
-          tags.has(tag),
-        ).length;
-        const sameCategory =
-          doc.frontmatter.category &&
-          item.frontmatter.category === doc.frontmatter.category
-            ? 1
-            : 0;
-        return { item, score: shared * 2 + sameCategory };
-      })
-      .filter((entry) => entry.score > 0)
-      .sort(
-        (a, b) =>
-          b.score - a.score ||
-          b.item.frontmatter.date.localeCompare(a.item.frontmatter.date),
-      );
+  if (picked.size < limit) {
+    const scores = new Map<string, { doc: Doc; score: number }>();
 
-    for (const entry of scored) {
-      if (picked.length >= limit) break;
-      picked.push(entry.item);
+    const consider = (candidate: Doc, weight: number) => {
+      const candidateKey = key(candidate.collection, candidate.slug);
+      if (candidateKey === self || picked.has(candidateKey)) return;
+      const existing = scores.get(candidateKey);
+      if (existing) existing.score += weight;
+      else scores.set(candidateKey, { doc: candidate, score: weight });
+    };
+
+    for (const tag of doc.frontmatter.tags ?? []) {
+      for (const candidate of getDocsByTag(slugify(tag))) consider(candidate, 2);
+    }
+    if (doc.frontmatter.category) {
+      for (const candidate of getDocsByCategory(
+        doc.collection,
+        slugify(doc.frontmatter.category),
+      )) {
+        consider(candidate, 1);
+      }
+    }
+
+    const ranked = [...scores.values()].sort(
+      (a, b) =>
+        b.score - a.score ||
+        b.doc.frontmatter.date.localeCompare(a.doc.frontmatter.date),
+    );
+
+    for (const entry of ranked) {
+      if (picked.size >= limit) break;
+      picked.set(key(entry.doc.collection, entry.doc.slug), entry.doc);
     }
   }
 
-  return picked.slice(0, limit).map(toSummary);
+  return [...picked.values()].slice(0, limit).map(toSummary);
+}
+
+/** Resolves `collection/slug`, `basePath/slug` or a bare `slug`. */
+function resolveReference(reference: string): Doc | undefined {
+  const { bySlug, all } = getIndex();
+
+  if (reference.includes("/")) {
+    const [prefix, slug] = reference.split("/");
+    const direct = bySlug.get(`${prefix}/${slug}`);
+    if (direct) return direct;
+
+    const collection = Object.values(collections).find(
+      (item) => item.basePath === `/${prefix}`,
+    );
+    if (collection) return bySlug.get(`${collection.id}/${slug}`);
+    return undefined;
+  }
+
+  return all.find((doc) => doc.slug === reference);
 }

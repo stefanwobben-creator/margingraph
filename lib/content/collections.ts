@@ -73,19 +73,6 @@ export const collections: Record<CollectionId, Collection> = {
     inFeed: true,
     order: 3,
   },
-  reports: {
-    id: "reports",
-    dir: "reports",
-    basePath: "/reports",
-    label: "Reports",
-    labelSingular: "Report",
-    title: "Reports",
-    description: "The report catalogue.",
-    schemaType: "WebPage",
-    categoryPages: false,
-    inFeed: false,
-    order: 4,
-  },
 };
 
 export const collectionList = Object.values(collections).sort(

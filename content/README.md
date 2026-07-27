@@ -7,8 +7,7 @@ page is adding a `.mdx` file. No code changes, no deploy configuration, no CMS.
 content/
 ├── decisions/   →  /decision/{slug}    the commercial pages
 ├── blog/        →  /blog/{slug}        the informational supply
-├── guides/      →  /guides/{slug}      long-form walkthroughs
-└── reports/     →  /reports/{slug}
+└── guides/      →  /guides/{slug}      long-form walkthroughs
 ```
 
 **Decision pages are the destination. Blog posts are the road to them.** A blog
@@ -25,6 +24,7 @@ slug: business-valuation                   # optional, defaults to the filename
 date: 2026-07-20                           # required, YYYY-MM-DD
 updated: 2026-07-27                        # optional — shown when it differs
 author: MarginGraph
+price: 9                                   # decisions only — shows the €9 card footer
 category: Exit                             # generates /category/{category}
 tags: [valuation, exit, EBITDA]            # generates /tags/{tag}
 image: /og/business-valuation.png          # OpenGraph image

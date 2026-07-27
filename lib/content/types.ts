@@ -6,7 +6,7 @@
  * other, or the build stops trusting the content.
  */
 
-export type CollectionId = "decisions" | "blog" | "reports" | "guides";
+export type CollectionId = "decisions" | "blog" | "guides";
 
 export type Frontmatter = {
   title: string;
@@ -26,6 +26,8 @@ export type Frontmatter = {
   canonical?: string;
   draft?: boolean;
   featured?: boolean;
+  /** Commercial pages only: price in whole euros. */
+  price?: number;
   faq?: { question: string; answer: string }[];
   /** Slugs of related docs, in `collection/slug` or bare `slug` form. */
   related?: string[];
@@ -63,4 +65,5 @@ export type DocSummary = Pick<
   category?: string;
   tags: string[];
   featured: boolean;
+  price?: number;
 };

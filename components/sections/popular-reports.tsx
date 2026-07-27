@@ -1,8 +1,15 @@
+import { DocCard } from "@/components/content/doc-card";
 import { Section, SectionHeader } from "@/components/layout/section";
-import { ReportCard } from "@/components/report-card";
-import { reports } from "@/lib/reports";
+import { getSummaries } from "@/lib/content/source";
 
+/**
+ * Reads straight from /content — publishing a decision page adds a card here.
+ * There is no second catalogue to keep in sync.
+ */
 export function PopularReports() {
+  const decisions = getSummaries("decisions");
+  if (!decisions.length) return null;
+
   return (
     <Section id="reports" bordered>
       <SectionHeader
@@ -12,8 +19,8 @@ export function PopularReports() {
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {reports.map((report) => (
-          <ReportCard key={report.slug} report={report} />
+        {decisions.map((decision) => (
+          <DocCard key={decision.slug} doc={decision} />
         ))}
       </div>
     </Section>
