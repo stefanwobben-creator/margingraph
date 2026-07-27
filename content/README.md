@@ -42,6 +42,14 @@ related:                                   # explicit first, then auto-filled
 Only `title`, `description` and `date` are required. **Bad frontmatter fails the
 build** — a missing description will not quietly ship.
 
+One YAML rule worth knowing before it costs you ten minutes: any value
+containing a colon followed by a space must be quoted, or YAML reads the rest
+of the line as a nested key.
+
+```yaml
+description: "Usually one of three things: the earnings figure, the multiple, or concentration."
+```
+
 ## What happens automatically
 
 Route · sitemap entry · RSS item · canonical · OpenGraph · Twitter card ·

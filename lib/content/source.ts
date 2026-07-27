@@ -67,8 +67,23 @@ function readCollection(id: CollectionId): Doc[] {
     .filter((file) => file.endsWith(".mdx") || file.endsWith(".md"))
     .map((file) => {
       const raw = fs.readFileSync(path.join(dir, file), "utf8");
-      const { data, content } = matter(raw);
       const relative = `content/${id}/${file}`;
+
+      // gray-matter throws a YAML error that does not name the file. At 5,000
+      // documents that is unusable, so re-throw with the path attached.
+      let data: unknown;
+      let content: string;
+      try {
+        const parsed = matter(raw);
+        data = parsed.data;
+        content = parsed.content;
+      } catch (error) {
+        throw new ContentError(
+          relative,
+          `${(error as Error).message}\n\nA value containing ": " must be quoted.`,
+        );
+      }
+
       const frontmatter = parseFrontmatter(data, relative);
       const slug = frontmatter.slug ?? slugFromFilename(file);
 

@@ -59,6 +59,20 @@ export const collections: Record<CollectionId, Collection> = {
     inFeed: true,
     order: 2,
   },
+  faq: {
+    id: "faq",
+    dir: "faq",
+    basePath: "/faq",
+    label: "FAQ",
+    labelSingular: "Answer",
+    title: "Questions about business value",
+    description:
+      "One question, one page, one answer. The things owners actually ask before they find out what their company is worth.",
+    schemaType: "WebPage",
+    categoryPages: true,
+    inFeed: false,
+    order: 3,
+  },
   guides: {
     id: "guides",
     dir: "guides",
@@ -71,7 +85,7 @@ export const collections: Record<CollectionId, Collection> = {
     schemaType: "TechArticle",
     categoryPages: true,
     inFeed: true,
-    order: 3,
+    order: 4,
   },
 };
 

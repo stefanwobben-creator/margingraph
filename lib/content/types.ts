@@ -6,10 +6,15 @@
  * other, or the build stops trusting the content.
  */
 
-export type CollectionId = "decisions" | "blog" | "guides";
+export type CollectionId = "decisions" | "blog" | "faq" | "guides";
 
 export type Frontmatter = {
   title: string;
+  /**
+   * Overrides the <title> tag only. Use where the H1 should stay a verbatim
+   * question but the search result needs to be shorter or more specific.
+   */
+  seoTitle?: string;
   description: string;
   /** Optional: defaults to the filename. Once published, never change it. */
   slug?: string;

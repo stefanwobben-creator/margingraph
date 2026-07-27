@@ -102,6 +102,12 @@ export function parseFrontmatter(raw: unknown, file: string): Frontmatter {
 
   return {
     title: requireString(data.title, "title", file, { maxLength: 120 }),
+    seoTitle:
+      data.seoTitle === undefined
+        ? undefined
+        // Google truncates around 60 characters; fail rather than ship a
+        // title that ends in an ellipsis.
+        : requireString(data.seoTitle, "seoTitle", file, { maxLength: 65 }),
     // Long descriptions get truncated in search results — fail early instead.
     description: requireString(data.description, "description", file, {
       maxLength: 200,

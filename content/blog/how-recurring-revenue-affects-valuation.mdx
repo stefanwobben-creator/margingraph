@@ -1,0 +1,93 @@
+---
+title: How recurring revenue affects valuation
+description: Why contracted revenue is worth two to three times what project revenue is worth, the four tiers buyers actually distinguish, and how to move revenue up a tier before you sell.
+date: 2026-08-02
+author: MarginGraph
+category: Valuation
+tags:
+  - valuation
+  - recurring revenue
+  - multiples
+related:
+  - decisions/business-valuation
+  - blog/revenue-multiple-explained
+  - blog/ebitda-multiple-explained
+faq:
+  - question: How much does recurring revenue increase valuation?
+    answer: Moving from mostly project revenue to mostly contracted revenue typically adds one to two turns to the multiple — on a business earning €500,000, roughly €500,000 to €1,000,000 of value. The effect is largest between 40% and 70% recurring.
+  - question: Does a monthly subscription count as recurring revenue?
+    answer: Only if renewal is the default rather than a decision. A month-to-month subscription a customer actively re-chooses is closer to repeat revenue; an annual contract with automatic renewal and a notice period is genuinely recurring.
+---
+
+Two businesses at €500,000 of EBITDA. One earns it from twelve-month contracts that renew automatically. The other from projects won one at a time. The first will sell for roughly double.
+
+Nothing about the earnings explains that. The difference is what a buyer believes about next year.
+
+## The four tiers buyers distinguish
+
+Owners tend to describe anything that happens more than once as recurring. Buyers grade it much more finely.
+
+<Comparison
+  columns={["Tier", "Definition", "Effect on multiple"]}
+  rows={[
+    ["Contracted", "Multi-year, notice period, automatic renewal", "Full premium"],
+    ["Recurring", "Renews by default, cancellable at will", "Most of the premium"],
+    ["Repeat", "Same customers return, no obligation", "Modest"],
+    ["Project", "Won individually, each time", "None"],
+  ]}
+/>
+
+The gap between *contracted* and *repeat* is where most of the value sits, and it is often a paperwork problem rather than a commercial one. Customers who have bought monthly for four years will frequently sign a twelve-month agreement if asked — and that single change moves revenue up two tiers.
+
+## Why the premium exists
+
+At 5× EBITDA a buyer pays five years of earnings for the risk that year six exists. Contracted revenue makes year six visible on a document. That is the entire mechanism, and it explains the shape of the effect:
+
+<Metrics
+  items={[
+    { label: "0–30% recurring", value: "no premium", note: "priced as a trading business" },
+    { label: "40–70% recurring", value: "+1 to 2 turns", note: "where the curve is steepest" },
+    { label: "Above 80% recurring", value: "revenue basis", note: "priced on ARR, not earnings" },
+  ]}
+/>
+
+The jump is not linear. Going from 20% to 40% moves the number little; going from 45% to 70% can move it a great deal, because that is the point at which the base covers the fixed cost of the business.
+
+## The two figures that decide the premium
+
+**Churn.** A 5% annual churn business and a 25% one are not in the same market, whatever their recurring percentages say. At 25%, the "recurring" base rebuilds itself every four years, which is a sales operation wearing subscription clothing.
+
+**Net revenue retention.** Whether the cohort you had last year is worth more or less this year. Above 100% — existing customers expanding faster than others leave — is the single strongest valuation signal a subscription business can present, and it is why software commands the multiples covered in [revenue multiple explained](/blog/revenue-multiple-explained).
+
+<Warning title="Recurring revenue with high churn is a treadmill">
+  Buyers calculate churn themselves from your customer list. Presenting a
+  recurring percentage without a churn figure invites them to assume the worst,
+  and their assumption is usually worse than the truth.
+</Warning>
+
+## Moving up a tier before you sell
+
+<Checklist
+  items={[
+    "Convert repeat customers to twelve-month agreements — most will sign if the price is unchanged",
+    "Add a notice period; thirty days of visibility is worth more than it costs",
+    "Move renewal from opt-in to opt-out where the law allows",
+    "Split maintenance and support out of project fees into a standing agreement",
+    "Start measuring churn monthly, a year before you sell, so you have a trend rather than a snapshot",
+  ]}
+/>
+
+Twelve months is enough to change the tier. It is not enough to change the churn rate, which is why the measurement should start earlier than the contract work.
+
+## What it does not fix
+
+Recurring revenue concentrated in three customers is still concentration. A contract is only as good as the counterparty's willingness to keep signing, and a buyer will ask when each one renews — hoping the answer is not *four months after completion*.
+
+[What buyers look for](/blog/what-buyers-look-for) covers how this is examined in practice.
+
+<Cta
+  title="See what your revenue mix is worth"
+  body="The report splits contracted, recurring, repeat and one-off revenue and shows what moving between tiers does to the range."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>

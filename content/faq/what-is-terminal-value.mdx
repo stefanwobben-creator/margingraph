@@ -1,0 +1,45 @@
+---
+title: What is terminal value?
+seoTitle: What is terminal value?
+description: Everything beyond the forecast horizon, compressed into one number. In an SME discounted cash flow it is usually 60 to 75 percent of the total valuation.
+date: 2026-08-15
+author: MarginGraph
+category: Methods
+tags:
+  - DCF
+  - valuation
+related:
+  - decisions/business-valuation
+  - blog/dcf-valuation-explained
+  - blog/how-to-value-a-business
+---
+The value of everything happening after your forecast ends, compressed into a single figure and discounted like any other year. In an SME discounted cash flow it routinely accounts for **60% to 75% of the total answer**.
+
+## Which means most of the model is decoration
+
+If three quarters of the valuation comes from one assumption about the years beyond your horizon, the five years you modelled carefully are less important than they feel. This is not a flaw in the method — it is the method being honest about where value in a going concern actually sits.
+
+## The two ways to calculate it
+
+<Comparison
+  columns={["Method", "Formula", "The trap"]}
+  rows={[
+    ["Perpetuity growth", "Final year cash ÷ (discount rate − growth)", "Growth above 2–3% assumes you outgrow the economy forever"],
+    ["Exit multiple", "Final year EBITDA × a multiple", "You have reintroduced the multiple you were avoiding"],
+  ]}
+/>
+
+Run both. If they differ by more than a third, one assumption is carrying too much weight and you should find out which before someone else does.
+
+## The sanity check
+
+Divide the terminal value by the final forecast year's EBITDA. If the implied multiple is well outside the normal range for a business of your size, the perpetuity growth rate is doing something unrealistic — usually assuming permanent growth above the rate of the wider economy.
+
+[DCF valuation explained](/blog/dcf-valuation-explained) has the worked figures; [how to value a business](/blog/how-to-value-a-business) covers when a DCF is worth building at all.
+
+<Cta
+  title="Find out what your business is worth"
+  body="Upload your P&L and balance sheet. Three methods, every assumption stated, in minutes."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>

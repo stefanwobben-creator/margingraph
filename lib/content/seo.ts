@@ -75,7 +75,7 @@ export function docMetadata(doc: Doc): Metadata {
   const collection = getCollection(doc.collection);
 
   return buildMetadata({
-    title: frontmatter.title,
+    title: frontmatter.seoTitle ?? frontmatter.title,
     description: frontmatter.description,
     path: doc.href,
     image: frontmatter.image,
