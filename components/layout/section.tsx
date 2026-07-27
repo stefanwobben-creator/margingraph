@@ -32,6 +32,11 @@ type SectionHeaderProps = {
   title: string;
   description?: string;
   className?: string;
+  /**
+   * Heading level. Listing pages must pass "h1" — a page whose only heading
+   * is an h2 has no document title for screen readers or for search.
+   */
+  as?: "h1" | "h2";
 };
 
 export function SectionHeader({
@@ -39,6 +44,7 @@ export function SectionHeader({
   title,
   description,
   className,
+  as: Heading = "h2",
 }: SectionHeaderProps) {
   return (
     <header className={cn("max-w-prose-page", className)}>
@@ -47,7 +53,7 @@ export function SectionHeader({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className={cn("text-title", eyebrow && "mt-3")}>{title}</h2>
+      <Heading className={cn("text-title", eyebrow && "mt-3")}>{title}</Heading>
       {description ? (
         <p className="mt-4 text-lead text-muted-foreground">{description}</p>
       ) : null}

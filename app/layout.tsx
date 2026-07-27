@@ -38,6 +38,13 @@ export const metadata: Metadata = {
     title: site.name,
     description: site.description,
   },
+  // Every page is public and indexable unless it opts out; taxonomy pages with
+  // too little content and error pages set their own robots directives.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
 };
 
 /**
@@ -53,8 +60,22 @@ export default function RootLayout({
   return (
     <html lang={site.locale} className={`${sans.variable} ${mono.variable}`}>
       <body className="flex min-h-dvh flex-col bg-background text-foreground antialiased">
+        {/*
+          Skip link: the header holds four links before the content on every
+          page, so keyboard and screen-reader users would otherwise tab
+          through them ninety-four times.
+        */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-md focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
+        >
+          Skip to content
+        </a>
+
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main id="main" className="flex-1">
+          {children}
+        </main>
         <SiteFooter />
       </body>
     </html>

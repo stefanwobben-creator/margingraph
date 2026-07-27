@@ -64,6 +64,7 @@ export function ListingPage({
           <Breadcrumbs trail={trail} />
           <div className="mt-10">
             <SectionHeader
+              as="h1"
               eyebrow={eyebrow}
               title={title}
               description={description}
@@ -176,6 +177,9 @@ export function createCollectionRoutes(id: CollectionId) {
       title: `${name} — ${collection.label}`,
       description: `Every ${collection.labelSingular.toLowerCase()} on ${name}. ${docs.length} published.`,
       path: `${collection.basePath}/category/${category}`,
+      // A taxonomy page listing one document is a duplicate of that document.
+      // Still crawlable, so the internal link works — just not indexed.
+      noIndex: docs.length < 2,
     });
   }
 

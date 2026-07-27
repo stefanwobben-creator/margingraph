@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: name,
     description: `Everything tagged ${name} — ${docs.length} ${docs.length === 1 ? "page" : "pages"} across decisions, guides and articles.`,
     path: `/tags/${tag}`,
+    noIndex: docs.length < 2,
   });
 }
 
@@ -33,6 +34,7 @@ export default async function TagPage({ params }: Params) {
   if (!docs.length) notFound();
 
   const name = getTagName(tag);
+  const display = name.charAt(0).toUpperCase() + name.slice(1);
 
   return (
     <ListingPage
@@ -41,7 +43,7 @@ export default async function TagPage({ params }: Params) {
         { name, path: `/tags/${tag}` },
       ]}
       eyebrow="Tag"
-      title={name}
+      title={display}
       description={`${docs.length} ${docs.length === 1 ? "page" : "pages"} across every collection.`}
       docs={docs.map(toSummary)}
       showCollection
