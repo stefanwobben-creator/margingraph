@@ -29,13 +29,10 @@ Once written, add them as `.mdx` files and link them from the footer.
 ### 2. Domain and environment
 
 - [ ] Point the domain at Vercel and confirm the certificate issues.
-- [ ] `public/robots.txt` hardcodes `https://margingraph.com/sitemap.xml`. If the
-      production domain is anything else, edit that line — preview deployments
-      will point crawlers at production, which is the correct behaviour and
-      worth knowing.
 - [ ] Set **`NEXT_PUBLIC_SITE_URL`** to the production origin, with no trailing
-      slash. Without it, canonicals, the sitemap, RSS and every absolute URL in
-      structured data fall back to the Vercel preview domain.
+      slash. Without it, canonicals, the sitemap, RSS, robots.txt and every
+      absolute URL in structured data fall back to the Vercel preview domain.
+      It is now the only place the domain is written down.
 - [ ] Decide www or apex, and redirect the other permanently. Two origins
       serving identical content splits ranking signals.
 
@@ -69,8 +66,11 @@ Once written, add them as `.mdx` files and link them from the footer.
       indexed automatically once they do not.
 - [ ] Set up an uptime check. The site is static, so the realistic failure is a
       bad deploy rather than an outage.
-- [ ] Consider `generateSitemaps` sharding if the page count passes ~10,000.
-      At 96 pages this is years away.
+- [ ] `generateSitemaps` sharding once the sitemap passes 50,000 URLs. The
+      build throws before that point rather than shipping an oversized file, so
+      this cannot be missed silently.
+- [ ] `llms.txt` is a proposed convention, not a standard. Check once a year
+      whether it is still worth serving; nothing depends on it.
 
 ## Deployment settings for Vercel
 

@@ -19,6 +19,18 @@ function resolveUrl(): string {
   return "http://localhost:3000";
 }
 
+/**
+ * True only on a real production deploy.
+ *
+ * Vercel sets VERCEL_ENV on every deployment; when it is present it is
+ * authoritative. Outside Vercel we fall back to NODE_ENV so a self-hosted
+ * production build still behaves correctly.
+ */
+export const isProduction =
+  process.env.VERCEL_ENV !== undefined
+    ? process.env.VERCEL_ENV === "production"
+    : process.env.NODE_ENV === "production";
+
 export const site = {
   name: "MarginGraph",
   tagline: "Business decisions, with the evidence attached.",
