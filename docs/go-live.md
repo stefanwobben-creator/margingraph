@@ -54,8 +54,15 @@ Once written, add them as `.mdx` files and link them from the footer.
       avoids needing a consent banner; anything else means a cookie statement
       and a banner, and the CSP in `next.config.ts` must be updated to allow the
       script origin or it will be silently blocked.
-- [ ] Replace the generated letter-mark favicon (`app/icon.tsx`) if a real
-      identity exists.
+- [ ] Replace the generated letter-mark favicon (`app/icon.tsx` and
+      `app/apple-icon.tsx`) if a real identity exists. The apple-icon is also
+      what the Organization schema declares as the company logo, so a real mark
+      improves both the browser tab and the knowledge panel.
+- [ ] Add `sameAs` to the Organization schema once verified profiles exist
+      (LinkedIn, X, Crunchbase). It is deliberately absent rather than guessed —
+      pointing at a profile you do not control is worse than omitting it.
+- [ ] Add `address` and `contactPoint` to the Organization schema when the
+      imprint is written. The same KvK and address details serve both.
 
 ## Worth doing in the first month
 

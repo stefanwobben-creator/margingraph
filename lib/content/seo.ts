@@ -93,6 +93,65 @@ export function docMetadata(doc: Doc): Metadata {
 
 export type JsonLd = Record<string, unknown>;
 
+/**
+ * Stable @id values for the two site-wide nodes.
+ *
+ * Every page-level schema references these rather than repeating the
+ * publisher inline, so the graph has one Organization node and one WebSite
+ * node no matter how many thousands of pages exist.
+ */
+export const ORGANIZATION_ID = `${site.url}/#organization`;
+export const WEBSITE_ID = `${site.url}/#website`;
+
+/**
+ * Emitted on the homepage only. Google's guidance for both Organization and
+ * for the site name feature is to place the markup on the most representative
+ * page — repeating it on every page adds bytes and no signal.
+ *
+ * Deliberately absent: aggregateRating and review (there are none), sameAs
+ * (no verified profiles yet), address and contactPoint (no published details
+ * yet). Unsupported or invented properties are worse than missing ones.
+ */
+export function organizationJsonLd(): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": ORGANIZATION_ID,
+    name: site.name,
+    url: site.url,
+    description: site.description,
+    logo: {
+      "@type": "ImageObject",
+      // Google requires a logo of at least 112x112. This is the site's actual
+      // mark, generated in app/apple-icon.tsx.
+      url: `${site.url}/apple-icon`,
+      width: 180,
+      height: 180,
+    },
+  };
+}
+
+/**
+ * Establishes the site name Google shows in results.
+ *
+ * No `potentialAction: SearchAction` — the sitelinks search box it powered was
+ * retired, and this site has no search endpoint for it to point at. Markup for
+ * a feature that no longer exists, aimed at a route that does not exist, is
+ * two problems rather than an optimisation.
+ */
+export function websiteJsonLd(): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    name: site.name,
+    url: site.url,
+    description: site.description,
+    inLanguage: site.locale,
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
 export function breadcrumbJsonLd(
   trail: { name: string; path: string }[],
 ): JsonLd {
@@ -125,11 +184,8 @@ export function articleJsonLd(doc: Doc): JsonLd {
     ...(frontmatter.author
       ? { author: { "@type": "Person", name: frontmatter.author } }
       : {}),
-    publisher: {
-      "@type": "Organization",
-      name: site.name,
-      url: site.url,
-    },
+    publisher: { "@id": ORGANIZATION_ID },
+    isPartOf: { "@id": WEBSITE_ID },
     mainEntityOfPage: { "@type": "WebPage", "@id": absolute(doc.href) },
     ...(frontmatter.tags?.length ? { keywords: frontmatter.tags.join(", ") } : {}),
     wordCount: doc.wordCount,
