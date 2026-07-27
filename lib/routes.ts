@@ -6,12 +6,12 @@
  * change the value here and every link in the app follows.
  */
 export const routes = {
-  reports: "#reports",
+  reports: "/decision",
   exampleReport: "#example-report",
-  guides: "#guides",
+  guides: "/blog",
   howItWorks: "#how-it-works",
   /** Per-report route. Only valid for reports with `hasPage: true`. */
-  report: (slug: string) => `/reports/${slug}`,
-  /** Per-guide route. Becomes `/guides/${slug}`. */
-  guide: (slug: string) => `#guides-${slug}`,
+  report: (slug: string) => `/decision/${slug}`,
+  /** Per-article route. */
+  guide: (slug: string) => `/blog/${slug}`,
 } as const;

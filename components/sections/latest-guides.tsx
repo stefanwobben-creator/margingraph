@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { GuideCard } from "@/components/guide-card";
+import { DocCard } from "@/components/content/doc-card";
 import { Section, SectionHeader } from "@/components/layout/section";
-import { guides } from "@/lib/guides";
+import { getSummaries } from "@/lib/content/source";
 import { routes } from "@/lib/routes";
 
+/** Reads straight from /content — publishing a post updates the homepage. */
 export function LatestGuides() {
+  const posts = getSummaries("blog").slice(0, 3);
+  if (!posts.length) return null;
+
   return (
     <Section id="guides" bordered>
       <div className="flex flex-wrap items-end justify-between gap-6">
@@ -22,8 +26,8 @@ export function LatestGuides() {
       </div>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {guides.slice(0, 3).map((guide) => (
-          <GuideCard key={guide.slug} guide={guide} />
+        {posts.map((post) => (
+          <DocCard key={post.slug} doc={post} />
         ))}
       </div>
     </Section>

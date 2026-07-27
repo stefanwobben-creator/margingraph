@@ -16,29 +16,54 @@ npm run lint     # eslint
 ## Structure
 
 ```
-app/                  routes and root layout
+app/                  routes — thin files that delegate to the engine
 ├── layout.tsx        html shell, fonts, metadata, header/footer
-├── globals.css       tailwind + shadcn tokens (entry point)
-└── page.tsx          placeholder, replace with the first real page
+├── page.tsx          homepage
+├── decision/ blog/ guides/ reports/   generated from /content
+├── tags/[tag]/       global tag pages
+├── feed.xml/         RSS
+├── sitemap.ts        generated from the content tree
+└── robots.ts
+
+content/              every page except the homepage — see content/README.md
+├── decisions/  →  /decision/{slug}
+├── blog/       →  /blog/{slug}
+├── guides/     →  /guides/{slug}
+└── reports/    →  /reports/{slug}
+
+lib/content/          the engine
+├── types.ts          the Doc contract
+├── collections.ts    registry — add a content type here
+├── schema.ts         frontmatter validation (fails the build)
+├── source.ts         filesystem read, cache, taxonomy, relations
+├── mdx.tsx           MDX compilation
+├── toc.ts            heading extraction
+├── seo.ts            metadata + JSON-LD, used by every route
+└── routes.tsx        route factory — index, detail and category pages
 
 components/
-├── layout/           container, site header, site footer
-└── ui/               shadcn/ui primitives (generated — edit with care)
-
-content/
-├── articles/         long-form pages (file-based)
-└── decisions/        entity pages (file-based)
-
-lib/
-├── site.ts           site-level constants, used by metadata
-└── utils.ts          cn() helper
+├── content/          document layout: header, TOC, pager, related, cards
+├── mdx/              components authors may use inside .mdx
+├── layout/           container, section, header, footer
+├── sections/         homepage sections
+└── ui/               shadcn/ui primitives
 
 styles/
-└── theme.css         design tokens: measure, accent, type scale
-
-public/               static assets
-docs/                 strategy documentation (not shipped)
+├── theme.css         design tokens
+└── prose.css         markdown typography
 ```
+
+## Publishing
+
+Add a `.mdx` file to `content/`. That is the whole workflow — routes, sitemap,
+RSS, canonical, OpenGraph, JSON-LD, reading time, table of contents,
+previous/next, related articles and tag pages all follow from the file.
+
+See [`content/README.md`](content/README.md) for the frontmatter contract and
+the components available inside MDX.
+
+Adding a new *content type* is one entry in `lib/content/collections.ts` plus
+three route files that re-export `createCollectionRoutes(...)`.
 
 ## Design system
 
