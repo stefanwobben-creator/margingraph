@@ -29,6 +29,10 @@ Once written, add them as `.mdx` files and link them from the footer.
 ### 2. Domain and environment
 
 - [ ] Point the domain at Vercel and confirm the certificate issues.
+- [ ] `public/robots.txt` hardcodes `https://margingraph.com/sitemap.xml`. If the
+      production domain is anything else, edit that line — preview deployments
+      will point crawlers at production, which is the correct behaviour and
+      worth knowing.
 - [ ] Set **`NEXT_PUBLIC_SITE_URL`** to the production origin, with no trailing
       slash. Without it, canonicals, the sitemap, RSS and every absolute URL in
       structured data fall back to the Vercel preview domain.
