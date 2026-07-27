@@ -30,6 +30,7 @@ one of the two is a bug — resolve it explicitly, do not let them drift.
 | Intelligence | [`03-intelligence/`](03-intelligence/) | How AI turns raw sources into graph, and graph into answers |
 | Platform | [`04-platform/`](04-platform/) | How it is stored, served, secured and shown |
 | Growth | [`05-growth/`](05-growth/) | How the world finds us |
+| Architecture | [`architecture/`](architecture/) | How the report platform is put together |
 | Decisions | [`decisions/`](decisions/) | Why things changed |
 
 ### Documents
@@ -61,6 +62,9 @@ one of the two is a bug — resolve it explicitly, do not let them drift.
 - [API](04-platform/api.md)
 - [UI](04-platform/ui.md)
 - [Security](04-platform/security.md)
+
+**Architecture**
+- [Report platform](architecture/report-platform.md) — the engine that produces every report
 
 **05 · Growth**
 - [SEO](05-growth/seo.md)
