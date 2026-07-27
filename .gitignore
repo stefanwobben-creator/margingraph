@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the example must be tracked: it documents the one variable a
+# deployment needs, and it contains no values.
+!.env.example
 
 # vercel
 .vercel
