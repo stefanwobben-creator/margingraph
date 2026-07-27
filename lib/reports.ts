@@ -11,6 +11,11 @@ export type Report = {
   description: string;
   /** Price in whole euros. */
   price: number;
+  /**
+   * True once /reports/{slug} exists. Cards for reports without a page fall
+   * back to an anchor so the homepage never links to a 404.
+   */
+  hasPage?: boolean;
 };
 
 export const reports: Report[] = [
@@ -20,6 +25,7 @@ export const reports: Report[] = [
     description:
       "What your company is worth across three standard methods, with the assumptions behind every number written out.",
     price: 9,
+    hasPage: true,
   },
   {
     slug: "cash-runway",

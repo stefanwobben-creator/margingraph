@@ -10,8 +10,8 @@ export const routes = {
   exampleReport: "#example-report",
   guides: "#guides",
   howItWorks: "#how-it-works",
-  /** Per-report route. Becomes `/reports/${slug}` once those pages exist. */
-  report: (slug: string) => `#reports-${slug}`,
+  /** Per-report route. Only valid for reports with `hasPage: true`. */
+  report: (slug: string) => `/reports/${slug}`,
   /** Per-guide route. Becomes `/guides/${slug}`. */
   guide: (slug: string) => `#guides-${slug}`,
 } as const;

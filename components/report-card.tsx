@@ -14,7 +14,7 @@ export function ReportCard({ report }: { report: Report }) {
     <Card className="group relative gap-0 p-6 transition-colors hover:border-foreground/20">
       <h3 className="text-base font-medium">
         <Link
-          href={routes.report(report.slug)}
+          href={report.hasPage ? routes.report(report.slug) : routes.reports}
           className="after:absolute after:inset-0 focus-visible:outline-none"
         >
           {report.title}
