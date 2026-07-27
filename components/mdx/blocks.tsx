@@ -1,7 +1,7 @@
-import Link from "next/link";
 import NextImage from "next/image";
 import { Check, Minus, Plus, X } from "lucide-react";
 
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -172,11 +172,16 @@ export function Cta({
   body,
   href,
   label,
+  reportSlug,
+  location = "content",
 }: {
   title: string;
   body?: string;
   href: string;
   label: string;
+  /** Defaults to the slug in `href` when it points at a decision page. */
+  reportSlug?: string;
+  location?: string;
 }) {
   return (
     <Card className="my-12 gap-0 p-8 not-prose">
@@ -184,7 +189,9 @@ export function Cta({
       {body ? <p className="mt-3 text-muted-foreground">{body}</p> : null}
       <div className="mt-6">
         <Button asChild>
-          <Link href={href}>{label}</Link>
+          <TrackedLink href={href} reportSlug={reportSlug} location={location}>
+            {label}
+          </TrackedLink>
         </Button>
       </div>
     </Card>

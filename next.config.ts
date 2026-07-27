@@ -15,13 +15,31 @@ import type { NextConfig } from "next";
  * analytics or embed script is ever added, its origin must be listed here or it
  * will be blocked, which is the intended behaviour.
  */
+/**
+ * Google Analytics origins, added only when a measurement ID is configured.
+ *
+ * Without these the browser blocks gtag silently — the failure mode is an
+ * analytics property that simply never receives data, with nothing in the
+ * application logs to explain it. Sites with no measurement ID keep the
+ * tighter policy.
+ */
+const gaEnabled = Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID);
+
+const gaScriptSrc = gaEnabled ? " https://www.googletagmanager.com" : "";
+const gaConnectSrc = gaEnabled
+  ? " https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
+  : "";
+const gaImgSrc = gaEnabled
+  ? " https://www.google-analytics.com https://www.googletagmanager.com"
+  : "";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${gaScriptSrc}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob:${gaImgSrc}`,
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self'${gaConnectSrc}`,
   // The Video component embeds youtube-nocookie and vimeo; nothing else.
   "frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com",
   "object-src 'none'",

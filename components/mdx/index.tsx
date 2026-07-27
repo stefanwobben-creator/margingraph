@@ -13,6 +13,7 @@ import {
 } from "@/components/mdx/blocks";
 import { Callout, Info, Success, Warning } from "@/components/mdx/callout";
 import { Faq } from "@/components/mdx/faq-block";
+import { OutboundLink } from "@/components/analytics/outbound-link";
 import { BusinessValuationPreview } from "@/components/reports/business-valuation-preview";
 import { ReportPreview } from "@/components/report-preview";
 
@@ -38,15 +39,9 @@ export const mdxComponents: MDXComponents = {
       );
     }
     return (
-      <a
-        href={href}
-        className={className}
-        rel="noopener noreferrer"
-        target="_blank"
-        {...props}
-      >
+      <OutboundLink href={href} className={className} {...props}>
         {children}
-      </a>
+      </OutboundLink>
     );
   },
 

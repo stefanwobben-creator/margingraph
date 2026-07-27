@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+
+import { trackEvent } from "@/lib/analytics";
 
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,14 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    trackEvent("error_occurred", {
+      message: error.message,
+      digest: error.digest,
+      path: typeof window !== "undefined" ? window.location.pathname : undefined,
+    });
+  }, [error]);
+
   return (
     <Container className="py-28 sm:py-36">
       <div className="max-w-prose-page">
