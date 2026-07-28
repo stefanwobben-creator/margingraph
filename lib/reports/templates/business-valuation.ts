@@ -33,6 +33,16 @@ export const businessValuationTemplate: TemplateDefinition = {
 
   chapters: [
     {
+      // First, deliberately. When we cannot answer, the reason is the answer,
+      // and burying it under three empty method sections wastes the only
+      // useful thing the report contains.
+      id: "gaps",
+      title: "What we could not establish, and what would fix it",
+      select: { tags: ["gap"] },
+      emptyText:
+        "Nothing was missing. Every figure this report needs was in your file.",
+    },
+    {
       id: "conclusion",
       title: "The range, and how much of it to believe",
       select: { tags: ["conclusion"] },

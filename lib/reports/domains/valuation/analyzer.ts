@@ -21,7 +21,8 @@ import type {
   ValuationInputs,
   ValuationJudgements,
 } from "./inputs";
-import { validateInputs } from "./inputs";
+import { validateInputs, type ValidationIssue } from "./inputs";
+import { describeLadder, marginLadder } from "./gaps";
 import {
   agreementBetween,
   assetBased,
@@ -124,15 +125,32 @@ export function createValuationAnalyzer(input: {
       const { inputs, judgements, equityRiskPremium } = input;
 
       const problems = validateInputs(inputs, judgements);
-      if (problems.length > 0) {
-        // Refusing is the right failure. A valuation built on figures that
-        // cannot be right is worse than no valuation, because it looks fine.
-        throw new Error(
-          `Cannot value this business: ${problems
-            .map((p) => `${p.field} ${p.problem}`)
-            .join("; ")}.`,
+      const blocking = problems.filter((p) => p.severity === "blocking");
+
+      /**
+       * A gap is a claim, not an exception.
+       *
+       * The first version of this analyzer threw, and the caller got nothing.
+       * On the first four real files that could not be valued, the reason was
+       * worth more than a number would have been, so it belongs in the report
+       * where the reader can act on it.
+       */
+      const gapClaims = (issues: ValidationIssue[]): Claim[] =>
+        issues.map((issue, index) =>
+          createClaim({
+            id: `cl-gap-${index + 1}`,
+            subject: "report",
+            metric: "gap",
+            statement: `${issue.field} ${issue.problem}.${
+              issue.unlocks ? ` Send us ${issue.unlocks} and this becomes an answer.` : ""
+            }`,
+            evidence: [],
+            assumptions: [],
+            derivedFrom: [],
+            producedBy: MODULE,
+            tags: ["gap", "headline", "warning"],
+          }),
         );
-      }
 
       const evidence: Evidence[] = [
         figureEvidence("ev-revenue", `Revenue for ${inputs.period}.`, inputs.revenue),
@@ -166,6 +184,36 @@ export function createValuationAnalyzer(input: {
         );
       }
 
+      if (blocking.length > 0) {
+        // Nothing can be valued, so the report is the gap plus the arithmetic
+        // that shows what the missing figure is worth. The margin ladder is
+        // what turns "we need your profit and loss" into a reason to go and
+        // get it.
+        const ladder = marginLadder({ revenue: inputs.revenue.amount });
+        const claims = gapClaims(blocking);
+        if (ladder.length > 0) {
+          claims.push(
+            createClaim({
+              id: "cl-gap-ladder",
+              subject: "company",
+              metric: "equity_value",
+              statement: `On turnover of ${eur(
+                inputs.revenue.amount,
+              )}, the business would be worth, at each profit margin: ${describeLadder(ladder)}. Which rung applies is the figure we are missing.`,
+              value: euro(ladder[1].enterprise.central, {
+                low: ladder[0].enterprise.low,
+                high: ladder[ladder.length - 1].enterprise.high,
+              }),
+              evidence: ["ev-revenue"],
+              assumptions: [],
+              derivedFrom: [],
+              producedBy: MODULE,
+              tags: ["gap", "conclusion", "headline"],
+            }),
+          );
+        }
+        return { claims, evidence, assumptions: [] };
+      }
       /* ---------------------------------------------------- normalisation */
 
       const norm = normalise({
@@ -236,6 +284,14 @@ export function createValuationAnalyzer(input: {
 
       /* -------------------------------------------------- method 1: market */
 
+      // Two of the three methods multiply or capitalise earnings. With none to
+      // multiply they are skipped rather than forced, and the reader is told
+      // which door closed and what would open it.
+      const lossMaking = problems.some((p) => p.severity === "method");
+      let marketEquity: Range | undefined;
+      let capitalisedEquity: Range | undefined;
+
+      if (!lossMaking) {
       const band = multipleBandFor(norm.adjustedEbitda);
 
       evidence.push(
@@ -280,7 +336,7 @@ export function createValuationAnalyzer(input: {
         multiple: band.multiple,
         bandWidth: MULTIPLE_BAND_WIDTH,
       });
-      const marketEquity = toEquityValue(marketEnterprise, {
+      marketEquity = toEquityValue(marketEnterprise, {
         cash: inputs.cash.amount,
         interestBearingDebt: inputs.interestBearingDebt.amount,
       });
@@ -374,7 +430,7 @@ export function createValuationAnalyzer(input: {
         rateLow: rateLow.total,
         rateHigh: rateHigh.total,
       });
-      const capitalisedEquity = toEquityValue(capitalisedEnterprise, {
+      capitalisedEquity = toEquityValue(capitalisedEnterprise, {
         cash: inputs.cash.amount,
         interestBearingDebt: inputs.interestBearingDebt.amount,
       });
@@ -395,6 +451,10 @@ export function createValuationAnalyzer(input: {
           tags: ["method", "income", "headline"],
         }),
       );
+
+      } else {
+        claims.push(...gapClaims(problems.filter((p) => p.severity === "method")));
+      }
 
       /* -------------------------------------------------- method 3: assets */
 
@@ -418,6 +478,10 @@ export function createValuationAnalyzer(input: {
       );
 
       /* ------------------------------------------------------- agreement  */
+
+      if (!marketEquity || !capitalisedEquity) {
+        return { claims, evidence, assumptions };
+      }
 
       const agreement = agreementBetween(marketEquity, capitalisedEquity);
 

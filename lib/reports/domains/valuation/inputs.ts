@@ -55,8 +55,24 @@ export type ValuationInputs = {
  * rate is the thing this whole product exists to argue against.
  */
 export type ValuationJudgements = {
-  /** What a hired manager would cost to do the owner's job. */
+  /**
+   * What a hired manager would cost to do the owner's job.
+   *
+   * Zero is only valid together with `managementAlreadyEmployed`. An
+   * owner-managed business whose salary line is left at zero produces
+   * earnings that include unpaid labour, and every method downstream then
+   * values work nobody is being paid for.
+   */
   marketRateSalary: number;
+  /**
+   * Set when the business already employs its management at arm's length and
+   * that cost is in the profit and loss account.
+   *
+   * Without this, the rule "a market-rate salary must be greater than zero"
+   * is right for the owner-managed case and wrong for every business that has
+   * already hired a general manager: it would charge the salary twice.
+   */
+  managementAlreadyEmployed?: boolean;
   /** Corporate tax rate applied to operating profit, as a fraction. */
   taxRate: number;
   /** Observable government bond yield at the valuation date, as a fraction. */
@@ -79,7 +95,21 @@ export type ValuationJudgements = {
   companySpecificRisk: { low: number; high: number };
 };
 
-export type ValidationIssue = { field: string; problem: string };
+/**
+ * `blocking` means no method can run and the report is a gap report.
+ * `method` means some methods cannot run but others still can: a business
+ * that loses money still has a balance sheet, and saying so is worth more
+ * than refusing outright.
+ *
+ * `unlocks` names the figure that would turn the gap into an answer. It is
+ * the sentence the reader acts on, so it is a field rather than prose.
+ */
+export type ValidationIssue = {
+  field: string;
+  problem: string;
+  severity: "blocking" | "method";
+  unlocks?: string;
+};
 
 /**
  * Structural checks only. Nothing here judges whether a business is a good
@@ -91,12 +121,32 @@ export function validateInputs(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  const positive: [string, number][] = [
-    ["revenue", inputs.revenue.amount],
-    ["marketRateSalary", judgements.marketRateSalary],
-  ];
-  for (const [field, amount] of positive) {
-    if (!(amount > 0)) issues.push({ field, problem: "must be greater than zero" });
+  if (!(inputs.revenue.amount > 0)) {
+    issues.push({
+      field: "revenue",
+      problem: "must be greater than zero",
+      severity: "blocking",
+      unlocks: "turnover for the most recent financial year",
+    });
+  }
+  if (!judgements.managementAlreadyEmployed && !(judgements.marketRateSalary > 0)) {
+    issues.push({
+      field: "marketRateSalary",
+      problem:
+        "must be greater than zero, or managementAlreadyEmployed must be set. " +
+        "Earnings that contain unpaid owner labour are not earnings",
+      severity: "blocking",
+      unlocks: "what a hired manager would cost to do the owner's job",
+    });
+  }
+  if (judgements.managementAlreadyEmployed && judgements.marketRateSalary !== 0) {
+    issues.push({
+      field: "marketRateSalary",
+      problem:
+        "must be zero when management is already employed, otherwise the same " +
+        "salary is charged twice",
+      severity: "blocking",
+    });
   }
 
   const nonNegative: [string, number][] = [
@@ -106,7 +156,9 @@ export function validateInputs(
     ["interestBearingDebt", inputs.interestBearingDebt.amount],
   ];
   for (const [field, amount] of nonNegative) {
-    if (amount < 0) issues.push({ field, problem: "cannot be negative" });
+    if (amount < 0) {
+      issues.push({ field, problem: "cannot be negative", severity: "blocking" });
+    }
   }
 
   const fractions: [string, number][] = [
@@ -118,7 +170,11 @@ export function validateInputs(
   ];
   for (const [field, value] of fractions) {
     if (value < 0 || value >= 1) {
-      issues.push({ field, problem: "must be a fraction between 0 and 1" });
+      issues.push({
+        field,
+        problem: "must be a fraction between 0 and 1",
+        severity: "blocking",
+      });
     }
   }
 
@@ -126,6 +182,7 @@ export function validateInputs(
     issues.push({
       field: "companySpecificRisk",
       problem: "low must not exceed high",
+      severity: "blocking",
     });
   }
 
@@ -133,6 +190,60 @@ export function validateInputs(
     issues.push({
       field: "ebitda",
       problem: "exceeds revenue, which usually means a row was misread",
+      severity: "blocking",
+    });
+  }
+
+  /**
+   * Absent is not zero, and this type cannot tell them apart: a `Figure`
+   * always has an amount, so a file with no profit and loss in it arrives
+   * looking like a business that earns nothing and owns nothing.
+   *
+   * Left unchecked that produces a valuation of zero, stated with the same
+   * confidence as any other, which is the exact failure this product exists
+   * to avoid. A real business with genuinely nil earnings, nil assets, nil
+   * cash and nil debt does not exist; a revenue-only spreadsheet does.
+   */
+  const balanceSheet = [
+    inputs.netAssets.amount,
+    inputs.cash.amount,
+    inputs.interestBearingDebt.amount,
+  ];
+  if (inputs.ebitda.amount === 0 && balanceSheet.every((amount) => amount === 0)) {
+    issues.push({
+      field: "ebitda, netAssets, cash, interestBearingDebt",
+      problem:
+        "are all zero, which means the file contains revenue but no profit and loss and no balance sheet. A business cannot be valued on turnover alone",
+      severity: "blocking",
+      unlocks: "a profit and loss account and a balance sheet for the same date",
+    });
+  }
+
+  /**
+   * A loss-making business has no earnings to multiply and no earnings to
+   * capitalise, so two of the three methods do not apply to it at all.
+   *
+   * Caught here rather than downstream, because without this check the
+   * failure surfaces as "no multiple band covers adjusted EBITDA of -82766"
+   * from the knowledge lookup: true, useless, and it names the wrong problem.
+   * The reader needs to be told that the business lost money once the owner
+   * is paid a market wage, which is a fact about the business rather than a
+   * gap in our reference data.
+   */
+  const adjustedEbitda =
+    inputs.ebitda.amount +
+    inputs.ownerRemuneration.amount -
+    judgements.marketRateSalary +
+    (inputs.oneOffCosts?.amount ?? 0);
+  if (adjustedEbitda <= 0) {
+    issues.push({
+      field: "adjusted EBITDA",
+      problem:
+        `is ${Math.round(adjustedEbitda)} once the owner is paid a market rate. ` +
+        "A business that does not earn cannot be valued on its earnings, so only " +
+        "the asset-based figure applies",
+      severity: "method",
+      unlocks: "earnings above zero after a market-rate salary",
     });
   }
 

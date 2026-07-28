@@ -162,6 +162,7 @@ describe("the analyzer, end to end", () => {
   it("produces a report with every chapter the template asked for", async () => {
     const result = await report();
     expect(result.chapters.map((c) => c.id)).toEqual([
+      "gaps",
       "conclusion",
       "earnings",
       "methods",
@@ -244,15 +245,57 @@ describe("the analyzer, end to end", () => {
     expect(result.manifest.analyzer).toEqual({ id: "valuation", version: "1.0.0" });
   });
 
-  it("refuses to value a business whose figures cannot be right", async () => {
-    const broken = createValuationAnalyzer({
+  it("names the misread row rather than valuing on it", async () => {
+    const { claims } = await createValuationAnalyzer({
       inputs: { ...inputs, ebitda: figure(9_000_000, "B18") },
       judgements,
       equityRiskPremium: ERP,
-    });
-    await expect(
-      broken.analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge }),
-    ).rejects.toThrow(/exceeds revenue/);
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+    expect(claims.map((c) => c.id)).not.toContain("cl-market-multiple");
+    expect(claims.find((c) => c.tags?.includes("gap"))?.statement).toMatch(
+      /exceeds revenue/,
+    );
+  });
+
+  // A revenue-only spreadsheet arrives looking like a business that earns
+  // nothing and owns nothing, because a Figure cannot express "absent". Left
+  // unchecked it values at zero with full confidence.
+  it("returns a gap report for a file that has turnover and nothing else", async () => {
+    const zero = (cell: string): Figure => ({ ...figure(0, cell) });
+    const { claims } = await createValuationAnalyzer({
+      inputs: {
+        period: "2025",
+        revenue: figure(2_437_547, "O156"),
+        ebitda: zero("—"),
+        depreciationAndAmortisation: zero("—"),
+        ownerRemuneration: zero("—"),
+        netAssets: zero("—"),
+        cash: zero("—"),
+        interestBearingDebt: zero("—"),
+      },
+      judgements,
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+    expect(claims.some((c) => /cannot be valued on turnover alone/.test(c.statement))).toBe(
+      true,
+    );
+    expect(claims.map((c) => c.id)).toContain("cl-gap-ladder");
+  });
+
+  // Two of the three methods multiply or capitalise earnings. Neither means
+  // anything when there are none, and the reader needs to hear that as a fact
+  // about the business rather than as a gap in our comparables data.
+  it("drops the earnings methods once the owner is paid a market rate", async () => {
+    const { claims } = await createValuationAnalyzer({
+      inputs: { ...inputs, ebitda: figure(-2_766, "B18"), oneOffCosts: undefined },
+      judgements: { ...judgements, marketRateSalary: 80_000 },
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+    expect(claims.map((c) => c.id)).toContain("cl-asset-based");
+    expect(claims.map((c) => c.id)).not.toContain("cl-capitalised");
+    expect(claims.find((c) => c.tags?.includes("gap"))?.statement).toMatch(
+      /adjusted EBITDA is -22766/,
+    );
   });
 
   it("says so when the business is worth more broken up than continued", async () => {
@@ -284,5 +327,91 @@ describe("the knowledge snapshot", () => {
 
   it("returns nothing rather than guessing for an unknown dataset", async () => {
     expect(await valuationKnowledge.lookup("sector-multiples", "bakery")).toBeUndefined();
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Regression set: the first real files, and what each of them proved          */
+/* -------------------------------------------------------------------------- */
+
+describe("the files that could not be valued still produce a report", () => {
+  const base = {
+    period: "2025",
+    depreciationAndAmortisation: figure(0, "-"),
+    ownerRemuneration: figure(0, "-"),
+    cash: figure(0, "-"),
+    interestBearingDebt: figure(0, "-"),
+  };
+
+  // A weekly turnover workbook with seven tabs and no profit and loss in any
+  // of them. The first version valued it at zero.
+  it("turns a turnover-only file into a gap report with a margin ladder", async () => {
+    const { claims } = await createValuationAnalyzer({
+      inputs: {
+        ...base,
+        revenue: figure(2_437_547, "O156"),
+        ebitda: figure(0, "-"),
+        netAssets: figure(0, "-"),
+      },
+      judgements,
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+
+    const ids = claims.map((c) => c.id);
+    expect(ids).toContain("cl-gap-1");
+    expect(ids).toContain("cl-gap-ladder");
+    const ladder = claims.find((c) => c.id === "cl-gap-ladder");
+    expect(ladder?.statement).toMatch(/profit and loss|5% →/);
+    expect(ladder?.value?.low).toBeGreaterThan(0);
+  });
+
+  // Negative equity, a loss, and no salary anywhere in the profit and loss.
+  it("gives a loss-making business its asset figure and skips the rest", async () => {
+    const { claims } = await createValuationAnalyzer({
+      inputs: {
+        ...base,
+        revenue: figure(58_013, "p9"),
+        ebitda: figure(5_425, "p9"),
+        depreciationAndAmortisation: figure(301, "p9"),
+        netAssets: figure(519, "p8"),
+        cash: figure(122_842, "p8"),
+      },
+      judgements: { ...judgements, marketRateSalary: 80_000 },
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+
+    const ids = claims.map((c) => c.id);
+    expect(ids).toContain("cl-asset-based");
+    expect(ids).not.toContain("cl-market-multiple");
+    expect(ids).not.toContain("cl-capitalised");
+    expect(claims.find((c) => c.tags?.includes("gap"))?.statement).toMatch(
+      /once the owner is paid a market rate/,
+    );
+  });
+
+  // Management already on the payroll. The rule written for owner-managed
+  // businesses charged the salary a second time.
+  it("values a professionally managed business without charging a second salary", async () => {
+    const { claims } = await createValuationAnalyzer({
+      inputs: {
+        ...base,
+        revenue: figure(2_148_826, "p5"),
+        ebitda: figure(161_576, "p5"),
+        depreciationAndAmortisation: figure(5_707, "p5"),
+        netAssets: figure(581_887, "p10"),
+        cash: figure(68_200, "p9"),
+        interestBearingDebt: figure(186_461, "p10"),
+      },
+      judgements: {
+        ...judgements,
+        marketRateSalary: 0,
+        managementAlreadyEmployed: true,
+      },
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+
+    const market = claims.find((c) => c.id === "cl-market-multiple");
+    expect(market?.value?.low).toBeCloseTo(285_679, -2);
+    expect(market?.value?.high).toBeCloseTo(608_831, -2);
   });
 });
