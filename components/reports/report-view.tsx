@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { ValueRangeChart, type ValueBand } from "@/components/reports/value-range-chart";
 import { Card } from "@/components/ui/card";
 import type {
   ConfidenceAssessment,
@@ -109,14 +110,62 @@ function Leverage({ counterargument }: { counterargument: Counterargument }) {
   );
 }
 
+/**
+ * Which claims become the figure.
+ *
+ * Read off metric and tag rather than hard-coded ids, so a second domain that
+ * produces equity values gets the chart for free and one that does not simply
+ * has no figure.
+ */
+function valueBands(report: Report): {
+  bands: ValueBand[];
+  agreement?: { low: number; high: number };
+} {
+  const bands: ValueBand[] = [];
+  let agreement: { low: number; high: number } | undefined;
+
+  for (const claim of report.claimSet.claims) {
+    const v = claim.value;
+    if (!v || v.unit !== "EUR") continue;
+    if (claim.tags?.includes("conclusion")) {
+      if (v.low !== undefined && v.high !== undefined) agreement = { low: v.low, high: v.high };
+      continue;
+    }
+    if (!claim.tags?.includes("method")) continue;
+    bands.push({
+      label: claim.metric === "asset_value" ? "Asset value" : labelFor(claim.tags),
+      low: v.low ?? v.amount,
+      high: v.high ?? v.amount,
+      central: v.amount,
+      point: v.low === undefined,
+    });
+  }
+  return { bands, agreement };
+}
+
+function labelFor(tags: string[]): string {
+  if (tags.includes("market")) return "Comparable transactions";
+  if (tags.includes("income")) return "Capitalised earnings";
+  return "Method";
+}
+
 export function ReportView({ report }: { report: Report }) {
   const { assessment } = report;
+  const figure = valueBands(report);
   const byLeverage = [...assessment.counterarguments].sort(
     (a, b) => b.leverage - a.leverage,
   );
 
   return (
     <article className="space-y-16">
+      {figure.bands.length > 1 ? (
+        <ValueRangeChart
+          bands={figure.bands}
+          agreement={figure.agreement}
+          caption="Each method on the same scale. The shaded band is where the two earnings-based methods overlap; that overlap is the defensible range. Asset value is a point rather than a range, and a floor rather than a valuation."
+        />
+      ) : null}
+
       {report.chapters.map((chapter) => (
         <section key={chapter.id} className="scroll-mt-24" id={chapter.id}>
           <h2 className="text-heading">{chapter.title}</h2>
