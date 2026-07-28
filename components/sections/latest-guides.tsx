@@ -3,31 +3,48 @@ import { ArrowRight } from "lucide-react";
 
 import { DocCard } from "@/components/content/doc-card";
 import { Section, SectionHeader } from "@/components/layout/section";
+import { getCollection } from "@/lib/content/collections";
 import { getSummaries } from "@/lib/content/source";
-import { routes } from "@/lib/routes";
+import type { CollectionId } from "@/lib/content/types";
 
-/** Reads straight from /content — publishing a post updates the homepage. */
-export function LatestGuides() {
-  const posts = getSummaries("blog").slice(0, 3);
-  if (!posts.length) return null;
+/**
+ * The newest few documents from one collection.
+ *
+ * Reads straight from /content, so publishing updates the homepage. The label
+ * and the destination both come from the collection registry, because the
+ * previous version hard-coded the word "guides" against a list of blog posts
+ * and a link to /blog, and stayed wrong for as long as nobody hovered it.
+ */
+export function LatestDocs({
+  collection,
+  title,
+  count = 3,
+}: {
+  collection: CollectionId;
+  title: string;
+  count?: number;
+}) {
+  const { label, basePath } = getCollection(collection);
+  const docs = getSummaries(collection).slice(0, count);
+  if (!docs.length) return null;
 
   return (
-    <Section id="guides" bordered>
+    <Section id={collection} bordered>
       <div className="flex flex-wrap items-end justify-between gap-6">
-        <SectionHeader eyebrow="Guides" title="Latest decision guides" />
+        <SectionHeader eyebrow={label} title={title} />
 
         <Link
-          href={routes.guides}
+          href={basePath}
           className="flex items-center gap-1.5 text-sm font-medium text-accent-brand hover:opacity-80"
         >
-          All guides
+          All {label.toLowerCase()}
           <ArrowRight aria-hidden className="size-4" />
         </Link>
       </div>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
-          <DocCard key={post.slug} doc={post} />
+        {docs.map((doc) => (
+          <DocCard key={doc.slug} doc={doc} />
         ))}
       </div>
     </Section>

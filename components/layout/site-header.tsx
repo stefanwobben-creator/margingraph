@@ -6,10 +6,16 @@ import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
+/**
+ * Every content section is reachable from here. A collection with fifty pages
+ * and no entry in the navigation is fifty pages that only a sitemap can find.
+ */
 const nav = [
   { label: "Reports", href: routes.reports },
   { label: "How it works", href: routes.howItWorks },
   { label: "Guides", href: routes.guides },
+  { label: "Blog", href: routes.blog },
+  { label: "FAQ", href: routes.faq },
 ];
 
 export function SiteHeader() {
@@ -25,7 +31,7 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Main" className="flex items-center gap-6">
-          <ul className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
+          <ul className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             {nav.map((item) => (
               <li key={item.label}>
                 <Link

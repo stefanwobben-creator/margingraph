@@ -12,8 +12,12 @@ export const products: Record<string, Product> = {
   "business-valuation": {
     slug: "business-valuation",
     price: 9,
-    // Lemon Squeezy variant UUID, from Store → Products → Share → the /buy/ URL.
-    variant: process.env.NEXT_PUBLIC_LS_VARIANT_BUSINESS_VALUATION ?? "",
+    // Lemon Squeezy variant UUID, from Store → Products → Share → the /buy/
+    // URL. Trimmed for the same reason as the store name: pasted by hand into
+    // a dashboard, and a trailing space survives the paste.
+    variant: (
+      process.env.NEXT_PUBLIC_LS_VARIANT_BUSINESS_VALUATION ?? ""
+    ).trim(),
   },
 };
 

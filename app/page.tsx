@@ -5,7 +5,7 @@ import { Comparison } from "@/components/sections/comparison";
 import { FooterCta } from "@/components/sections/footer-cta";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
-import { LatestGuides } from "@/components/sections/latest-guides";
+import { LatestDocs } from "@/components/sections/latest-guides";
 import { PopularReports } from "@/components/sections/popular-reports";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/content/seo";
 
@@ -29,7 +29,8 @@ export default function Home() {
       <PopularReports />
       <HowItWorks />
       <Comparison />
-      <LatestGuides />
+      <LatestDocs collection="guides" title="Latest decision guides" />
+      <LatestDocs collection="blog" title="Latest from the blog" />
       <FooterCta />
     </>
   );

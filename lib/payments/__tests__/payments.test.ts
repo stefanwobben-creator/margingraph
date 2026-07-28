@@ -34,6 +34,21 @@ describe("checkout url", () => {
     expect(url.searchParams.has("checkout[custom][source_path]")).toBe(false);
   });
 
+  // A trailing space in the Vercel dashboard produced
+  // `https://higher-ground .lemonsqueezy.com/...` and a bare
+  // `TypeError: Invalid URL` that named neither variable.
+  it("names the offending variable instead of throwing Invalid URL", () => {
+    expect(() => buildCheckoutUrl("higher-ground ", { product })).toThrow(
+      PaymentConfigError,
+    );
+    expect(() => buildCheckoutUrl("higher-ground ", { product })).toThrow(
+      /NEXT_PUBLIC_LS_STORE/,
+    );
+    expect(() =>
+      buildCheckoutUrl("https://higher-ground.lemonsqueezy.com", { product }),
+    ).toThrow(PaymentConfigError);
+  });
+
   it("refuses to build a URL without a store or a variant", () => {
     expect(() => buildCheckoutUrl("", { product })).toThrow(PaymentConfigError);
     expect(() =>
