@@ -33,13 +33,23 @@ const gaImgSrc = gaEnabled
   ? " https://www.google-analytics.com https://www.googletagmanager.com"
   : "";
 
+/**
+ * Vercel Analytics origins.
+ *
+ * Vercel Analytics sends data to vitals.vercel-insights.com and loads scripts
+ * from va.vercel-scripts.com (in development). These are always added since
+ * the package is installed.
+ */
+const vercelAnalyticsScriptSrc = " https://va.vercel-scripts.com";
+const vercelAnalyticsConnectSrc = " https://vitals.vercel-insights.com";
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${gaScriptSrc}`,
+  `script-src 'self' 'unsafe-inline'${gaScriptSrc}${vercelAnalyticsScriptSrc}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${gaImgSrc}`,
   "font-src 'self' data:",
-  `connect-src 'self'${gaConnectSrc}`,
+  `connect-src 'self'${gaConnectSrc}${vercelAnalyticsConnectSrc}`,
   // The Video component embeds youtube-nocookie and vimeo; nothing else.
   "frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com",
   "object-src 'none'",

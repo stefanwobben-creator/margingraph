@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { Analytics } from "@/components/analytics/analytics";
+import { Analytics as GoogleAnalytics } from "@/components/analytics/analytics";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { buildSha, site } from "@/lib/site";
@@ -82,6 +83,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <GoogleAnalytics />
         <Analytics />
       </body>
     </html>
