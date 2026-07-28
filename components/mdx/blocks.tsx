@@ -2,6 +2,7 @@ import NextImage from "next/image";
 import { Check, Minus, Plus, X } from "lucide-react";
 
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { CheckoutLink } from "@/components/commerce/checkout-link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -167,32 +168,60 @@ export function Metrics({
 
 /* -------------------------------------------------------------------------- */
 
-export function Cta({
-  title,
-  body,
-  href,
-  label,
-  reportSlug,
-  location = "content",
-}: {
+/**
+ * A call to action. Two shapes, and only two.
+ *
+ * `href` sends the reader somewhere on the site. `report` sells something and
+ * renders a checkout button instead. The union type makes the combination that
+ * would silently do nothing — both, or neither — fail to compile, because a
+ * call to action that goes nowhere is invisible in review and expensive live.
+ */
+type CtaBase = {
   title: string;
   body?: string;
-  href: string;
   label: string;
+  location?: string;
+};
+
+type CtaLink = CtaBase & {
+  href: string;
+  report?: never;
   /** Defaults to the slug in `href` when it points at a decision page. */
   reportSlug?: string;
-  location?: string;
-}) {
+};
+
+type CtaBuy = CtaBase & {
+  /** A key in lib/payments/catalogue.ts. */
+  report: string;
+  href?: never;
+  reportSlug?: never;
+};
+
+export function Cta(props: CtaLink | CtaBuy) {
+  const { title, body, label, location = "content" } = props;
+
   return (
     <Card className="my-12 gap-0 p-8 not-prose">
       <h3 className="text-heading text-balance">{title}</h3>
       {body ? <p className="mt-3 text-muted-foreground">{body}</p> : null}
       <div className="mt-6">
-        <Button asChild>
-          <TrackedLink href={href} reportSlug={reportSlug} location={location}>
-            {label}
-          </TrackedLink>
-        </Button>
+        {props.report ? (
+          <CheckoutLink
+            report={props.report}
+            label={label}
+            location={location}
+          />
+        ) : (
+          <Button asChild>
+            <TrackedLink
+              href={props.href}
+              reportSlug={props.reportSlug}
+              location={location}
+            >
+              {label}
+            </TrackedLink>
+          </Button>
+        )}
       </div>
     </Card>
   );

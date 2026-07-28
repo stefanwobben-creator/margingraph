@@ -12,6 +12,7 @@ import {
   Video,
 } from "@/components/mdx/blocks";
 import { Callout, Info, Success, Warning } from "@/components/mdx/callout";
+import { CheckoutLink } from "@/components/commerce/checkout-link";
 import { Faq } from "@/components/mdx/faq-block";
 import { OutboundLink } from "@/components/analytics/outbound-link";
 import { BusinessValuationPreview } from "@/components/reports/business-valuation-preview";
@@ -60,6 +61,9 @@ export const mdxComponents: MDXComponents = {
   Image: Figure,
   Video,
   Faq,
+
+  /* Commerce. A decision page without one of these cannot take money. */
+  CheckoutLink,
 
   /* Product previews, usable from any document. */
   ReportPreview,
