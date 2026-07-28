@@ -205,7 +205,7 @@ export function Cta(props: CtaLink | CtaBuy) {
       <h3 className="text-heading text-balance">{title}</h3>
       {body ? <p className="mt-3 text-muted-foreground">{body}</p> : null}
       <div className="mt-6">
-        {props.report ? (
+        {props.report !== undefined ? (
           <CheckoutLink
             report={props.report}
             label={label}

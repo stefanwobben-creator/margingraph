@@ -2,8 +2,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { buildCheckoutUrl } from "../lemonsqueezy.ts";
-import { PaymentConfigError, type Product } from "../types.ts";
+import { buildCheckoutUrl } from "../lemonsqueezy";
+import { PaymentConfigError, type Product } from "../types";
 
 const product: Product = {
   slug: "business-valuation",
