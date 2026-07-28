@@ -166,6 +166,7 @@ describe("the analyzer, end to end", () => {
       "conclusion",
       "earnings",
       "methods",
+      "levers",
       "warnings",
     ]);
   });
@@ -413,5 +414,30 @@ describe("the files that could not be valued still produce a report", () => {
     const market = claims.find((c) => c.id === "cl-market-multiple");
     expect(market?.value?.low).toBeCloseTo(285_679, -2);
     expect(market?.value?.high).toBeCloseTo(608_831, -2);
+  });
+});
+
+describe("every lever is priced in euros of value", () => {
+  it("multiplies a euro earned and does not multiply a euro repaid", async () => {
+    const result = await report();
+    const find = (id: string) => result.claimSet.claims.find((c) => c.id === id);
+
+    // 3.5x at this size band: €10.000 of earnings, €35.000 of value.
+    expect(find("lv-earnings")?.value?.amount).toBeCloseTo(35_000, 0);
+    // Debt comes off one for one. This contrast is the whole point.
+    expect(find("lv-debt")?.value?.amount).toBe(10_000);
+    // One point of margin on €1.2m of turnover is €12.000, times 3.5.
+    expect(find("lv-margin")?.value?.amount).toBeCloseTo(42_000, 0);
+
+    expect(find("cl-leverage")?.statement).toMatch(/3\.5 times a euro of debt repaid/);
+  });
+
+  it("prices no lever when no earnings method applied", async () => {
+    const { claims } = await createValuationAnalyzer({
+      inputs: { ...inputs, ebitda: figure(-2_766, "B18"), oneOffCosts: undefined },
+      judgements: { ...judgements, marketRateSalary: 80_000 },
+      equityRiskPremium: ERP,
+    }).analyze({ evidence: [], assumptions: [], knowledge: valuationKnowledge });
+    expect(claims.filter((c) => c.tags?.includes("lever"))).toEqual([]);
   });
 });

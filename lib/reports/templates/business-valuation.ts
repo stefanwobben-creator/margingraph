@@ -63,6 +63,15 @@ export const businessValuationTemplate: TemplateDefinition = {
       emptyText: "No valuation method could be applied to these figures.",
     },
     {
+      // Before the warnings and after the methods: an owner who reads two
+      // sections reads the number and then what moves it.
+      id: "levers",
+      title: "What each euro of improvement is worth",
+      select: { tags: ["lever"] },
+      emptyText:
+        "No lever could be priced, because no earnings-based method applied to these figures.",
+    },
+    {
       id: "warnings",
       // Distinct from the counterargument section, which the engine produces
       // from declared assumptions. This chapter is for flags the figures

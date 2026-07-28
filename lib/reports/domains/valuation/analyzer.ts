@@ -23,6 +23,7 @@ import type {
 } from "./inputs";
 import { validateInputs, type ValidationIssue } from "./inputs";
 import { describeLadder, marginLadder } from "./gaps";
+import { leverageSentence, valuationLevers } from "./levers";
 import {
   agreementBetween,
   assetBased,
@@ -451,6 +452,53 @@ export function createValuationAnalyzer(input: {
           tags: ["method", "income", "headline"],
         }),
       );
+
+      /* ---------------------------------------------------------- levers  */
+
+      // Every driver, priced in the only currency the owner already thinks in.
+      // Placed before the conclusion on purpose: the answer to "what is it
+      // worth" is less useful than the answer to "what would make it worth
+      // more", and the report should not bury the second under the first.
+      const levers = valuationLevers({
+        revenue: inputs.revenue.amount,
+        multiple: band.multiple,
+        discountRate: (rateLow.total + rateHigh.total) / 2,
+        taxRate: judgements.taxRate,
+      });
+
+      for (const lever of levers) {
+        claims.push(
+          createClaim({
+            id: lever.id,
+            subject: "company",
+            metric: "value_lever",
+            statement: `${lever.action}: worth ${eur(lever.worth)}, because ${lever.because}.`,
+            value: euro(lever.worth),
+            evidence: ["ev-revenue", "ev-adjusted-ebitda", "ev-multiple"],
+            assumptions: ["as-band-width", "as-market-salary"],
+            derivedFrom: [lever.affects],
+            producedBy: MODULE,
+            tags: ["lever"],
+          }),
+        );
+      }
+
+      const leverage = leverageSentence(levers);
+      if (leverage) {
+        claims.push(
+          createClaim({
+            id: "cl-leverage",
+            subject: "company",
+            metric: "value_lever",
+            statement: leverage,
+            evidence: ["ev-multiple"],
+            assumptions: ["as-band-width"],
+            derivedFrom: ["lv-earnings", "lv-debt"],
+            producedBy: MODULE,
+            tags: ["lever", "headline"],
+          }),
+        );
+      }
 
       } else {
         claims.push(...gapClaims(problems.filter((p) => p.severity === "method")));
