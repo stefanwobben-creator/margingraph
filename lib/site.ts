@@ -31,6 +31,15 @@ export const isProduction =
     ? process.env.VERCEL_ENV === "production"
     : process.env.NODE_ENV === "production";
 
+/**
+ * The commit this build came from.
+ *
+ * Vercel sets VERCEL_GIT_COMMIT_SHA at build time. Rendered into the page as a
+ * meta tag so `npm run verify:live` can answer the question that is otherwise
+ * guesswork: is what I am looking at actually my latest commit?
+ */
+export const buildSha = process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
+
 export const site = {
   name: "MarginGraph",
   tagline: "Business decisions, with the evidence attached.",

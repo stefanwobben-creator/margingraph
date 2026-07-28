@@ -53,10 +53,19 @@ async function main() {
     );
   } else {
     servingOrigin = apex;
+    // Both hosts serve. That is only a real problem if they disagree about
+    // which one is canonical — search engines consolidate on the canonical
+    // tag, so matching tags make this untidy rather than broken.
+    const wwwCanonical = await fetch(www)
+      .then((r) => r.text())
+      .then((body) => body.match(/rel="canonical"\s+href="([^"]+)"/)?.[1]);
+    const agrees = wwwCanonical && new URL(wwwCanonical).origin === apex;
     record(
-      false,
+      Boolean(agrees),
       "Canonical host",
-      "Both apex and www return 200. Two origins serving identical content splits ranking signals — one must redirect to the other.",
+      agrees
+        ? `both hosts serve, both canonical to ${apex} — consolidation works, but a redirect would be cleaner`
+        : "Both apex and www return 200 with different canonicals. Two origins serving identical content splits ranking signals.",
     );
   }
 
@@ -135,6 +144,27 @@ async function main() {
         ? "googletagmanager permitted"
         : "CSP does not list googletagmanager — gtag will be blocked silently.",
     );
+  }
+
+  /* ----------------------------------------------------------- build ------- */
+
+  const deployedSha = html.match(/name="x-build-sha"\s+content="([^"]+)"/)?.[1];
+  const localSha = process.env.LOCAL_SHA;
+
+  if (!deployedSha) {
+    record(
+      false,
+      "Deployed build",
+      "No build stamp in the HTML. This deploy predates the stamp — redeploy to see which commit is live.",
+    );
+  } else if (localSha && deployedSha !== localSha) {
+    record(
+      false,
+      "Deployed build",
+      `Live is ${deployedSha.slice(0, 7)}, local HEAD is ${localSha.slice(0, 7)}. The latest commits are not deployed.`,
+    );
+  } else {
+    record(true, "Deployed build", deployedSha.slice(0, 7));
   }
 
   /* --------------------------------------------------------- headers ------- */

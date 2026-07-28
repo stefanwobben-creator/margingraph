@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@/components/analytics/analytics";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { site } from "@/lib/site";
+import { buildSha, site } from "@/lib/site";
 
 import "./globals.css";
 
@@ -60,6 +60,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang={site.locale} className={`${sans.variable} ${mono.variable}`}>
+      <head>
+        {/* Which commit produced this build. Read by scripts/verify-live.mjs. */}
+        <meta name="x-build-sha" content={buildSha} />
+      </head>
       <body className="flex min-h-dvh flex-col bg-background text-foreground antialiased">
         {/*
           Skip link: the header holds four links before the content on every
