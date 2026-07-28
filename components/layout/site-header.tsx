@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Wordmark } from "@/components/brand/wordmark";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
@@ -17,9 +18,10 @@ export function SiteHeader() {
       <Container className="flex h-16 items-center justify-between gap-6">
         <Link
           href="/"
-          className="text-[15px] font-semibold tracking-tight transition-opacity hover:opacity-70"
+          aria-label={`${site.name} home`}
+          className="text-[17px] transition-opacity hover:opacity-70"
         >
-          {site.name}
+          <Wordmark />
         </Link>
 
         <nav aria-label="Main" className="flex items-center gap-6">

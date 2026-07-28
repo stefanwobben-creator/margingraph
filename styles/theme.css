@@ -10,6 +10,9 @@
   --container-page: 75rem; /* 1200px -> max-w-page */
   --container-prose-page: 44rem; /* 704px -> max-w-prose-page */
 
+  /* The wordmark sits a shade deeper than body text, on purpose. */
+  --color-wordmark: var(--wordmark);
+
   /* Single accent. Restrained blue; used for links, focus and emphasis only. */
   --color-accent-brand: var(--accent-brand);
   --color-accent-brand-foreground: var(--accent-brand-foreground);
@@ -33,6 +36,7 @@
 }
 
 :root {
+  --wordmark: #0b0f14;
   --accent-brand: oklch(0.53 0.17 258);
   --accent-brand-foreground: oklch(0.99 0 0);
   --accent-brand-subtle: oklch(0.965 0.018 258);
