@@ -27,8 +27,14 @@ const wordmarkFont = localFont({
  * The MarginGraph wordmark.
  *
  * "Margin" at 450, "Graph" at 850 — the weight contrast is the mark itself.
- * Expressed as two spans rather than a `<b>`, which would tell a screen reader
- * that the second half of a company name is more important than the first.
+ *
+ * `<b>` is the correct element: HTML5 defines it as text stylistically offset
+ * without conveying extra importance, which is exactly this. `<strong>` would
+ * be wrong, and screen readers announce neither the same way.
+ *
+ * The explicit weight matters. Tailwind's preflight sets `b { font-weight:
+ * bolder }`, which on a variable font resolves to roughly 700 relative to the
+ * 450 parent — close enough to look deliberate and wrong enough to miss.
  */
 export function Wordmark({ className }: { className?: string }) {
   return (
@@ -39,7 +45,7 @@ export function Wordmark({ className }: { className?: string }) {
         className,
       )}
     >
-      Margin<span className="font-[850]">Graph</span>
+      Margin<b className="font-[850]">Graph</b>
     </span>
   );
 }
