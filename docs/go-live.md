@@ -33,8 +33,22 @@ Once written, add them as `.mdx` files and link them from the footer.
       slash. Without it, canonicals, the sitemap, RSS, robots.txt and every
       absolute URL in structured data fall back to the Vercel preview domain.
       It is now the only place the domain is written down.
-- [ ] Decide www or apex, and redirect the other permanently. Two origins
-      serving identical content splits ranking signals.
+- [ ] **Make the apex the primary domain in Vercel**, so `www` redirects to
+      `margingraph.com` instead of the other way round.
+
+      Vercel → Project → Settings → Domains → `margingraph.com` → set as
+      primary. Vercel then issues the `www` → apex redirect itself.
+
+      Apex is the right choice here: the code already uses it everywhere, and
+      the usual argument for `www` — that DNS cannot put a CNAME on an apex —
+      does not apply, because the apex already resolves via an A record to
+      Vercel.
+
+      **Do not add a `www` → apex redirect in `next.config.ts` while Vercel's
+      primary is still `www`.** Vercel redirects apex → www at the edge before
+      Next sees the request; a Next-level redirect back would loop.
+
+      Verify afterwards with `npm run verify:live`.
 
 ### 3. Dead call-to-action buttons
 
