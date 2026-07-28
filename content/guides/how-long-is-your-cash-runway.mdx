@@ -1,0 +1,136 @@
+---
+title: "How long is your cash runway, really"
+description: "Cash divided by monthly burn is the number most owners quote, and the first one to fail. What to calculate instead, and why the answer is a date rather than a duration."
+slug: how-long-is-your-cash-runway
+date: 2026-07-28
+author: MarginGraph
+category: Cash
+tags:
+  - cash flow
+  - runway
+  - working capital
+  - VAT
+related:
+  - guides/profitable-and-broke
+  - guides/what-a-20-percent-revenue-drop-does
+  - faq/does-working-capital-affect-valuation
+faq:
+  - question: "What is a good cash runway for a small business?"
+    answer: "There is no standard, but the JPMorgan Chase Institute measured a median of 27 days of cash buffer across 597,000 US small businesses, ranging from 16 days in restaurants to 47 in real estate. Treat that as a floor to beat, not a target."
+  - question: "Why is my runway shorter than my calculation says?"
+    answer: "Almost always because the calculation used an average. VAT payments, annual holiday allowance, tax instalments and loan principal are lumpy, and insolvency happens at the trough of your cash curve rather than at its mean."
+---
+
+Most owners can tell you their runway in one number, and most of those numbers were produced by dividing the bank balance by an average. That calculation has a specific failure mode: it describes a business whose money arrives and leaves in equal daily instalments. Almost none do.
+
+Runway is not a duration. It is a date, and the date is set by the lowest point in your cash schedule, not by the average distance between your inflows and your outflows.
+
+## What the standard formula says, and what it leaves out
+
+The conventional definitions come from practitioner sources rather than accounting standards. There is no IFRS or FASB definition of burn rate or runway, which is worth knowing before you compare your number to anyone else's. The Corporate Finance Institute states the common version as cash runway equals the current cash balance divided by the monthly net burn rate, where gross burn is total monthly operating outflow and net burn is the difference between outflow and inflow.
+
+Both versions are averages, and both assume the average describes the path. Consider a wholesale business holding €48,000 in the bank at the start of February, looking back at a stable recent period:
+
+- Regular monthly cash out: €24,000
+- Recent monthly cash in: €25,500
+
+Net burn is negative. The business is generating cash, so the naive net runway is effectively infinite. The gross runway, cash divided by outflows, gives two months. Neither number is wrong arithmetically. Both are useless, because neither is what happens next.
+
+## The same business, month by month
+
+Here is the actual six-month schedule, with the lumpy items put back where they fall. This is a Dutch business filing VAT quarterly and paying statutory holiday allowance in May.
+
+| Month | Cash in | Regular out | Lumpy out | Total out | Closing balance |
+|---|---|---|---|---|---|
+| February | 26,000 | 24,000 | 0 | 24,000 | 50,000 |
+| March | 25,000 | 24,000 | 0 | 24,000 | 51,000 |
+| April | 23,000 | 24,000 | 9,500 (Q1 VAT) | 33,500 | 40,500 |
+| May | 21,000 | 24,000 | 11,000 (holiday allowance) | 35,000 | 26,500 |
+| June | 20,000 | 24,000 | 0 | 24,000 | 22,500 |
+| July | 27,000 | 24,000 | 8,200 (Q2 VAT) | 32,200 | 17,300 |
+
+Cash falls from €48,000 to €17,300 in six months. In February and March it rises, which is exactly when an owner running the naive calculation would conclude there was nothing to watch.
+
+Nothing unusual happened here. No customer defaulted, no equipment broke, revenue drifted down about 20% into the summer and recovered. The €30,700 of cash that disappeared went to two obligations that were entirely predictable and entirely absent from the average.
+
+## The five mechanisms that break the average
+
+**Money that is in your account but is not yours.** VAT is not revenue. Under the EU VAT Directive the tax becomes chargeable when the supply is made, not when your customer pays you, and you remit it on the filing deadline regardless. In the Netherlands, quarterly filers must have both the return and the payment in by the last day of the month following the quarter. A business on 60-day payment terms can be remitting VAT on invoices it has not yet been paid for. Your bank balance on 30 April and your bank balance on 1 May are structurally different amounts even when the number looks similar.
+
+**Annual costs that the average pretends are monthly.** Dutch employers owe statutory holiday allowance of at least 8% of gross annual salary, paid at least once a year and in practice usually in May or June. That makes one payroll month roughly twice the size of every other. Spread across twelve months it looks like an extra 8% a month. It is not. It is one cliff.
+
+**Revenue recognised before cash arrives.** Across the EU, suppliers reported receiving payment from other businesses on average in 60.3 days in 2024, against average agreed terms of 43.0 days. Public authorities took 69.8 days. Your P&L records the sale on the day you invoice. Your bank does not.
+
+**Growth absorbing cash.** Where your [cash conversion cycle](/guides/profitable-and-broke) is positive, every additional euro of sales consumes cash before it returns it. Churchill and Mullins formalised this as the self-financeable growth rate: the pace at which a company can grow on its own revenues. Above that rate, growth is cash-negative even when it is profitable. Runway calculated from trailing months therefore understates forward burn for any growing business.
+
+**Averaging hides the trough.** This is the general form of all of the above. Insolvency happens at the minimum of your cash curve, not at its mean. The JPMorgan Chase Institute found the median US small business had average daily cash outflows of $374 against average daily inflows of $381, roughly flat, yet the same firm held only 27 days of cash buffer. Being flat on average tells you nothing about whether you survive the trough.
+
+## How much buffer businesses actually hold
+
+The best available measurement is still the JPMorgan Chase Institute's 2016 study of 597,000 US small businesses. They define cash buffer days as the ratio of a business's average daily cash balance to its average daily cash outflows, that is, the number of days of outflows it could cover if inflows stopped entirely.
+
+The median was 27 days. By industry:
+
+| Industry | Median cash buffer days |
+|---|---|
+| Restaurants | 16 |
+| Repair and maintenance | 18 |
+| Retail | 19 |
+| Construction | 20 |
+| Personal services | 21 |
+| Wholesalers | 23 |
+| **All small businesses** | **27** |
+| Metal and machinery | 28 |
+| Health care services | 30 |
+| High-tech manufacturing | 32 |
+| High-tech services | 33 |
+| Other professional services | 33 |
+| Real estate | 47 |
+
+Three caveats matter before you compare yourself to this. It counts only balances in Chase Business Banking deposit accounts, so it excludes undrawn credit lines, cards, and accounts elsewhere: it is a lower bound on liquidity, not a measure of it. The data covers nine non-holiday months of 2015, so it is now a decade old. And the metric is itself an average-based measure, subject to exactly the critique above.
+
+A later JPMorgan Chase Institute report, published in April 2020 and covering 1.4 million businesses, found half of small businesses operating with fewer than 15 cash buffer days. The two figures use different samples and slightly different definitions and should not be read as a time series.
+
+## What to calculate instead
+
+Build a thirteen-week cash schedule, not a ratio. Thirteen weeks because it is long enough to contain a full VAT quarter and short enough that you can name every line.
+
+1. Open with today's actual bank balance, not your management accounts.
+2. Enter expected receipts by the date you expect the money, not the date you invoiced. Use your own observed payment behaviour per customer, not your terms.
+3. Enter payroll on payroll dates, including the annual allowance if it falls inside the window.
+4. Enter the VAT and tax payment dates explicitly, with amounts.
+5. Enter loan repayments in full, principal as well as interest. Principal is not in your P&L and will not appear if you build this from your profit figure. The [seven bridges between profit and cash](/guides/profitable-and-broke) covers why.
+6. Enter any capital purchase you have committed to.
+7. Enter your own drawings. They are not a cost, and they are the line most often left out.
+
+Then read the lowest closing balance in the schedule and the date it occurs. That pair of numbers is your runway. If the trough is negative, you have a date by which something must change, and you know precisely which line caused it.
+
+## What this does not tell you
+
+A thirteen-week schedule is a forecast, and its accuracy is entirely determined by the accuracy of your receipt dates. If you assume customers pay on terms and they historically pay 20 days late, the schedule is decorative. Build the receipt dates from what customers actually did in the last twelve months.
+
+It also assumes your revenue forecast is roughly right. It will not tell you what happens if a major customer leaves. That is a different question, and it belongs in [a stress test](/guides/what-a-20-percent-revenue-drop-does) rather than a cash schedule.
+
+Finally, buffer days and runway both measure how long you survive with no change in behaviour. They are not predictions. They are the amount of time you have to make a decision.
+
+<Cta
+  title="See what your working capital does to your valuation"
+  body="Working capital is one of the adjustments a buyer makes to your price. The report shows the calculation and the assumptions behind it."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>
+
+## Sources
+
+- Corporate Finance Institute, "Cash Runway Explained" and "Burn Rate", the commonly taught formulas. Note these are practitioner conventions; no accounting standard defines burn rate or runway. https://corporatefinanceinstitute.com/resources/valuation/cash-runway-explained/
+- Diana Farrell and Chris Wheat, *Cash is King: Flows, Balances, and Buffer Days*, JPMorgan Chase Institute, September 2016. 597,000 US small businesses, 470 million transactions, February to October 2015. https://www.jpmorganchase.com/institute/all-topics/business-growth-and-entrepreneurship/report-cash-flows-balances-and-buffer-days
+- JPMorgan Chase Institute, *Small Business Cash Liquidity in 25 Metro Areas*, April 2020. 1.4 million businesses. https://www.jpmorganchase.com/institute/all-topics/business-growth-and-entrepreneurship/small-business-cash-liquidity-in-25-metro-areas
+- EU Payment Observatory, *Annual Report 2025*, prepared by CEPS and EY for the European Commission (EISMEA), December 2025. B2B and G2B payment durations for 2024. https://single-market-economy.ec.europa.eu/document/download/db1722d8-9cad-40fd-9ad4-f56a907317fa_en
+- European Commission, VAT Directive 2006/112/EC, chargeable event (Articles 63, 65, 66). https://taxation-customs.ec.europa.eu/taxation/vat/vat-directive/chargeable-event_en
+- Belastingdienst, deadlines for VAT return and payment. https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/uiterste-aangifte-en-betaaldatums
+- Rijksoverheid, statutory holiday allowance of at least 8% of gross annual salary. https://www.rijksoverheid.nl/onderwerpen/vakantiedagen-en-vakantiegeld/vraag-en-antwoord/hoe-hoog-is-mijn-vakantiegeld
+- Neil C. Churchill and John W. Mullins, "How Fast Can Your Company Afford to Grow?", *Harvard Business Review*, May 2001. Subscription required for the full text. https://hbr.org/2001/05/how-fast-can-your-company-afford-to-grow
+
+### A note on one statistic we did not use
+
+You will frequently see the claim that 82% of small businesses fail because of cash flow problems, attributed to a US Bank study by Jessie Hagen. We could not locate any such study. It is not published by US Bank, the page usually cited as the onward source does not contain it, and in its original circulating form it is one line in a twelve-factor list whose percentages sum to roughly 800%, describing factors that contributed to failure rather than caused it. We have left it out.

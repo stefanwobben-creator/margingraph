@@ -1,0 +1,175 @@
+---
+title: "What a 20% drop in revenue would actually do to you"
+description: "Two businesses with almost identical profit. One loses two thirds of it when revenue falls a fifth, the other a third. The difference is one number from a single income statement."
+slug: what-a-20-percent-revenue-drop-does
+date: 2026-07-28
+author: MarginGraph
+category: Cash
+tags:
+  - operating leverage
+  - cost structure
+  - resilience
+  - break-even
+related:
+  - guides/how-long-is-your-cash-runway
+  - guides/profitable-and-broke
+  - guides/how-much-volume-can-you-lose-after-a-price-rise
+faq:
+  - question: "How do I calculate my degree of operating leverage?"
+    answer: "Divide contribution margin by operating profit. Multiply the result by a percentage change in sales to get the percentage change in profit."
+  - question: "How big a revenue fall can my business absorb?"
+    answer: "One divided by your degree of operating leverage. A DOL of 5 means you reach break-even at a 20% revenue fall. Recompute it at the lower revenue, because leverage rises sharply as you approach break-even."
+---
+
+Every business owner has an intuition about how much of a downturn they could take. Almost nobody has calculated it, and the intuition is usually generous, because it quietly assumes costs fall roughly in line with revenue.
+
+They do not. The share of your costs that keeps arriving whether or not the work does is what determines how a revenue drop lands on your profit, and it can be computed from one income statement in about five minutes.
+
+## The number, and its useful reciprocal
+
+**Degree of operating leverage = contribution margin ÷ operating profit**
+
+OpenStax defines operating leverage as "a measurement of how sensitive net operating income is to a percentage change in sales dollars," and gives this ratio as the calculation. Multiply your DOL by a percentage change in sales and you get the percentage change in operating profit.
+
+The reciprocal is where it becomes an actual tool:
+
+**Margin of safety % = 1 ÷ DOL**
+
+Margin of safety is defined as the difference between current sales and break-even sales, expressed as a percentage of current sales. The algebra ties the two together exactly: if contribution margin is CM and fixed costs are F, then DOL = CM ÷ (CM − F), and margin of safety percentage = (CM − F) ÷ CM, which is 1 ÷ DOL.
+
+So **one divided by your degree of operating leverage is the revenue drop that takes you to precisely zero profit.** A DOL of 5 means you break even at a 20% fall. A DOL of 3 means you can lose a third of your revenue and still be marginally in profit.
+
+Neither measure is defined in any accounting standard. They are management accounting constructs, which is why no two businesses calculate them identically and why you should record what you counted as variable.
+
+## Two agencies
+
+Both bill €600,000. Both make roughly €110,000. They are not the same business.
+
+**Firm A** owns its studio, employs all its staff, and runs equipment on lease. Fixed costs €260,000, contribution margin 62%.
+
+**Firm B** works from a small office and staffs projects with freelancers. Fixed costs €96,000, contribution margin 34%.
+
+| | Firm A | Firm B |
+|---|---|---|
+| Revenue | 600,000 | 600,000 |
+| Contribution margin | 372,000 (62%) | 204,000 (34%) |
+| Fixed costs | 260,000 | 96,000 |
+| **Operating profit** | **112,000** | **108,000** |
+| Degree of operating leverage | **3.32** | **1.89** |
+| Margin of safety | **30.1%** | **52.9%** |
+| Break-even revenue | 419,355 | 282,353 |
+
+On a profit and loss statement these two look like near-twins. On resilience they are not comparable. Firm A stops making money once revenue falls 30%. Firm B has to lose more than half its revenue before it reaches the same point.
+
+Now run the 20% drop:
+
+| | Firm A | Firm B |
+|---|---|---|
+| Revenue | 480,000 | 480,000 |
+| Contribution margin | 297,600 | 163,200 |
+| Fixed costs | 260,000 | 96,000 |
+| Operating profit | 37,600 | 67,200 |
+| Change in profit | **−66.4%** | **−37.8%** |
+| New DOL | **7.91** | **2.43** |
+| New margin of safety | **12.6%** | **41.2%** |
+
+Firm A loses two thirds of its profit. Firm B loses a bit over a third. And the crucial second-order effect: Firm A's leverage has more than doubled, from 3.32 to 7.91. Its remaining margin of safety is now 12.6%. Another 13% decline wipes it out entirely.
+
+## Leverage gets worse exactly when conditions do
+
+This is the property most people miss. DOL is not a constant. From DOL = CM ÷ (CM − F), as sales fall toward break-even the denominator approaches zero and the ratio rises without limit.
+
+For a business with €200,000 of fixed costs and a 50% contribution margin:
+
+| Revenue | Contribution | Operating profit | DOL | Drop to break-even |
+|---|---|---|---|---|
+| 1,000,000 | 500,000 | 300,000 | 1.67 | 60.0% |
+| 600,000 | 300,000 | 100,000 | 3.00 | 33.3% |
+| 500,000 | 250,000 | 50,000 | 5.00 | 20.0% |
+| 440,000 | 220,000 | 20,000 | 11.00 | 9.1% |
+| 400,000 | 200,000 | 0 | undefined | 0% |
+
+Quoting your DOL from a good year understates the sensitivity you face after sales have already fallen. The safety margin does not decline linearly with revenue. It collapses.
+
+Note also that the effect is symmetric. The same structure that turns a 10% revenue gain into a 33% profit gain turns a 10% loss into a 33% loss. High fixed costs are not a risk in one direction only, which is why the trade is genuine rather than obvious.
+
+## Why costs do not fall when revenue does
+
+You cannot fix this in the month it happens, and there is decent evidence on how quickly you can move.
+
+The OECD's model of European firm liquidity during COVID-19, built on 859,299 firms across 14 countries, calibrates the elasticity of the wage bill to sales at **0.2** and the elasticity of intermediate inputs at **0.8**. In plain terms: a 10% fall in sales reduces materials spending by about 8% within the month, and payroll by about 2%. The authors reduced these from their freely estimated values because a firm's ability to adjust is lower at monthly than at annual frequency. Taxes and debt service are treated as fully fixed.
+
+Law is part of the reason. Under EU Directive 98/59/EC on collective redundancies, projected collective redundancies notified to the competent public authority "shall take effect not earlier than 30 days after the notification," and consultation with workers' representatives must begin "in good time with a view to reaching an agreement" before that. That is the EU floor; national law is frequently stricter.
+
+The evidence from the shock itself is stark. Bartik and colleagues surveyed 5,843 US small businesses in the last week of March and the first days of April 2020 and published in *PNAS*: **"The median business with more than $10,000 in monthly expenses had only about 2 wk of cash on hand."** Roughly 25% of firms had less than one month of expenses in cash; about 75% had two months or less. By that point 41.3% had temporarily closed and employment was down 39% against the end of January.
+
+The European picture from the same period, in the ECB's Survey on the Access to Finance of Enterprises covering April to September 2020 across 11,019 firms of which 91% were SMEs, shows the mechanism in a single line. Net percentages for euro area SMEs:
+
+| | Net % reporting increase |
+|---|---|
+| Turnover | **−46** |
+| Profits | **−47** |
+| Labour costs | **+3** |
+| Other costs | **+11** |
+
+Turnover collapsed on net. Labour costs and other costs continued, on net, to rise. That gap is operating leverage observed rather than modelled, across ten thousand European SMEs.
+
+The consequences ran through liquidity rather than through profitability. The OECD study found that without policy intervention, **34 to 38% of European firms would have faced a liquidity shortfall within ten months**, against roughly 11% in a no-COVID counterfactual. Over 50% of firms in accommodation and food service, transport, and arts and recreation; under 20% in utilities, information and communication, and professional services.
+
+Working separately on SME-level data across eleven European countries, Gourinchas, Kalemli-Özcan, Penciakova and Sander estimated that absent government support, SME failure rates would have risen by 6.01 percentage points, putting 3.1% of employment at risk. Their finding that the firms which would have failed were broadly comparable in productivity and growth to those that survived is worth sitting with, though it comes from a working paper rather than a refereed article. On that evidence the shock selected on cost structure and cash rather than on quality.
+
+## Running your own
+
+1. **Split your costs.** Go through last year's profit and loss and mark each line variable or fixed over a six-month horizon. [Contribution margin, not gross margin](/guides/which-products-actually-make-money), is what you are building. Six months, because that is roughly how long it takes to exit a lease or complete a redundancy consultation. Be honest: salaried staff are fixed, freelancers are variable, rent is fixed, and most software subscriptions are fixed because nobody cancels them.
+2. **Compute contribution margin.** Revenue minus the variable pile.
+3. **Compute DOL.** Contribution margin divided by operating profit.
+4. **Compute margin of safety.** One divided by DOL. That is your break-even revenue decline.
+5. **Run the scenario.** Multiply DOL by the drop you want to test. A DOL of 3.32 and a 20% drop gives a 66% profit decline.
+6. **Recompute DOL at the lower revenue.** This is the step everyone skips, and it is the one that tells you how much room you have left after the first shock.
+7. **Convert to cash.** Profit is not survival. Take the reduced profit figure into [a thirteen-week cash schedule](/guides/how-long-is-your-cash-runway) and find the trough.
+
+## What you can actually change
+
+There are three levers, and they trade against each other.
+
+**Convert fixed costs to variable.** Freelancers instead of employees, revenue-share instead of rent, outsourced instead of in-house. This buys resilience and gives up margin in good times, which is exactly the trade Firm B has made. Firm B makes slightly less profit at €600,000 of revenue and would keep making money down to €282,000.
+
+**Raise contribution margin.** A price rise moves both terms of the ratio in the right direction at once, which is why it is the highest-leverage response to fragility. See [how much volume you can afford to lose](/guides/how-much-volume-can-you-lose-after-a-price-rise).
+
+**Hold more cash.** This does not change your DOL at all. It changes how long you can operate below break-even without the leverage mattering. Given that the median small business in the JPMorgan Chase Institute data held 27 days of buffer, this is the lever most businesses have the most room on.
+
+## What this does not tell you
+
+The fixed and variable split is a judgement about a time horizon, not a property of your costs. Everything is variable eventually and nothing is variable this week. Change the horizon and you change the answer, so state the horizon.
+
+DOL assumes your contribution margin ratio holds as volume changes. In a downturn it usually does not: you discount to hold volume, which cuts contribution margin and makes the outcome worse than the calculation suggests.
+
+And it is a profit measure, not a survival measure. A business can run below break-even for a long time with cash reserves and an understanding bank, and a business can fail while profitable. The evidence from 2020 is that liquidity, not profitability, decided who continued. Use this calculation to size the shock, then take it to [your cash schedule](/guides/how-long-is-your-cash-runway) to find out whether you survive it.
+
+<Cta
+  title="Resilience is priced into what you are worth"
+  body="Cost structure is one of the things a buyer discounts for. The report makes the assumptions visible instead of burying them in a single number."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>
+
+## Sources
+
+- OpenStax, *Principles of Accounting, Volume 2: Managerial Accounting*, sections 3.2 and 3.5. Break-even, margin of safety and degree of operating leverage, with worked examples. https://openstax.org/books/principles-managerial-accounting/pages/3-5-calculate-and-interpret-a-companys-margin-of-safety-and-operating-leverage
+- Saylor Academy, *Managerial Accounting*, sections 6.1 and 6.4. Cost structure comparison of high and low operating leverage firms. https://saylordotorg.github.io/text_managerial-accounting/s10-04-impact-of-cost-structure-on-co.html
+- Alexander W. Bartik, Marianne Bertrand, Zoe Cullen, Edward L. Glaeser, Michael Luca and Christopher Stanton, "The impact of COVID-19 on small business outcomes and expectations," *Proceedings of the National Academy of Sciences*, 117(30), 2020. 5,843 US firms, surveyed in the last week of March and first days of April 2020. Note this is a convenience sample of one business network, not a probability sample. Figures here are from the published version; the earlier NBER working paper reports 5,819 firms, 43% temporarily closed and a 40% employment fall. https://doi.org/10.1073/pnas.2006991117
+- Lilas Demmou, Guido Franco, Sara Calligaris and Dennis Dlugosch, "Liquidity shortfalls during the COVID-19 outbreak," OECD Economics Department Working Papers No. 1647, 2021; published in *Économie et Statistique* 532–533, 2022. 859,299 firms across 14 European countries. https://doi.org/10.24187/ecostat.2022.532.2070
+- European Central Bank, Survey on the Access to Finance of Enterprises, round 23, November 2020. 11,019 euro area enterprises, of which 10,042 had fewer than 250 employees. https://www.ecb.europa.eu/stats/ecb_surveys/safe/html/ecb.safe202011~e3858add29.en.html
+- Council Directive 98/59/EC of 20 July 1998 on collective redundancies, Articles 1, 2 and 4. https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:31998L0059
+- Robert W. Fairlie, "The impact of COVID-19 on small business owners," *Journal of Economics & Management Strategy*, 29(4), 2020. Active US business owners fell 22% between February and April 2020, measured as owner activity in the Current Population Survey rather than as permanent closures. https://doi.org/10.1111/jems.12400
+- Diana Farrell and Chris Wheat, *Cash is King: Flows, Balances, and Buffer Days*, JPMorgan Chase Institute, September 2016. https://www.jpmorganchase.com/institute/all-topics/business-growth-and-entrepreneurship/report-cash-flows-balances-and-buffer-days
+- Pierre-Olivier Gourinchas, Şebnem Kalemli-Özcan, Veronika Penciakova and Nick Sander, "SME Failures Under Large Liquidity Shocks," NBER Working Paper 27877, 2020. Working paper, not refereed. https://www.nber.org/papers/w27877
+
+### Further reading
+
+- Robert W. Fairlie's Current Population Survey work above, for what happened to owner activity rather than to firms.
+- US Department of Homeland Security, Ready.gov, Business Impact Analysis, for a structured way to cost out a disruption scenario. https://www.ready.gov/business/planning/impact-analysis
+
+### A note on a statistic we did not use
+
+The claim that 25% of businesses never reopen after a disaster appears on the US Small Business Administration's own preparedness page without any citation, and we could not locate a primary study behind it. We have left it out and used the measured cash-on-hand and liquidity-shortfall figures instead.
