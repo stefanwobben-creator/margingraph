@@ -57,3 +57,19 @@ describe("no decision page can ship without a working checkout", () => {
     ).toEqual([]);
   });
 });
+
+describe("the buy button survives every way a link gets opened", () => {
+  const source = readFileSync(
+    join(process.cwd(), "components", "commerce", "checkout-link.tsx"),
+    "utf8",
+  );
+
+  // cmd-click, middle click, "open in new tab" and "copy link address" either
+  // skip the React click handler or run it too late to matter. Whatever sits
+  // in the href attribute at render time is where the buyer actually lands, so
+  // it has to be a real checkout URL rather than an internal placeholder.
+  it("renders a real checkout URL rather than an internal placeholder", () => {
+    expect(source).not.toMatch(/href="\/[^"]*"/);
+    expect(source).toContain("payments.checkoutUrl({ product })");
+  });
+});

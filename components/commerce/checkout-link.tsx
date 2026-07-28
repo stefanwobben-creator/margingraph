@@ -15,6 +15,13 @@ import { getProduct, payments } from "@/lib/payments";
  * the consent rules, at the cost of only knowing the last page rather than the
  * first. For a ten-minute read that is a real limitation, and it is the honest
  * trade for not needing a banner.
+ *
+ * The rendered `href` is already a working checkout URL, without the source
+ * path. The click handler only enriches it. That matters because a plain left
+ * click is not the only way people open a link: cmd-click, middle click,
+ * "open in new tab" and "copy link address" either skip the handler or run it
+ * too late, and whatever is in the attribute at that moment is where the buyer
+ * ends up. Attribution is worth having. It is not worth losing a sale for.
  */
 export function CheckoutLink({
   report,
@@ -56,9 +63,14 @@ export function CheckoutLink({
     );
   }
 
+  // Safe here: the guard above has established that the provider is
+  // configured and the product has a variant, which are the only two reasons
+  // `checkoutUrl` throws.
+  const href = payments.checkoutUrl({ product });
+
   return (
     <Button asChild>
-      <a href="/checkout-unavailable" onClick={onClick} rel="nofollow">
+      <a href={href} onClick={onClick} rel="nofollow">
         {label ?? `Generate report — €${product.price}`}
       </a>
     </Button>
