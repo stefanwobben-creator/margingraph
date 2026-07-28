@@ -41,6 +41,10 @@ describe("navigation reaches every collection", () => {
   // page the visitor is on: silently correct on the homepage, dead elsewhere.
   it("keeps homepage anchors root-absolute", () => {
     expect(routes.howItWorks.startsWith("/#")).toBe(true);
-    expect(routes.exampleReport.startsWith("/#")).toBe(true);
+  });
+
+  // The example is a generated page now, not a section of the homepage.
+  it("points the example report at a page of its own", () => {
+    expect(routes.exampleReport).toBe("/example-report");
   });
 });

@@ -18,6 +18,7 @@ export const routes = {
   guides: collections.guides.basePath,
   blog: collections.blog.basePath,
   faq: collections.faq.basePath,
-  exampleReport: "/#example-report",
+  /** A real generated report, not a screenshot. */
+  exampleReport: "/example-report",
   howItWorks: "/#how-it-works",
 } as const;
