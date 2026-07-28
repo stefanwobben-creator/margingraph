@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 
+import { LogoMark } from "@/components/brand/logo-mark";
 import { cn } from "@/lib/utils";
 
 /**
@@ -46,6 +47,22 @@ export function Wordmark({ className }: { className?: string }) {
       )}
     >
       Margin<b className="font-[850]">Graph</b>
+    </span>
+  );
+}
+
+/**
+ * The lockup: mark and wordmark together.
+ *
+ * The mark sits at the cap height of the wordmark rather than on the baseline,
+ * so the two read as one object. Use this wherever the brand appears as a
+ * brand; use `Wordmark` alone where it is running text.
+ */
+export function Logo({ className }: { className?: string }) {
+  return (
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
+      <LogoMark className="size-[1.15em] text-wordmark" />
+      <Wordmark />
     </span>
   );
 }

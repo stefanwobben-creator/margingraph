@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Wordmark } from "@/components/brand/wordmark";
+import { Logo } from "@/components/brand/wordmark";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
@@ -21,7 +21,7 @@ export function SiteHeader() {
           aria-label={`${site.name} home`}
           className="text-[17px] transition-opacity hover:opacity-70"
         >
-          <Wordmark />
+          <Logo />
         </Link>
 
         <nav aria-label="Main" className="flex items-center gap-6">

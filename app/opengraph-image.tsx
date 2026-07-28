@@ -27,8 +27,15 @@ export default function OpengraphImage() {
           padding: 80,
         }}
       >
-        <div style={{ display: "flex", fontSize: 34, color: "#2f5fd0" }}>
-          {site.name}
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 7 }}>
+            <div style={{ width: 11, height: 24, borderRadius: 4, background: "#0b0f14", opacity: 0.35 }} />
+            <div style={{ width: 11, height: 36, borderRadius: 4, background: "#0b0f14", opacity: 0.6 }} />
+            <div style={{ width: 11, height: 52, borderRadius: 4, background: "#2f5fd0" }} />
+          </div>
+          <div style={{ display: "flex", fontSize: 34, color: "#0b0f14" }}>
+            {site.name}
+          </div>
         </div>
         <div
           style={{

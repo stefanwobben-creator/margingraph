@@ -4,10 +4,20 @@ export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
 /**
- * Replaces the Vercel triangle that create-next-app ships. Generated rather
- * than committed as a binary so the mark stays editable in one place.
+ * The mark, as the browser-tab icon.
+ *
+ * Drawn with divs rather than the SVG component: ImageResponse renders a
+ * subset of CSS and does not support external components or CSS variables.
+ * The proportions match components/brand/logo-mark.tsx — if one changes, so
+ * must the other.
  */
 export default function Icon() {
+  const bars = [
+    { height: 13, opacity: 0.35, colour: "#0b0f14" },
+    { height: 20, opacity: 0.6, colour: "#0b0f14" },
+    { height: 29, opacity: 1, colour: "#2f5fd0" },
+  ];
+
   return new ImageResponse(
     (
       <div
@@ -15,17 +25,25 @@ export default function Icon() {
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-end",
           justifyContent: "center",
-          background: "#111111",
-          color: "#ffffff",
-          fontSize: 21,
-          fontWeight: 700,
-          letterSpacing: "-0.05em",
-          borderRadius: 6,
+          gap: 4,
+          background: "#ffffff",
+          paddingBottom: 1,
         }}
       >
-        M
+        {bars.map((bar) => (
+          <div
+            key={bar.height}
+            style={{
+              width: 6,
+              height: bar.height,
+              borderRadius: 2,
+              background: bar.colour,
+              opacity: bar.opacity,
+            }}
+          />
+        ))}
       </div>
     ),
     size,
