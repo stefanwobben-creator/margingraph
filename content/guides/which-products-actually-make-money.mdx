@@ -1,0 +1,138 @@
+---
+title: "Gross margin lies: which of your products actually make money"
+description: "The line that looks like your worst performer is often the one paying for the overhead. How allocation creates fake losses, and which number to use when you decide what to drop."
+slug: which-products-actually-make-money
+date: 2026-07-28
+author: MarginGraph
+category: Margins
+tags:
+  - margins
+  - contribution margin
+  - costing
+  - product mix
+related:
+  - guides/cost-to-serve-and-customer-profitability
+  - guides/how-much-volume-can-you-lose-after-a-price-rise
+  - blog/how-profitability-affects-valuation
+faq:
+  - question: "Should I use gross margin or contribution margin?"
+    answer: "Use contribution margin for any decision about dropping a line, accepting a marginal order or prioritising sales effort. Gross margin usually contains fixed manufacturing overhead, which does not disappear when the line does."
+  - question: "Is a loss-making product line always worth dropping?"
+    answer: "No. Dropping it removes its contribution immediately but only removes overhead to the extent that overhead is genuinely avoidable. In the worked example here, a line showing an €81,000 allocated loss costs €16,000 of profit to discontinue."
+---
+
+Every business with more than one product line eventually runs the same report: revenue by line, cost by line, overhead spread across the lines, profit at the bottom. Then someone points at the negative number and asks why we still do that.
+
+The negative number is frequently an artefact of how the overhead was spread. Drop the line and the overhead does not leave with it. It lands on everything else, and next quarter a different line is in the red.
+
+## Two numbers that are not the same thing
+
+**Gross margin** is revenue minus cost of goods sold. It is a reporting convention. Interestingly, it is not required by anyone: the SEC's Regulation S-X requires a revenue caption and a cost-of-sales caption but never mentions gross profit, which is derived from them by habit. IFRS 18, effective from 2027, introduces two new defined subtotals, operating profit and profit before financing and income taxes. Gross profit is not one of them.
+
+**Contribution margin** is revenue minus the costs that vary with the unit. OpenStax defines it as "the amount by which a product's selling price exceeds its total variable cost per unit," and the contribution margin ratio as "the percentage of a unit's selling price that exceeds total unit variable costs."
+
+Contribution margin has no definition in IFRS, none in Regulation S-X, and none in the Institute of Management Accountants' own *Conceptual Framework for Managerial Costing*. It is a management accounting convention, which means nobody can tell you that your version is wrong, and also that you should write down what you included.
+
+The distinction matters because gross margin usually contains some fixed manufacturing overhead. If you use gross margin where you need contribution margin, you are already mixing costs that stop when you stop with costs that do not.
+
+## A crate manufacturer, two ways
+
+A business making shipping crates. Three lines, €690,000 revenue, €180,000 of overhead. Here it is with overhead spread by share of revenue, which is the default in most accounting packages:
+
+| Line | Revenue | Variable cost | Contribution | CM % | Overhead by revenue | Profit |
+|---|---|---|---|---|---|---|
+| Standard crates | 420,000 | 268,800 | 151,200 | 36.0% | 109,565 | 41,635 |
+| Custom crates | 180,000 | 126,000 | 54,000 | 30.0% | 46,957 | 7,043 |
+| Repair and refit | 90,000 | 40,500 | 49,500 | 55.0% | 23,478 | 26,022 |
+| **Total** | **690,000** | **435,300** | **254,700** | 36.9% | **180,000** | **74,700** |
+
+Everything is profitable. Custom crates is thin but positive. No action required.
+
+Now spread the same €180,000 by what actually consumes it. The overhead here is overwhelmingly production setup, scheduling and engineering time. Standard crates run in long batches and needed 40 setups last year. Custom crates needed 300. Repair needed 60. That is 400 setups, €450 each:
+
+| Line | Contribution | Setups | Overhead by activity | Profit |
+|---|---|---|---|---|
+| Standard crates | 151,200 | 40 | 18,000 | 133,200 |
+| Custom crates | 54,000 | 300 | 135,000 | **−81,000** |
+| Repair and refit | 49,500 | 60 | 27,000 | 22,500 |
+| **Total** | **254,700** | **400** | **180,000** | **74,700** |
+
+Same total profit. Same revenue. Custom crates has gone from mildly profitable to an €81,000 loss, and the answer looks obvious.
+
+## Why this happens, and why it is not new
+
+This is the classic distortion Cooper and Kaplan documented in the late 1980s. Their argument, from "Measure Costs Right: Make the Right Decisions" in the September–October 1988 *Harvard Business Review*, opens: "Managers in companies selling multiple products are making important decisions about pricing, product mix, and process technology based on distorted cost information." Their point was that the distortion typically goes undetected until competitive position and profitability have already suffered, because there is no second system to contradict it.
+
+The mechanism is specific. When overhead is spread by a volume-based driver, whether that is revenue share, units, direct labour hours or square metres, high-volume products absorb most of the cost because they have most of the volume. Low-volume, high-complexity products absorb little, even though complexity is what consumes the overhead. The IMA's framework puts it plainly: allocating these costs to outputs arbitrarily, or with a highly generalised driver, distorts decision-making information at many levels of an organisation.
+
+The size of the distortion can be large. Turney, writing in *Target* in 1989, reported that activity-based costing at Schrader Bellows showed low-volume specialty products cost "100 to 1000 percent greater than the previously reported standard costs."
+
+## The trap on the other side
+
+<Warning title="The €16,000 mistake">
+  The allocated number says custom crates lose €81,000 a year. Dropping the line
+  actually costs €16,000 of profit, because the contribution leaves immediately
+  and most of the overhead does not. Allocation is not avoidability.
+</Warning>
+
+Having seen the €81,000 loss, the obvious move is to drop custom crates. Run that decision properly.
+
+Dropping the line removes €54,000 of contribution immediately. It removes overhead only to the extent that overhead is genuinely avoidable. Suppose that of the €135,000 allocated, one part-time setup technician at €38,000 can actually be released, and the rest is the plant manager, the scheduling software, the building, and the engineer you would keep anyway.
+
+| | Before | After dropping custom crates |
+|---|---|---|
+| Total contribution | 254,700 | 200,700 |
+| Overhead | 180,000 | 142,000 |
+| **Operating profit** | **74,700** | **58,700** |
+
+Dropping the loss-making line costs €16,000 of profit. The allocated number said minus eighty-one thousand. The decision-relevant number said plus sixteen thousand for keeping it.
+
+OpenStax states the rule directly for keep-or-discontinue decisions: determine the contribution margins with and without the segment, compare them, and choose the alternative with the greater contribution. Costs that will continue to exist either way, and allocated common costs that do not differ between the alternatives, are excluded. Their worked example produces exactly this shape: a line showing a $76,000 loss with allocated costs included, and a $457,000 positive product margin once only avoidable costs are counted.
+
+## So what is the activity view good for
+
+Not for dropping things. For three other decisions.
+
+**Pricing.** Custom crates consume 17.5 times more setup activity per euro of revenue than standard crates and are priced at a lower margin. That is a pricing error, not a product error. The right response to the €81,000 is a price rise or a minimum batch size, not a discontinuation, and [the break-even arithmetic on a price change](/guides/how-much-volume-can-you-lose-after-a-price-rise) tells you how much room you have.
+
+**Design.** If 300 setups produce €180,000 of custom crate revenue, the question is why 300. Batch sizes, standardised components and a shorter option list all reduce setups without losing a single customer.
+
+**Sales direction.** Repair and refit has a 55% contribution margin and consumes almost no overhead. If you are going to point your sales effort somewhere, the activity view tells you where.
+
+## Keep the honesty in
+
+Two things stop this from becoming a different kind of false precision.
+
+A more granular allocation is still an allocation. Eric Noreen showed in 1991 that activity-based costs only equal avoidable costs under three strict conditions: each cost pool must depend on a single activity, cost in each pool must be strictly proportional to activity level, and each activity must be partitionable to products. He concluded those conditions "are quite strong." Your setup rate of €450 is an average of a distribution, and it is not what you save by doing one fewer setup.
+
+And better costing does not automatically produce better returns. Ittner, Lanen and Larcker, studying US manufacturing plants in the *Journal of Accounting Research* in 2002, found extensive ABC use associated with higher quality and better cycle time, but "on average, extensive ABC use has no significant association with return on assets." Knowing your costs is a precondition for acting on them, not a substitute.
+
+## What this does not tell you
+
+Contribution margin governs short-run decisions, where short-run means the period over which your fixed costs are genuinely fixed. If dropping a line lets you exit a lease in six months, that lease is not fixed over an eighteen-month horizon and belongs in the analysis. The boundary between fixed and variable is a function of your time horizon, not a property of the cost.
+
+It also says nothing about strategic value. A low-contribution line that brings customers who buy the profitable lines is not a loss-maker, it is an acquisition cost recorded in the wrong place. The arithmetic here will not find that for you. Only [knowing your customers](/guides/cost-to-serve-and-customer-profitability) will.
+
+<Cta
+  title="Profitability is what sets your multiple"
+  body="Two businesses with the same revenue and different margins do not sell for the same price. The report shows which figure a buyer uses and what it does to the range."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>
+
+## Sources
+
+- OpenStax, *Principles of Accounting, Volume 2: Managerial Accounting* (Franklin, Graybeal and Cooper, 2019), section 3.1 for the contribution margin definitions. https://openstax.org/books/principles-managerial-accounting/pages/3-1-explain-contribution-margin-and-calculate-contribution-margin-per-unit-contribution-margin-ratio-and-total-contribution-margin
+- OpenStax, same volume, section 10.4, for the keep-or-discontinue rule and the $76,000 / $457,000 worked figures. https://openstax.org/books/principles-managerial-accounting/pages/10-4-evaluate-and-determine-whether-to-keep-or-discontinue-a-segment-or-product
+- Robin Cooper and Robert S. Kaplan, "Measure Costs Right: Make the Right Decisions," *Harvard Business Review*, September–October 1988. The opening sentence quoted above is on the free article page; the body is subscription-only. https://hbr.org/1988/09/measure-costs-right-make-the-right-decisions
+- Robert S. Kaplan and Robin Cooper, "How Cost Accounting Systematically Distorts Product Costs," in Bruns and Kaplan (eds.), *Accounting and Management: Field Study Perspectives*, Harvard Business School Press, 1987.
+- Larry R. White and B. Douglas Clinton, *Conceptual Framework for Managerial Costing*, Institute of Management Accountants, September 2014. https://www.imanet.org/research-publications/statements-on-management-accounting/conceptual-framework-for-managerial-costing
+- Peter B.B. Turney, "Activity-Based Costing: A Tool for Manufacturing Excellence," *Target*, Association for Manufacturing Excellence, Summer 1989. Source of the Schrader Bellows figures. https://www.ame.org/sites/default/files/target_articles/89Q2A4.pdf
+- Eric Noreen, "Conditions Under Which Activity-Based Cost Systems Provide Relevant Costs," *Journal of Management Accounting Research*, vol. 3, Fall 1991. https://bpb-us-w2.wpmucdn.com/u.osu.edu/dist/8/36875/files/2016/12/Noreen-JMAR-1991-vrlob7.pdf
+- Christopher D. Ittner, William N. Lanen and David F. Larcker, "The Association Between Activity-Based Costing and Manufacturing Performance," *Journal of Accounting Research*, vol. 40 no. 3, 2002. https://ideas.repec.org/a/bla/joares/v40y2002i3p711-726.html
+- IFRS 18, *Presentation and Disclosure in Financial Statements*, IFRS Foundation, effective 1 January 2027. https://www.ifrs.org/issued-standards/list-of-standards/ifrs-18-presentation-and-disclosure-in-financial-statements/
+- SEC Regulation S-X, 17 CFR 210.5-03. https://www.ecfr.gov/current/title-17/chapter-II/part-210/subject-group-ECFR15666770601dd20/section-210.5-03
+
+### A note on a statistic we looked for and could not find
+
+We searched for survey evidence on how many small businesses know their per-product margins. There is none that we could locate from any independent source, and the figures circulating on the subject come from accounting software vendors without published methodology. We have treated this as an absence of evidence rather than filling it with a number.

@@ -1,0 +1,150 @@
+---
+title: "How much volume can you afford to lose after a price rise?"
+description: "There is an exact answer and it takes one line of arithmetic. The same formula shows why discounting is far more dangerous than it looks."
+slug: how-much-volume-can-you-lose-after-a-price-rise
+date: 2026-07-28
+author: MarginGraph
+category: Margins
+tags:
+  - pricing
+  - margins
+  - contribution margin
+  - discounting
+related:
+  - guides/which-products-actually-make-money
+  - guides/cost-to-serve-and-customer-profitability
+  - blog/how-profitability-affects-valuation
+faq:
+  - question: "How much volume can I lose after raising prices?"
+    answer: "Divide the price rise by the sum of the price rise and your contribution margin. At a 30% contribution margin, a 10% price rise stays worthwhile until you lose more than 25% of your unit volume."
+  - question: "Why is a price cut worse than a price rise is good?"
+    answer: "Because the denominator moves the other way. A cut equal to your contribution margin can never be recovered by any volume at all, and a 10% cut at a 30% margin needs a 50% volume gain just to break even."
+---
+
+The reason most price rises never happen is a sentence: "we'll lose customers." It is probably true. The question nobody asks is how many, and that question has an exact answer you can compute in about thirty seconds.
+
+## The formula
+
+Let **m** be your contribution margin as a fraction of price, and **p** the size of the price change as a fraction of the current price.
+
+**Maximum volume you can lose on a price rise = p ÷ (m + p)**
+
+**Minimum volume you must gain on a price cut = c ÷ (m − c)**
+
+The derivation is short. Raise price by p and your contribution per unit, expressed against the original price, goes from m to m + p. Total contribution is unchanged when new volume times (m + p) equals old volume times m. Everything follows from that.
+
+Two properties of these formulas do the real work.
+
+On a rise, the denominator grows, so the answer is bounded and always below 100%. On a cut, the denominator shrinks, so the answer explodes. And when the cut equals your contribution margin, the denominator hits zero: **no volume gain whatsoever can recover it.** A café with a 25% contribution margin running a 30% discount loses money on every additional unit sold, forever, at any volume.
+
+<Warning title="The discount that cannot be recovered">
+  If the discount is equal to or larger than your contribution margin, no volume
+  gain of any size makes it back. This is not a hard case to hit: a 30% promotion
+  at a 25% margin is an ordinary retail decision.
+</Warning>
+
+## The table
+
+| Contribution margin | 5% rise: max volume loss | 10% rise: max volume loss | 5% cut: required gain | 10% cut: required gain |
+|---|---|---|---|---|
+| 15% | 25.0% | 40.0% | 50.0% | 200.0% |
+| 20% | 20.0% | 33.3% | 33.3% | 100.0% |
+| 25% | 16.7% | 28.6% | 25.0% | 66.7% |
+| 30% | 14.3% | 25.0% | 20.0% | 50.0% |
+| 40% | 11.1% | 20.0% | 14.3% | 33.3% |
+| 50% | 9.1% | 16.7% | 11.1% | 25.0% |
+| 60% | 7.7% | 14.3% | 9.1% | 20.0% |
+
+Read a row in both directions. At a 30% contribution margin, a 10% price rise survives losing a quarter of your unit volume. A 10% price cut requires you to sell half again as much just to stand still.
+
+The asymmetry is the point. Same size move, opposite directions, and the downside case demands roughly twice as much of the market.
+
+## A worked example
+
+A business with €380,000 of annual revenue at a 32% contribution margin, so €121,600 of contribution. It raises prices 8%.
+
+Break-even volume loss is 0.08 ÷ (0.32 + 0.08) = **20.0%**. One customer in five can leave before the rise is a mistake.
+
+| Volume lost | Contribution after | Change |
+|---|---|---|
+| 0% | 152,000 | +30,400 |
+| 5% | 144,400 | +22,800 |
+| 10% | 136,800 | +15,200 |
+| 15% | 129,200 | +7,600 |
+| 20% (break-even) | 121,600 | 0 |
+| 25% | 114,000 | −7,600 |
+
+Note the shape. Losing 10% of your volume, which would feel like a disaster in the moment, still leaves you €15,200 better off. Losing nothing at all improves contribution by 25% on an 8% price move.
+
+There is a second way to state the same threshold. Break-even price elasticity is 1 ÷ (m + p), here 1 ÷ 0.40 = **2.50**. You only lose money if a 1% price rise costs you more than 2.5% of volume.
+
+That number is useful because there is published evidence on what elasticities look like. Tellis's 1988 meta-analysis of 367 estimates drawn from about 220 brands and markets found a mean price elasticity of −1.76 with a standard deviation of 1.74. Bijmolt, van Heerde and Pieters, working from 1,851 elasticities across 81 studies in 2005, found a mean of −2.62. A break-even elasticity of −2.50 sits well beyond Tellis's mean and just inside Bijmolt's, so the two best meta-analyses disagree about which side of the line the average product falls on.
+
+One caveat matters more than the numbers. Both meta-analyses measure brand-level elasticity, largely from consumer goods scanner data, where a single brand raises price while its competitors do not and loses share to them. A small business raising its own prices across the whole book is closer to a category-level elasticity, which is generally lower in absolute terms. Read those means as a hard test rather than a fair one.
+
+## Why you should not try to measure your own elasticity
+
+The most useful finding in the whole literature is about uncertainty rather than magnitude.
+
+Hitsch, Hortaçsu and Lin estimated 27.2 million price and promotion coefficients across roughly 50,000 products in 17,184 stores. Their result: for the median brand in a local retail chain, **only 7.5% of price elasticity estimates could be distinguished from the chain's own average**, at a 95% credible interval. Loosen the interval to 80% and it rises to 21.2%.
+
+That is with tens of millions of observations and state-of-the-art methods. A business with a few hundred transactions a month cannot estimate its own elasticity in any meaningful sense. The break-even formula is valuable precisely because it does not require you to. It converts an unanswerable question, how sensitive are my customers, into an answerable one: is my elasticity worse than this specific threshold?
+
+## The 1% claim, and what it actually says
+
+You will encounter a figure that a 1% price improvement raises operating profit by 8 to 11%. It is worth knowing what that number is, because it is regularly quoted as though it were a finding about the effect of raising prices.
+
+It is three separate publications, on three different samples, eighteen years apart:
+
+- **11.1%**, Marn and Rosiello, *Harvard Business Review*, September–October 1992, based on "average economics of 2,463 companies in Compustat aggregate"
+- **8%**, Marn, Roegner and Zawada, *McKinsey Quarterly*, 2003 Number 1, based on the typical economics of an S&P 1500 company
+- **8.7%**, Baker, Marn and Zawada, McKinsey, August 2010, for the typical Global 1200 company
+
+All three are the same piece of arithmetic: the reciprocal of the operating margin, applied to an average income statement. Nothing was measured about firms raising prices and observing profit. The 1992 and 2003 versions carry the volume caveat explicitly, 2003 as "if volumes remained stable," and it is dropped in almost every retelling, including McKinsey's own 2010 restatement. Without it the statement is simply false.
+
+And all three samples are large listed companies. Your own multiplier is one divided by your operating margin. If you run at 6%, it is roughly 17. If you run at 25%, it is 4. Use your own number.
+
+## Where the money actually leaks
+
+Marn and Rosiello's more durable contribution was the pocket price waterfall: the gap between list price and what you actually keep. In their linoleum example, a $6.00 dealer list price became a $5.78 invoice price after order-size and competitive discounts, then a $4.47 pocket price after payment terms, annual volume bonus, off-invoice promotions, co-op advertising and freight. That is 22.7% below invoice, in items that never appear on an invoice.
+
+They also documented the spread. For one product, units sold as high as $25 and as low as $14, a band of more than 25% either side of the average. Across their examples the pocket price band ran from 60% to 500%.
+
+Two things follow. First, you are already price-discriminating; the question is whether you are doing it in favour of the customers who value you most or the ones who negotiate hardest. Second, if your band is 60% wide, tightening it is worth more than any list price change and requires no announcement to anyone.
+
+On discount authority, Stephenson, Cron and Frazier studied 108 firms in the *Journal of Marketing* in 1979 and found that the firms giving salespeople the greatest pricing authority produced the weakest sales and profit performance. A more recent study by Sharma and colleagues, covering 504,446 B2B transactions, found the relationship is not that simple: discretion improves customer satisfaction and purchase quantities, and its effect on profitability is non-linear and depends on salesperson experience. So the honest reading is not "remove all discretion" but "cap it and require a reason." Castle Battery, in Marn and Rosiello's account, capped exception discounts at 5% and required a documented volume-and-margin evaluation.
+
+## The cost-plus trap
+
+If you set prices by adding a markup to cost, there is a specific reason you never escape it. Hanson and Kalyanam showed in *Marketing Letters* in 1994 that a firm following cost-plus pricing generates data that is uninformative about demand, because price only ever moves when cost moves. You never observe what happens when price moves independently, so you never learn enough to stop. They called it the cost-plus trap.
+
+Across roughly two dozen empirical studies reviewed by Hinterhuber in 2008, cost-based pricing accounted for about 37% of practice, competition-based 44%, and customer value-based only 17%.
+
+## What this does not tell you
+
+The break-even formula tells you the threshold. It does not tell you whether you will cross it. That depends on how the increase is communicated, how much notice customers get, whether it lands on everyone or on segments, and what your competitors do next.
+
+It also assumes your contribution margin is a true variable-cost margin. If you plug in gross margin that contains fixed manufacturing overhead, you will overstate the volume you can afford to lose. [Gross margin and contribution margin are not the same thing](/guides/which-products-actually-make-money), and the difference matters here more than anywhere.
+
+And it is a single-period calculation. It says nothing about whether the customers you lose were the ones you wanted to keep. That question belongs with [cost to serve](/guides/cost-to-serve-and-customer-profitability), not with pricing.
+
+<Cta
+  title="Better margins, higher multiple"
+  body="A price change moves profitability, and profitability moves your valuation range. The report traces both, with every figure tied back to a line in your file."
+  href="/decision/business-valuation"
+  label="Business Valuation report — €9"
+/>
+
+## Sources
+
+- Thomas T. Nagle, Georg Müller and Evert Gruyaert, *The Strategy and Tactics of Pricing*, 7th edition, Routledge, 2023, chapter 9. The standard textbook treatment of break-even sales analysis for price changes. https://www.routledge.com/p/book/9781032016825
+- Michael V. Marn and Robert L. Rosiello, "Managing Price, Gaining Profit," *Harvard Business Review*, September–October 1992. Source of the 11.1% figure, the pocket price waterfall and the pocket price band. Subscription required for the full text and exhibits. https://hbr.org/1992/09/managing-price-gaining-profit
+- Michael V. Marn, Eric V. Roegner and Craig C. Zawada, "The power of pricing," *McKinsey Quarterly*, 2003 Number 1. https://www.mckinsey.com/capabilities/growth-marketing-and-sales/our-insights/the-power-of-pricing
+- Walter L. Baker, Michael V. Marn and Craig C. Zawada, "Building a better pricing infrastructure," McKinsey, August 2010. Source of the 8.7% Global 1200 figure. https://www.mckinsey.com/capabilities/growth-marketing-and-sales/our-insights/building-a-better-pricing-infrastructure
+- Gerard J. Tellis, "The Price Elasticity of Selective Demand: A Meta-Analysis of Econometric Models of Sales," *Journal of Marketing Research*, 25(4), November 1988. 367 elasticities from about 220 brands and markets. Subscription required beyond the abstract. https://www.jstor.org/stable/3172944
+- Tammo H.A. Bijmolt, Harald J. van Heerde and Rik G.M. Pieters, "New Empirical Generalizations on the Determinants of Price Elasticity," *Journal of Marketing Research*, 42(2), May 2005. 1,851 elasticities across 81 studies. https://journals.sagepub.com/doi/10.1509/jmkr.42.2.141.62296
+- Günter J. Hitsch, Ali Hortaçsu and Xiliang Lin, "Prices and Promotions in U.S. Retail Markets," NBER Working Paper 26306, 2019. https://www.nber.org/papers/w26306
+- P. Ronald Stephenson, William L. Cron and Gary L. Frazier, "Delegating Pricing Authority to the Sales Force: The Effects on Sales and Profit Performance," *Journal of Marketing*, 43(2), March 1979. 108 firms. https://journals.sagepub.com/doi/10.1177/002224297904300203
+- Amalesh Sharma, Tarun Kumar Sharma, Wyatt A. Schrock and Eli Jones, "Salesperson pricing discretion: Exploring the contingent effects and customer outcomes," *Journal of the Academy of Marketing Science*, 53(6), 2025. 504,446 B2B transactions. https://link.springer.com/article/10.1007/s11747-025-01093-6
+- Ward A. Hanson and Kirthi Kalyanam, "A cost-plus trap: Pricing heuristics and demand identification," *Marketing Letters*, 5(3), 1994. https://link.springer.com/article/10.1007/BF00993899
+- Andreas Hinterhuber, "Customer value-based pricing strategies: why companies resist," *Journal of Business Strategy*, 29(4), 2008. https://www.emerald.com/insight/content/doi/10.1108/02756660810887079/full/html
