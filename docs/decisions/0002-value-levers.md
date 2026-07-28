@@ -54,7 +54,13 @@ in.
 
 Today, on real figures, one line did more work than any report:
 
-> €10.000 of EBITDA is worth €103.700 of enterprise value at this multiple.
+> One point of gross margin is worth €75.209 of value.
+
+(That figure is Authentic Models, run through the engine after this ADR was
+first written. The draft carried €103.700 per €10.000 of EBITDA and attributed
+it to the same company; it was the holiday park, at a yield of twelve. Corrected
+here rather than quietly, because misattributing a number between two of our own
+cases is exactly the failure this product sells against.)
 
 That converts every operational decision into the only currency an owner
 already cares about. Clearing €388.782 of dead stock is a balance-sheet event
