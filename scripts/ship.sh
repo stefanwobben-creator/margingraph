@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# One command from working tree to pushed commit.
+#
+# It exists because the manual sequence has a specific failure mode: run as
+# separate lines, `npm run check` can fail and `git push` still runs, so broken
+# code reaches main while the terminal has just said it should not. `set -e`
+# plus a single entry point makes that impossible.
+#
+#   npm run ship "feat: what changed"
+#
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+if [ $# -lt 1 ] || [ -z "$1" ]; then
+  echo "usage: npm run ship \"commit message\"" >&2
+  exit 64
+fi
+MESSAGE="$1"
+
+# Stale lock files left behind by tooling that could not unlink them. Harmless
+# to remove when no git process is running, and they block everything when they
+# are there. `find` rather than a glob: zsh aborts the whole command when a
+# glob matches nothing, which is how these survived last time.
+find .git -name '*.lock' -delete 2>/dev/null || true
+
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+echo "→ branch: $BRANCH"
+
+if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+  echo "nothing to ship: working tree is clean" >&2
+  exit 0
+fi
+
+echo "→ changes:"
+git status --short
+
+echo "→ running npm run check"
+npm run check
+
+echo "→ committing"
+git add -A
+git commit -m "$MESSAGE"
+
+echo "→ pushing"
+git push -u origin "$BRANCH"
+
+echo "✓ pushed $(git rev-parse --short HEAD) to $BRANCH"

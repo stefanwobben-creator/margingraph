@@ -11,7 +11,8 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:live": "LOCAL_SHA=$(git rev-parse HEAD) node scripts/verify-live.mjs"
+    "verify:live": "LOCAL_SHA=$(git rev-parse HEAD) node scripts/verify-live.mjs",
+    "ship": "bash scripts/ship.sh"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
