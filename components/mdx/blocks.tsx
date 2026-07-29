@@ -169,6 +169,47 @@ export function Metrics({
 /* -------------------------------------------------------------------------- */
 
 /**
+ * A vertical cascade: label, amount, and what it was before.
+ *
+ * `Metrics` puts three figures side by side, which is right for three
+ * unrelated numbers and wrong for a sequence. A cascade is read downwards,
+ * because each line is what is left after the line above it, and laying it out
+ * in a grid destroys the one property that makes it worth reading.
+ */
+export function Cascade({
+  title,
+  items,
+}: {
+  title?: string;
+  items: { label: string; value: string; note?: string }[];
+}) {
+  return (
+    <figure className="my-10 overflow-hidden rounded-lg border border-border not-prose">
+      {title ? (
+        <figcaption className="border-b border-border bg-muted/40 px-5 py-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
+          {title}
+        </figcaption>
+      ) : null}
+      <dl className="divide-y divide-border">
+        {items.map((item) => (
+          <div key={item.label} className="flex items-baseline justify-between gap-4 px-5 py-3">
+            <dt className="text-sm">{item.label}</dt>
+            <dd className="flex items-baseline gap-3 text-sm tabular-nums">
+              {item.note ? (
+                <span className="text-xs text-muted-foreground">{item.note}</span>
+              ) : null}
+              <span className="font-medium">{item.value}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </figure>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/**
  * A call to action. Two shapes, and only two.
  *
  * `href` sends the reader somewhere on the site. `report` sells something and

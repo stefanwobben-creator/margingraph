@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { MDXComponents } from "mdx/types";
 
 import {
+  Cascade,
   Checklist,
   Comparison,
   Cta,
@@ -56,6 +57,7 @@ export const mdxComponents: MDXComponents = {
   Comparison,
   ProsCons,
   Metrics,
+  Cascade,
   Cta,
   Figure,
   Image: Figure,

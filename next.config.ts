@@ -88,6 +88,14 @@ const nextConfig: NextConfig = {
    * /reports was published before decisions became the only commercial content
    * type. These are permanent: the URLs were live, and a 301 preserves whatever
    * link equity and bookmarks they picked up.
+   *
+   * The Dutch pages are the same problem with a worse cause. The site was
+   * written in two languages, one was chosen, and the Dutch versions were
+   * removed from the working copy without ever being removed from the
+   * repository, so they went on being built and served: five pages, four of
+   * them near-duplicates of an English page, on one domain, with nothing
+   * telling a search engine which was which. Each one now points at its
+   * English twin.
    */
   async redirects() {
     return [
@@ -95,6 +103,34 @@ const nextConfig: NextConfig = {
       {
         source: "/reports/:slug",
         destination: "/decision/:slug",
+        permanent: true,
+      },
+      {
+        source: "/decision/wat-zit-er-in-mijn-cijfers",
+        destination: "/decision/what-is-hiding-in-my-figures",
+        permanent: true,
+      },
+      {
+        source: "/blog/omzet-daalt-kosten-niet-hoe-zie-je-dat-op-tijd",
+        destination: "/blog/revenue-fell-costs-did-not",
+        permanent: true,
+      },
+      {
+        source: "/blog/vracht-doorbelasten-hoeveel-is-normaal",
+        destination: "/blog/how-much-freight-are-you-giving-away",
+        permanent: true,
+      },
+      {
+        source: "/blog/waarom-telt-mijn-winst-en-verliesrekening-niet-op",
+        destination: "/blog/why-your-profit-and-loss-does-not-add-up",
+        permanent: true,
+      },
+      // No English twin: this one was an anonymised read of a real information
+      // memorandum and was never rewritten. The index is the honest landing
+      // place until it is.
+      {
+        source: "/blog/informatiememorandum-lezen-de-ene-deling",
+        destination: "/blog",
         permanent: true,
       },
     ];

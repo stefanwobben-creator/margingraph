@@ -18,6 +18,7 @@ import {
   has,
   normalise,
   spanOf,
+  tierOf,
 } from "./vocabulary";
 
 export type ReadOptions = {
@@ -368,6 +369,17 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
       .filter((row) => kinds.includes(row.kind) && row.actual !== null)
       .map((row) => ({ key: row.key, label: row.label }));
 
+  // Only lines we can actually place. A cost we cannot read into a step is
+  // left out of the cascade rather than dropped into the nearest one, because
+  // the whole value of the cascade is that it names which step, and a step
+  // padded with unplaceable lines names nothing.
+  const tiers = rows
+    .filter((row) => (row.kind === "variable" || row.kind === "cost") && row.actual !== null)
+    .map((row) => ({ key: row.key, label: row.label, tier: tierOf(row.label) }))
+    .filter((line): line is { key: string; label: string; tier: 1 | 2 | 3 | 4 } =>
+      line.tier !== undefined,
+    );
+
   const input: FindingsInput = {
     actual: { label: actualLabel, revenueKey: revenue.key, values: actualValues },
     reference:
@@ -381,6 +393,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     recoveries,
     variableLines: lines(["variable"]),
     costLines: lines(["variable", "cost"]),
+    tiers,
     contributionMargin,
   };
 

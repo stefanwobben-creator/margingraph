@@ -1,0 +1,139 @@
+---
+title: "Where your margin actually goes: the four steps between a sale and your profit"
+description: "Your accounts list costs in the order a bookkeeper needs. Sorted by distance from the sale instead, they answer what a ledger cannot: which step drains the money, and who to talk to about it."
+slug: where-your-margin-actually-goes
+date: 2026-07-29
+author: MarginGraph
+category: Margin
+tags:
+  - contribution margin
+  - gross margin
+  - cost structure
+  - services
+related:
+  - guides/which-products-actually-make-money
+  - guides/cost-to-serve-and-customer-profitability
+  - blog/how-much-freight-are-you-giving-away
+faq:
+  - question: "What is the difference between gross profit and contribution margin?"
+    answer: "Gross profit takes only the cost of what you sold off your turnover. Contribution margin keeps going and takes off every other cost that moves with the sale: fulfilling it and winning it. Two companies can report the same gross margin and keep entirely different amounts once delivery and marketing are counted."
+  - question: "Why does my accounting package not show this?"
+    answer: "A ledger is ordered by account code, which is the order a bookkeeper needs to file things. The cascade is ordered by distance from the sale, which is the order you need to decide things. Nothing is missing from your accounts; the lines are simply in the wrong order for the question."
+  - question: "Should a services business use the same steps?"
+    answer: "The same four steps, but the shape is completely different. A goods business loses roughly half of every euro at step one and a services business almost nothing, because in services the people are the product and the money leaves at step four. Reading one against the other is how you conclude that a consultancy has a purchasing problem."
+---
+
+Ask an owner what their margin is and you get one number. Usually gross margin, usually from the top of the profit and loss account, usually right. Then ask where the rest of it goes and the answer gets vague, because the profit and loss account does not answer that question. It lists costs in the order the ledger files them: account 4100, then 4200, then 4300. That order is exactly right for a bookkeeper and useless for a decision.
+
+Sort the same costs by how close they sit to the sale and something else appears. Not new numbers. The same numbers, in the order the money actually leaves.
+
+## The four steps
+
+Every sale runs a gauntlet. Four steps, each with a different owner, each a different conversation.
+
+**Step one, what it cost to buy.** The goods themselves, the freight inbound, the duty, the packaging. Take this off net sales and you have gross profit, which most people call gross margin. This step belongs to whoever does your purchasing.
+
+**Step two, what it cost to fulfil.** Picking, packing, outbound freight, the warehouse, the fulfilment partner. Take this off gross profit and you have trading profit: what the sale is worth once it has physically reached the customer. This step belongs to your logistics partner.
+
+**Step three, what it cost to win.** Brand spend, performance spend, affiliate fees, commission, payment charges. Take this off trading profit and you have contribution margin: what the sale contributes towards keeping the company standing. This step belongs to marketing.
+
+**Step four, what it costs to exist.** People, housing, software, insurance, the accountant. Take this off contribution margin and you have EBITDA. This step belongs to you.
+
+The reason to separate them is that each one fails differently and each one is fixed differently. A purchasing problem is a supplier negotiation. A fulfilment problem is a contract with a minimum commitment buried in clause nine. A winning problem is a channel that stopped converting. An existing problem is a decision about how many people you employ. Told only that "costs are up eleven percent", you cannot start any of those conversations.
+
+## What it looks like on a goods business
+
+Round numbers, per hundred euros of net sales:
+
+<Cascade
+  title="A trading company, per €100 of net sales"
+  items={[
+    { label: "Net sales", value: "100" },
+    { label: "Cost of sales", value: "−50" },
+    { label: "Gross profit", value: "50", note: "step 1 done" },
+    { label: "Picking and outbound freight", value: "−6" },
+    { label: "Trading profit", value: "44", note: "step 2 done" },
+    { label: "Selling expenses", value: "−13" },
+    { label: "Contribution margin", value: "31", note: "step 3 done" },
+    { label: "Personnel, housing, general", value: "−15" },
+    { label: "EBITDA", value: "16", note: "step 4 done" },
+  ]}
+/>
+
+Two things fall out of that shape immediately.
+
+The first is that gross margin, the number everybody quotes, is only the first of four gates. This company reports fifty percent and keeps sixteen. A competitor reporting forty-five could easily keep more, and no conversation about gross margin alone would ever reveal it.
+
+The second is where the leverage is. Six points on fulfilment looks small next to fifty on purchasing, so it gets no attention. But a point off purchasing means renegotiating with a supplier who has their own margin to defend, and a point off fulfilment often means reading your own contract properly. The small number is frequently the cheap one.
+
+## What it looks like on a services business
+
+The same four steps. A completely different animal.
+
+<Cascade
+  title="A services company, per €100 of net sales"
+  items={[
+    { label: "Net sales", value: "100" },
+    { label: "Purchased services", value: "−2" },
+    { label: "Gross profit", value: "98", note: "step 1 barely exists" },
+    { label: "Selling expenses", value: "−13" },
+    { label: "Contribution margin", value: "85", note: "step 3" },
+    { label: "Direct people", value: "−50" },
+    { label: "Management and indirect people", value: "−10" },
+    { label: "Housing, office, general", value: "−12" },
+    { label: "EBITDA", value: "13", note: "step 4 done" },
+  ]}
+/>
+
+A services business has almost no step one and no step two at all. Ninety-eight cents of every euro survives to the point where a goods business has already lost half. That looks wonderful and means nothing, because in services the people are the product and the entire outcome is decided at step four.
+
+Which is why the single most common analytical error in a small services company is importing a goods-business instinct. Gross margin is not a useful management number in a consultancy: it is ninety-eight percent every month, in a good year and a bad one. The numbers that move are utilisation, rate, and the ratio of direct people to everyone else. If you are running a services business against a gross margin target, you are steering with an instrument that is welded in place.
+
+There is one more split worth making in services, and it costs nothing: contracted revenue against non-contracted. Sixty against forty is a different company from forty against sixty, at identical turnover and identical margin. That difference does not appear anywhere in the cascade, and it is the first thing a buyer asks about.
+
+## The point of doing it monthly
+
+A cascade computed once is a photograph. Computed every month, in both euros and percentages, it becomes the only early warning system a small company gets, and it works because percentages survive a change in volume where euros do not.
+
+Consider a real quarter. Turnover comes in forty-six percent under budget. Fulfilment costs are almost exactly on budget in euros, so nothing in the accounting package flags anything: every line is within a few percent of plan. In the cascade the same quarter reads:
+
+<Cascade
+  title="Of every euro of turnover"
+  items={[
+    { label: "Cost of sales", value: "40 cents", note: "was 37" },
+    { label: "Fulfilling the order", value: "22 cents", note: "was 12" },
+    { label: "Winning the order", value: "3 cents", note: "was 2" },
+    { label: "Running the company", value: "43 cents", note: "was 26" },
+    { label: "Left over", value: "−9 cents" },
+  ]}
+/>
+
+Fulfilment nearly doubled its share of turnover while staying on budget in euros. That is not a cost problem, it is a contract that did not notice the company got smaller, and it is invisible to anyone looking at variance against budget. The step that widened names the supplier to call. The step that did not tells you where not to waste the month.
+
+Step four widening from twenty-six to forty-three is the same arithmetic and a different conclusion: fixed costs are fixed, so when turnover falls they must take a bigger share. That is not a finding, it is a definition. Which is exactly why the steps are separated. Three of them should follow volume down. One of them cannot.
+
+## How to build one
+
+You do not need a system. You need your profit and loss account and half an hour.
+
+1. Take net sales, after discounts and credit notes, as your hundred.
+2. Put every cost line into one of the four steps. Anything you cannot place, leave out and note it rather than guessing; a step padded with unplaceable lines names nothing.
+3. Express each step as a percentage of net sales, not as a percentage of the step above it. Percentages of percentages are how people end up believing costs fell when they rose.
+4. Do it again next month, in the same shape, and put the two side by side.
+5. Once you have twelve of them, compare each month with the same month a year earlier rather than with last month. Seasonality will otherwise tell you a story every quarter and it will be the same story every year.
+
+The discipline that makes this work is the boring one: the same lines in the same steps every month. A cascade where a cost moves between steps because someone recoded it in the ledger is worse than no cascade, because the change looks like a result.
+
+<Cta
+  title="See it on your own figures"
+  body="Send your profit and loss account and we do this on your numbers, both periods side by side, before anything is for sale."
+  href="/send"
+  location="footer"
+  label="Send your figures"
+/>
+
+## What this does not tell you
+
+Whether any of it is good. There is no defensible benchmark for these steps at small-company scale: published margin statistics are sector aggregates dominated by companies a hundred times your size, and filed small-company accounts in most of Europe are filleted, which means they contain a balance sheet and no profit and loss account at all. Anybody quoting you an industry contribution margin for a business your size is quoting something that was not measured.
+
+What the cascade gives you instead is your own company against your own company. Which step widened, by how much, and what that costs at this turnover. That comparison needs no benchmark, cannot be argued with, and is the only one where you know the two sides were measured the same way.

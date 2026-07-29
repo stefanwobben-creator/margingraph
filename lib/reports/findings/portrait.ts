@@ -1,3 +1,4 @@
+import { cascade } from "./cascade";
 import type { FindingsInput } from "./types";
 
 /**
@@ -24,14 +25,14 @@ export type PortraitLine = { label: string; value: string };
 const euro = (n: number) => `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-export type Portrait = { lines: PortraitLine[]; text: string };
+export type Portrait = { lines: PortraitLine[]; cascade: PortraitLine[]; text: string };
 
 export function portrait(input: FindingsInput): Portrait {
   const { actual, reference, contributionMargin, variableLines = [], costLines = [] } = input;
   const revenue = actual.values[actual.revenueKey];
   const lines: PortraitLine[] = [];
 
-  if (!revenue) return { lines, text: "" };
+  if (!revenue) return { lines, cascade: [], text: "" };
 
   lines.push({ label: `Turnover, ${actual.label}`, value: euro(revenue) });
 
@@ -81,9 +82,44 @@ export function portrait(input: FindingsInput): Portrait {
     });
   }
 
-  const width = Math.max(...lines.map((l) => l.label.length));
-  return {
-    lines,
-    text: lines.map((l) => `  ${l.label.padEnd(width)}   ${l.value}`).join("\n"),
-  };
+  // Where every euro of turnover actually goes, in the order it leaves.
+  //
+  // An accounting package sorts costs by ledger code, which is the order a
+  // bookkeeper needs and the wrong order for deciding anything. This sorts
+  // them by distance from the sale: what it cost to buy, to fulfil, to win,
+  // and to keep the company standing. Almost no small company has ever seen
+  // its own figures in this shape, it is free to produce, and it cannot be
+  // wrong: it is division.
+  //
+  // Deliberately no judgement attached. Whether 63 cents on buying is good is
+  // not something this can know, and the moment a portrait starts grading you
+  // it has become a horoscope.
+  const steps = cascade(actual, input.tiers ?? []);
+  const before = reference ? cascade(reference, input.tiers ?? []) : undefined;
+
+  const drain: PortraitLine[] = steps.steps.map((step) => {
+    const was = before?.steps.find((s) => s.tier === step.tier);
+    return {
+      label: step.label,
+      value:
+        `${Math.round(step.share * 100)} cents` +
+        (was ? ` (was ${Math.round(was.share * 100)})` : ""),
+    };
+  });
+
+  if (drain.length > 0) {
+    const kept = steps.steps[steps.steps.length - 1].remaining;
+    drain.push({ label: "Left over", value: `${Math.round(kept * 100)} cents` });
+  }
+
+  const width = Math.max(...[...lines, ...drain].map((l) => l.label.length));
+  const render = (rows: PortraitLine[]) =>
+    rows.map((l) => `  ${l.label.padEnd(width)}   ${l.value}`).join("\n");
+
+  const body =
+    drain.length > 0
+      ? `${render(lines)}\n\n  Of every euro of turnover:\n\n${render(drain)}`
+      : render(lines);
+
+  return { lines, cascade: drain, text: body };
 }

@@ -133,4 +133,13 @@ export type FindingsInput = {
   contributionMargin?: number;
   /** Every cost line, for the plain budget comparison. */
   costLines?: { key: string; label: string }[];
+  /**
+   * Where each cost sits in the margin cascade: 1 buying, 2 fulfilling,
+   * 3 winning, 4 running.
+   *
+   * Optional because a file may not say enough to place its costs, and a
+   * cascade built on guesses is worse than none: it would tell an owner their
+   * logistics are the problem when the line was actually a software licence.
+   */
+  tiers?: { key: string; label: string; tier: 1 | 2 | 3 | 4 }[];
 };

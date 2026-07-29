@@ -343,3 +343,151 @@ export const DERIVED_HEADER = [
   "percentage",
   "cumulatief verschil",
 ] as const;
+
+/**
+ * Where a cost sits in the margin cascade.
+ *
+ * Net sales, then four steps down to EBITDA. It is the structure every
+ * competent operator keeps in their head and almost no small company has in
+ * its accounting package, because a package orders costs by ledger code and
+ * this orders them by how close they are to the sale.
+ *
+ * It matters because "costs went up" is not actionable and "you lose four
+ * points more between gross profit and trading profit than you did last year"
+ * is: it names the step, and each step has a different owner and a different
+ * conversation. Step 1 is your buyer, step 2 is your logistics partner, step 3
+ * is your marketing budget, step 4 is your organisation.
+ *
+ * The tiers are the same for a goods business and a services business, but the
+ * shape is not. A goods business loses half of turnover at step 1 and a
+ * services business loses almost nothing there and nearly everything at step
+ * 4, because in services the people are the product. Reading one against the
+ * other is how you conclude that a consultancy has a purchasing problem.
+ */
+export type Tier = 1 | 2 | 3 | 4;
+
+export const TIERS: readonly { tier: Tier; label: string; step: string; words: readonly string[] }[] = [
+  {
+    tier: 1,
+    label: "Cost of sales",
+    step: "Net sales to gross profit",
+    words: [
+      "kostprijs",
+      "inkoop",
+      "inkoopwaarde",
+      "cogs",
+      "cost of sales",
+      "cost of goods",
+      "purchased",
+      "goederen",
+      "materiaal",
+      "materials",
+      "grondstof",
+      "grondstoffen",
+      "inbound",
+      "invoerrechten",
+      "duty",
+      "verpakking",
+      "packaging",
+    ],
+  },
+  {
+    tier: 2,
+    label: "Fulfilling the order",
+    step: "Gross profit to trading profit",
+    words: [
+      "vracht",
+      "freight",
+      "transport",
+      "shipping",
+      "verzend",
+      "koerier",
+      "courier",
+      "outbound",
+      "pick",
+      "pack",
+      "fulfilment",
+      "fulfillment",
+      "logistiek",
+      "logistics",
+      "3pl",
+      "assemblage",
+      "handling",
+      "warehousing",
+      "opslag",
+      "magazijn",
+      "distributie",
+      "distribution",
+    ],
+  },
+  {
+    tier: 3,
+    label: "Winning the order",
+    step: "Trading profit to contribution margin",
+    words: [
+      "marketing",
+      "brand",
+      "performance",
+      "advertentie",
+      "advertising",
+      "reclame",
+      "adwords",
+      "affiliate",
+      "commissie",
+      "commission",
+      "provisie",
+      "selling",
+      "verkoop",
+      "sales expenses",
+      "betaalkosten",
+      "payment fees",
+      "psp",
+    ],
+  },
+  {
+    tier: 4,
+    label: "Running the company",
+    step: "Contribution margin to EBITDA",
+    words: [
+      "personeel",
+      "personeels",
+      "salaris",
+      "salarissen",
+      "loon",
+      "lonen",
+      "payroll",
+      "wages",
+      "salary",
+      "sociale lasten",
+      "pensioen",
+      "pension",
+      "huisvesting",
+      "housing",
+      "huur",
+      "rent",
+      "kantoor",
+      "office",
+      "algemene",
+      "general",
+      "overige",
+      "other costs",
+      "it",
+      "ict",
+      "software",
+      "abonnement",
+      "verzekering",
+      "insurance",
+      "accountant",
+      "juridisch",
+      "legal",
+      "reiskosten",
+      "travel",
+      "auto",
+    ],
+  },
+];
+
+/** Which step of the cascade this cost belongs to, if we can tell. */
+export function tierOf(label: string): Tier | undefined {
+  return TIERS.find((t) => has(label, t.words))?.tier;
+}

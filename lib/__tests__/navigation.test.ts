@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -108,5 +108,49 @@ describe("the intake", () => {
 
   it("has a page for the payment provider to return to", () => {
     expect(read("app", "thanks", "page.tsx")).toContain("on its way");
+  });
+});
+
+describe("a redirected page is a deleted page", () => {
+  /**
+   * The site was written in two languages and then one was chosen. The Dutch
+   * pages were removed from the working copy and never from the repository, so
+   * they went on being built, served and listed in the sitemap: five pages,
+   * four of them near-duplicates of an English page, on one domain, with
+   * nothing telling a search engine which was which. Nobody noticed for a week.
+   *
+   * A redirect alone would not have caught it either. The redirect fires for a
+   * visitor and the sitemap still advertises the old URL, so the duplicate
+   * stays discoverable. The only fix that works is removing the file, and this
+   * is the test that says so.
+   */
+  const config = readFileSync(join(process.cwd(), "next.config.ts"), "utf8");
+  const sources = [...config.matchAll(/source:\s*"([^"]+)"/g)].map((m) => m[1]);
+
+  const collectionOf: Record<string, string> = {
+    "/blog": "blog",
+    "/decision": "decisions",
+    "/guides": "guides",
+    "/faq": "faq",
+  };
+
+  it("has redirects at all, or this test is asserting nothing", () => {
+    expect(sources.length).toBeGreaterThan(0);
+  });
+
+  it("does not still ship the pages it redirects away from", () => {
+    const survivors = sources
+      .filter((source) => !source.includes(":"))
+      .map((source) => {
+        const at = source.lastIndexOf("/");
+        const dir = collectionOf[source.slice(0, at)];
+        return dir ? join(process.cwd(), "content", dir, `${source.slice(at + 1)}.mdx`) : "";
+      })
+      .filter((path) => path !== "" && existsSync(path));
+
+    expect(
+      survivors,
+      "these files are still built and still in the sitemap despite being redirected away from",
+    ).toEqual([]);
   });
 });
