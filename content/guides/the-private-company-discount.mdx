@@ -1,0 +1,127 @@
+---
+title: "The private company discount, and the case against it"
+description: "Being unlisted is supposed to cost you 20 to 30 percent of your value. The published estimates run from zero to fifty, and the best-identified ones cluster far below what practitioners apply."
+slug: the-private-company-discount
+date: 2026-05-18
+author: MarginGraph
+category: Valuation
+tags:
+  - valuation
+  - multiples
+  - evidence
+related:
+  - decisions/business-valuation
+  - guides/the-company-specific-risk-premium
+  - guides/where-sme-multiples-come-from
+faq:
+  - question: "How big is the private company discount?"
+    answer: "Published estimates run from zero to about fifty percent depending on method. Officer's 2007 study found 15 to 30 percent against comparable listed targets. Restricted stock studies find a median around 16 to 20 percent. Studies that control for firm characteristics find 7 to 10 percent. And a 2019 paper in the Journal of Financial and Quantitative Analysis, correcting two statistical biases in the earlier work, found no evidence of a discount at all."
+  - question: "Should I accept a marketability discount in my valuation?"
+    answer: "Ask which study it comes from and what population that study measured. Restricted stock studies measure a temporary registration restriction on shares of already-listed companies, which is not the same thing as permanent illiquidity of a whole private business. Pre-IPO studies are rejected outright by senior practitioners for at least six methodological reasons."
+---
+
+There is a number that gets applied to almost every private business valuation, usually without argument. Your business is not listed on a stock exchange, so a discount comes off. Twenty percent, thirty, sometimes more. The reasoning is that shares you can sell in a click are worth more than a business that takes a year to sell.
+
+The size of that discount is not a detail. On a business valued at €2m before it is applied, the difference between 7% and 30% is the difference between losing €140,000 and losing €600,000. Both of those percentages come from published studies of real transactions.
+
+So the question is which study, and what it actually measured. The literature here is genuine, and it is considerably less settled than the number suggests.
+
+## The case for
+
+The most-cited transaction study is Micah Officer's, published in the *Journal of Financial Economics* in 2007. It documents "acquisition discounts for stand-alone private firms and subsidiaries of other firms (unlisted targets) of 15 to 30%, on average, relative to acquisition multiples for comparable publicly-traded targets," and attributes the gap primarily to liquidity rather than to information asymmetry.
+
+The practitioner mainstay is different: restricted stock studies. When a listed company places shares privately, those shares cannot be resold for a period, and they change hands below the market price. The gap is treated as the price of illiquidity.
+
+<Metrics
+  items={[
+    { label: "Stout Restricted Stock Study", value: "15.7%", note: "median discount, 783 transactions, 1980 to 2025" },
+    { label: "Same study, mean", value: "20.4%", note: "the mean sits well above the median" },
+    { label: "FMV study, Robak & Hall", value: "20.1%", note: "median across 230 transactions, 1980 to 1997" },
+  ]}
+/>
+
+Those are real numbers from real transactions, and they are the basis on which roughly three-quarters of valuation practitioners apply a discount.
+
+## The case against
+
+**The population is wrong.** Every restricted stock study measures shares of an *already public* company that cannot be sold for a defined period. That is a temporary registration restriction with a known end date. Your business is permanently unlisted, has no quoted price, and cannot be sold in a click at any point. Whether one is a good proxy for the other is an assumption, not a finding.
+
+**The selection is not random.** Aswath Damodaran's review of the standard studies is blunt on this. The samples are small and spread over long periods with substantial standard errors. Firms that do private placements "tend to be smaller, riskier and less healthy than the typical firm," so the discount picks up distress as well as illiquidity. And investors buying into a private placement often provide other services to the company, for which the discount may be partial compensation.
+
+**Controlled studies find much less.** The older studies compare a restricted share price with a market price and call the whole gap illiquidity. Once you hold the other differences constant, the part attributable to marketability itself shrinks sharply: one such study puts it at 7.23%, another at a 10.4% median. Against the 30% to 35% the uncontrolled studies report, that is a different claim about a different thing.
+
+**Pre-IPO studies should not be used at all.** These compare private transactions in a company's shares with its later IPO price, and they produce the largest discounts: Emory's studies report 40% to 50%, and one Willamette series shows a median around 50%. Gilbert Matthews, a valuation practitioner with 35 years at Bear Stearns, lists six fatal defects, including that the IPO price is unknowable at the time of the earlier transaction, that IPO underpricing inflates the apparent discount by an average first-day gain of over 15%, and that companies which never went public are excluded entirely. In 2001 the same Willamette series produced a median of minus 196%. Roughly 40% of practitioners still use these studies.
+
+**And the strongest paper finds nothing.** In 2019 a team of four finance academics redid the transaction work in the *Journal of Financial and Quantitative Analysis*, correcting two statistical problems in the earlier studies. Their abstract is worth reading twice:
+
+<Quote cite="Jaffe and colleagues, Journal of Financial and Quantitative Analysis, 2019">
+  Academic literature, practitioners, courts, and regulators routinely assert that
+  both private and subsidiary targets sell at discounts relative to public targets.
+  However, the empirical evidence to support this conclusion is thin. Our work
+  alters the methodology from prior research to avoid biases due to both one-sided
+  sample truncation and Jensen's inequality. Following these changes, we find no
+  evidence that unlisted targets sell at discounts.
+</Quote>
+
+Two specific statistical corrections, and the effect disappears.
+
+## Where that leaves the number
+
+<Comparison
+  columns={["Method", "Reported discount", "What it actually measured"]}
+  rows={[
+    ["Pre-IPO studies", "40% – 50%", "Rejected by senior practitioners on six grounds"],
+    ["Uncontrolled restricted stock", "30% – 35%", "Listed shares under temporary sale restriction"],
+    ["Recent restricted stock", "16% – 20%", "Same population, larger and cleaner sample"],
+    ["Transaction comparison", "15% – 30%", "Unlisted targets versus comparable listed targets"],
+    ["Controlled for firm traits", "7% – 10%", "Marketability isolated from distress and size"],
+    ["Bias-corrected", "0%", "No discount detectable"],
+  ]}
+/>
+
+The estimates that survive methodological scrutiny cluster between 7% and 20%. The large numbers come from studies whose authors' critics, and in some cases whose own summarisers, acknowledge selection bias.
+
+<Warning title="What a hostile buyer will do with this">
+  A discount is a negotiating position dressed as a calculation. If a buyer applies
+  30% because your business is private, the useful response is not to argue about
+  whether discounts exist. It is to ask which study, on which population, and why
+  a temporary registration restriction on listed shares is the right comparison for
+  your business.
+</Warning>
+
+## What to do
+
+**Insist on a named source.** Any discount applied to your business should come with a study, a population and a year. "Standard practice" is not a citation.
+
+**Check the direction of the bias.** If the source is a restricted stock study, its firms were smaller, riskier and less healthy than average. That is a reason the number is high, not a reason your business deserves it.
+
+**Argue about the mechanism instead.** Illiquidity has a specific meaning: how long it takes to find a buyer and how much price you give up for speed. Those are facts about your market, your sector and your size, and they are arguable with evidence. A fixed percentage is not.
+
+**Do not accept it twice.** If your comparables are already private company transactions, and [most published SME multiples are](/guides/where-sme-multiples-come-from), the discount is already inside them. Applying a marketability discount on top of a private company multiple double-counts, and it is a common enough error to be worth checking for explicitly.
+
+## What this does not tell you
+
+None of these studies is about a business like yours. Officer's compares acquisition multiples of unlisted targets with listed ones, mostly at a scale far above an owner-managed business. The restricted stock studies are about listed equity. The bias-corrected study that found nothing was working in the same large-deal universe.
+
+There is no study of what an owner-managed business with €500,000 of earnings sells for relative to some liquid equivalent, because no liquid equivalent exists. Everything above is an argument by analogy, and knowing that is more useful than any of the percentages.
+
+<Cta
+  title="Every adjustment, stated and sourced"
+  body="The report shows which adjustments were applied to your figures, why, and what the range looks like without them."
+  href="/send"
+  location="footer"
+  label="Send your figures"
+/>
+
+## Sources
+
+- Micah S. Officer, "The price of corporate liquidity: Acquisition discounts for unlisted targets," *Journal of Financial Economics* 83(3), 2007, pp. 571–598. Discounts of 15 to 30 percent relative to comparable listed targets. https://ideas.repec.org/a/eee/jfinec/v83y2007i3p571-598.html
+- Jeffrey Jaffe, Jan Jindra, David Pedersen and Torben Voetmann, "Do Unlisted Targets Sell at Discounts?", *Journal of Financial and Quantitative Analysis* 54(3), 2019, pp. 1371–1401. https://www.cambridge.org/core/journals/journal-of-financial-and-quantitative-analysis/article/do-unlisted-targets-sell-at-discounts/5DB2DDB0154D458A8AD9D7900F1B4D4E
+- Stout Restricted Stock Study, companion guide published by Business Valuation Resources: 783 transactions from July 1980 to March 2025, mean discount 20.4%, median 15.7%, with over 95% of reviewed transactions excluded to retain plain-vanilla placements. https://www.bvresources.com/docs/default-source/free-downloads/rss-companion.pdf
+- Espen Robak and Lance Hall, "Bringing Sanity to Marketability Discounts: A New Data Source," the FMV Restricted Stock Study: 230 transactions from 1980 to April 1997, mean 22.3%, median 20.1%, standard deviation 17.2%. https://pages.stern.nyu.edu/adamodar/pdfiles/eqnotes/fmvstudyarticle.pdf
+- Aswath Damodaran, *Marketability and Value: Measuring the Illiquidity Discount*, NYU Stern working paper. Source of the Bajaj 7.23% and Wruck 10.4% figures, the Silber and Maher study results, and the selection-bias critique. https://pages.stern.nyu.edu/~adamodar/pdfiles/papers/liquidity.pdf
+- Gilbert E. Matthews, "Pre-IPO Studies Are Not a Valid Basis for Calculating DLOMs," NACVA QuickRead, 16 June 2021. Source of the six methodological defects, the Emory and Willamette figures, and the practitioner usage rates. https://quickreadbuzz.com/2021/06/16/business-valuation-gil-matthews-pre-ipo-studies-are-not-a-valid-basis-for-calculating-dloms/
+
+### A note on a source we did not quote a number from
+
+Koeplin, Sarin and Shapiro's 2000 paper in the *Journal of Applied Corporate Finance* is the foundational transaction-based study on this topic and is cited everywhere, usually with a figure attached. We could not confirm those percentages from any freely available source, so we have left the number out rather than repeat what everyone else repeats.

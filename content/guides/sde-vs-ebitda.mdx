@@ -1,0 +1,102 @@
+---
+title: SDE vs EBITDA
+description: Which earnings figure applies to your business, why the multiples attached to them are not interchangeable, and the €400,000 mistake owners make when they mix the two.
+date: 2026-06-04
+author: MarginGraph
+category: Valuation
+tags:
+  - valuation
+  - EBITDA
+  - SDE
+  - multiples
+related:
+  - decisions/business-valuation
+  - guides/how-ebitda-affects-your-valuation
+  - guides/ebitda-multiple-explained
+faq:
+  - question: Should I use SDE or EBITDA?
+    answer: Use SDE if one owner works in the business full time and the buyer will replace them personally — typically under about €1M of turnover. Use EBITDA once a management layer exists and the buyer is acquiring a business rather than a job.
+  - question: What is the difference between SDE and EBITDA?
+    answer: SDE includes one owner's full compensation as if it were profit; EBITDA removes it at a market rate. For a business paying its owner €95,000, SDE is €95,000 higher than EBITDA on identical accounts.
+---
+
+Two figures, calculated from the same accounts, that can differ by a hundred thousand euros. The mistake is never in the arithmetic. It is in applying a multiple built for one to the other.
+
+## What each one includes
+
+<Comparison
+  columns={["", "SDE", "EBITDA"]}
+  rows={[
+    ["Owner salary", "Added back in full", "Deducted at market rate"],
+    ["Owner benefits", "Added back", "Deducted if the role needs them"],
+    ["One-off costs", "Added back", "Added back"],
+    ["Non-operating costs", "Added back", "Added back"],
+    ["Second working owner", "Deducted at market rate", "Deducted at market rate"],
+    ["Depreciation", "Added back", "Added back"],
+    ["Answers", "What one owner-operator takes home", "What the business earns independently"],
+  ]}
+/>
+
+The last row is the whole distinction. SDE describes a job plus a business. EBITDA describes a business.
+
+## The same company, both ways
+
+<Metrics
+  items={[
+    { label: "Operating profit", value: "€185,000", note: "as reported" },
+    { label: "SDE", value: "€312,000", note: "+ owner €95k, + car €14k, + one-offs €18k" },
+    { label: "EBITDA", value: "€247,000", note: "same add-backs, then − €65k market-rate manager" },
+  ]}
+/>
+
+The €65,000 gap is what it would cost to hire someone to do what the owner does. SDE assumes the buyer does that work themselves. EBITDA assumes they pay someone.
+
+## Why the multiples are different, and not by a little
+
+<Comparison
+  columns={["", "Typical multiple", "Implied price on the figures above"]}
+  rows={[
+    ["SDE", "2–3.5×", "€624k – €1.09M"],
+    ["EBITDA", "4–6×", "€988k – €1.48M"],
+  ]}
+/>
+
+SDE multiples are lower precisely because SDE is a larger number containing a salary. They are two halves of the same equation and neither is generous.
+
+<Warning title="The €400,000 mistake">
+  Apply a 5× EBITDA multiple to an SDE figure and you get €1.56M for a business
+  that will transact around €1.1M. Owners arrive at a broker with that number,
+  spend nine months finding out it is not real, and often come out of the
+  process worse than if they had started honestly.
+</Warning>
+
+## Which one applies to you
+
+<Checklist
+  items={[
+    "One owner working full time in the business, under roughly €1M turnover → SDE",
+    "The buyer will step into the owner's job personally → SDE",
+    "A management layer runs day-to-day operations → EBITDA",
+    "Above roughly €1M of turnover, or €500k of earnings → EBITDA",
+    "Private equity or a strategic buyer is in the process → EBITDA, without exception",
+  ]}
+/>
+
+If you are between the two, calculate both. The gap tells you what your own involvement is worth in the sale, which is useful information regardless of which figure you present.
+
+## The second working owner problem
+
+Two founders both working full time, one salary between them. SDE adds back **one** owner's compensation, not two — the second is a genuine operating cost, because the buyer will have to replace that person.
+
+Owners routinely add back both and inflate SDE by an entire salary. It is the first thing a buyer's advisor recalculates, and it costs credibility on everything else in the file.
+
+## What buyers do with the number
+
+Neither figure is accepted as presented. A buyer will recalculate it from your accounts, and their version will be lower — that is not adversarial, it is the job. [What buyers look for](/guides/what-buyers-look-for) covers what they check first, and [how EBITDA affects your valuation](/guides/how-ebitda-affects-your-valuation) covers which add-backs survive.
+
+<Cta
+  title="See both figures calculated from your accounts"
+  body="The report works out SDE and EBITDA, states which one applies to your business, and applies the right multiple to it."
+  href="/decision/business-valuation"
+  label="Send your figures"
+/>

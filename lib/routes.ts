@@ -14,18 +14,17 @@ import { collections } from "@/lib/content/collections";
  * silently dead everywhere else.
  */
 export const routes = {
-  reports: collections.decisions.basePath,
+  reports: collections.reports.basePath,
   guides: collections.guides.basePath,
-  blog: collections.blog.basePath,
   faq: collections.faq.basePath,
   /** A real generated report, not a screenshot. */
   exampleReport: "/example-report",
   /**
-   * How it works used to be an anchor on the homepage. It is now a page that
-   * renders both halves of the flow from the shipped engine, which is a better
-   * answer to the same question and one that cannot drift out of date.
+   * Both halves of the flow used to be their own page. They are part of the
+   * report now: a page that answers "what will you find in mine" belongs where
+   * somebody is deciding, not one click away from it.
    */
-  whatWeFind: "/what-we-find",
+  whatWeFind: "/reports/what-is-hiding-in-my-figures",
   /** Where every call to action ends. The only page that asks for anything. */
   send: "/send",
   /** A name and a face, because the site asks strangers for a balance sheet. */

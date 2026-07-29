@@ -6,7 +6,7 @@
  * other, or the build stops trusting the content.
  */
 
-export type CollectionId = "decisions" | "blog" | "faq" | "guides";
+export type CollectionId = "reports" | "faq" | "guides";
 
 export type Frontmatter = {
   title: string;

@@ -10,12 +10,18 @@ import { site } from "@/lib/site";
  * Every content section is reachable from here. A collection with fifty pages
  * and no entry in the navigation is fifty pages that only a sitemap can find.
  */
+/**
+ * Four items, not seven.
+ *
+ * "Reports", "What we find", "Guides", "Blog" and "FAQ" asked a visitor to
+ * work out the difference between four kinds of writing before they could look
+ * for anything. Blog and guides were the same thing, and what we find was part
+ * of a report. What is left is the shape of the business: what you can buy,
+ * what you can learn for free, the questions, and who we are.
+ */
 const nav = [
   { label: "Reports", href: routes.reports },
-  { label: "What we find", href: routes.whatWeFind },
-  { label: "Send a file", href: routes.send },
   { label: "Guides", href: routes.guides },
-  { label: "Blog", href: routes.blog },
   { label: "FAQ", href: routes.faq },
   { label: "About", href: routes.about },
 ];

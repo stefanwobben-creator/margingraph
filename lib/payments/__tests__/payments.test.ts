@@ -58,7 +58,7 @@ describe("checkout url", () => {
 });
 
 describe("no decision page can ship without a working checkout", () => {
-  const dir = join(process.cwd(), "content", "decisions");
+  const dir = join(process.cwd(), "content", "reports");
 
   it("has no placeholder links left in any decision page", () => {
     const offenders = readdirSync(dir)

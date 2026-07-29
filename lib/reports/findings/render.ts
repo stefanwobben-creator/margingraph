@@ -3,8 +3,24 @@ import type { Finding, FindingsInput } from "./types";
 
 const euro = (n: number) => `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
 
-/** The price of a report. Every headline compares it to what was found. */
+/** The price of one report. Every headline compares it to what was found. */
 export const REPORT_PRICE = 9;
+
+/**
+ * Three reports from the same file, for the price of a bit over two.
+ *
+ * One upload can answer several different questions, and the marginal cost of
+ * the second answer is nothing: the file is already read, the gate has already
+ * passed, the lines are already classified. Charging full price for work that
+ * costs nothing extra is how a fair price becomes a greedy one, and the
+ * discount is small enough to stay a nudge rather than a fire sale.
+ *
+ * The guarantee stays per report. Each one still has to clear the minimum on
+ * its own, so a bundle can never be three reports where two of them are
+ * padding.
+ */
+export const BUNDLE_SIZE = 3;
+export const BUNDLE_PRICE = 21;
 
 /**
  * The threshold under which we do not charge.

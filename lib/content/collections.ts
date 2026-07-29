@@ -27,37 +27,28 @@ export type Collection = {
  * The registry. Adding a content type is one entry here plus one route file
  * that calls `createCollectionRoutes(...)` — nothing else changes.
  *
- * Decision pages are the commercial pages; blog posts are the informational
- * supply that links into them.
+ * Three types, not four. Blog and guides were the same thing wearing two
+ * labels: both were educational, both linked into the commercial pages, and a
+ * visitor was asked to work out which was which. They are now all guides.
+ *
+ * "Decisions" became "reports" for the same reason. The header said Reports,
+ * the footer said Decisions and the URL said /decision, which is three names
+ * for one product.
  */
 export const collections: Record<CollectionId, Collection> = {
-  decisions: {
-    id: "decisions",
-    dir: "decisions",
-    basePath: "/decision",
-    label: "Decisions",
-    labelSingular: "Decision",
-    title: "Decisions",
+  reports: {
+    id: "reports",
+    dir: "reports",
+    basePath: "/reports",
+    label: "Reports",
+    labelSingular: "Report",
+    title: "Reports",
     description:
-      "One page per business decision. What the question is, what you upload, and what the report gives you back.",
+      "One page per question. What it answers, what to send, what we find in a real company's figures, and what €9 unlocks.",
     schemaType: "WebPage",
     categoryPages: true,
     inFeed: false,
     order: 1,
-  },
-  blog: {
-    id: "blog",
-    dir: "blog",
-    basePath: "/blog",
-    label: "Blog",
-    labelSingular: "Article",
-    title: "Blog",
-    description:
-      "How the numbers behind each decision actually work — the reasoning, the mistakes and the thresholds that move the answer.",
-    schemaType: "Article",
-    categoryPages: true,
-    inFeed: true,
-    order: 2,
   },
   faq: {
     id: "faq",
@@ -81,11 +72,11 @@ export const collections: Record<CollectionId, Collection> = {
     labelSingular: "Guide",
     title: "Guides",
     description:
-      "Longer walkthroughs for decisions that take more than one sitting.",
+      "How the numbers actually work: the reasoning, the mistakes, and the thresholds that move the answer. Free, and enough to do it yourself.",
     schemaType: "TechArticle",
     categoryPages: true,
     inFeed: true,
-    order: 4,
+    order: 2,
   },
 };
 

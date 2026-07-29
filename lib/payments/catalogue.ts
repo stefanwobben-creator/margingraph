@@ -9,6 +9,18 @@ import type { Product } from "@/lib/payments/types";
  * pay, and by then you have lost the customer and will never know.
  */
 export const products: Record<string, Product> = {
+  /**
+   * Three reports off one file, at €21 rather than €27.
+   *
+   * A separate Mollie link rather than a quantity field, because a payment
+   * link with a fixed amount cannot be edited by whoever opens it and a
+   * checkout that can be edited by the buyer is a checkout that will be.
+   */
+  bundle: {
+    slug: "bundle",
+    price: 21,
+    checkout: (process.env.NEXT_PUBLIC_MOLLIE_LINK_BUNDLE ?? "").trim(),
+  },
   "business-valuation": {
     slug: "business-valuation",
     price: 9,

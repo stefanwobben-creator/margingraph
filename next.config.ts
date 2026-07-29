@@ -99,10 +99,25 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
-      { source: "/reports", destination: "/decision", permanent: true },
+      // Reversed. /reports was the redirect and /decision was the page; the
+      // header said Reports, the footer said Decisions and the URL said
+      // /decision, which is three names for one product. /reports is the page
+      // now and everything else points at it.
+      { source: "/decision", destination: "/reports", permanent: true },
       {
-        source: "/reports/:slug",
-        destination: "/decision/:slug",
+        source: "/decision/:slug",
+        destination: "/reports/:slug",
+        permanent: true,
+      },
+      { source: "/decision/category/:slug", destination: "/reports/category/:slug", permanent: true },
+      // Blog and guides were the same thing with two labels.
+      { source: "/blog", destination: "/guides", permanent: true },
+      { source: "/blog/:slug", destination: "/guides/:slug", permanent: true },
+      { source: "/blog/category/:slug", destination: "/guides/category/:slug", permanent: true },
+      // Both halves of the flow now live on the report they describe.
+      {
+        source: "/what-we-find",
+        destination: "/reports/what-is-hiding-in-my-figures",
         permanent: true,
       },
       {

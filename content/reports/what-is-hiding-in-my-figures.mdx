@@ -1,0 +1,140 @@
+---
+title: "What is hiding in my figures?"
+seoTitle: "Find what your accounts are not telling you"
+description: "Send your management accounts, annual accounts or a supplier quote. We analyse first and show you what we found. You only pay if you want the rest, and only if it clears €90."
+date: 2026-07-28
+author: MarginGraph
+price: 9
+category: Margins
+tags:
+  - margins
+  - costs
+  - management accounts
+featured: true
+related:
+  - guides/why-your-profit-and-loss-does-not-add-up
+  - guides/how-much-freight-are-you-giving-away
+  - guides/revenue-fell-costs-did-not
+faq:
+  - question: "When do I pay?"
+    answer: "After the analysis, not before. We read your file, run the checks and show you what we found, including the largest finding in full with its arithmetic. Only if you want the remaining findings do you pay €9."
+  - question: "What if there is nothing in my file?"
+    answer: "Then no payment screen appears at all. We hold ourselves to a €90 minimum: below that there is nothing to sell and nothing to pay. That is not a refund policy, it is the order of operations."
+  - question: "What exactly should I send?"
+    answer: "For a margin report: your profit and loss for the current period plus the budget or the same period last year. For a valuation: annual accounts for the last three years including balance sheets. For a contract check: the quote or agreement itself. One file is enough to start."
+  - question: "Which formats work?"
+    answer: "Excel and CSV exports from Exact, Moneybird, e-Boekhouden, Xero, QuickBooks or Sage, and text-based PDFs such as accounts prepared by your accountant. Scans and photographs of paper are unreliable, and we say so rather than guess."
+  - question: "Do I need to tidy the file first?"
+    answer: "No. Messy exports are the normal case and the reading check is built for them. If a subtotal does not add up we name the cell, and that is usually the first finding rather than an obstacle."
+  - question: "What happens to my file?"
+    answer: "It is used to produce your report and then deleted. It is not shared with third parties and it is not used to train models."
+  - question: "How do I know the figures are right?"
+    answer: "Every finding carries its own arithmetic and points at the line in your file it came from. You do not have to trust it, you can redo it. Where an amount rests on an assumption, the assumption is printed next to it."
+---
+
+Most owners have a file and a feeling that something is in it. The feeling is
+usually right, and it is usually not where they are looking.
+
+Send the file. We analyse it first and charge afterwards, if at all.
+
+
+## What that looks like on a real file
+
+Not a mock-up. Both halves below are what the shipped code returns on one Dutch wholesaler's management accounts, anonymised and otherwise unchanged.
+
+<WhatWeFind />
+
+## How it works
+
+```
+1  you send a file            management accounts, annual accounts, a quote
+2  we check we can read it    every subtotal has to add up, or we ask
+3  we run the analysis        free, and before any payment screen exists
+4  you see what we found      the total, the count, and the largest finding
+                              in full, with its arithmetic
+5  you decide                 €9 unlocks the rest, or you walk away
+```
+
+Step three happens before step five on purpose. You are not buying a promise
+that something is in there, you are looking at one of the findings with the
+sums attached and deciding whether the others are worth nine euros.
+
+## What the free half looks like
+
+```
+We found €57,600 across 2 findings in your file. Here is the largest one
+in full, so you can check the arithmetic before you decide.
+
+1. You recover 55.5% of your outbound freight from customers.
+   Worth:  €36,400 (2026 trend).
+   Do:     Reprice the freight line to cost, or set a free-shipping
+           threshold above your current average order value.
+   Check:  €81,800 of cost against €45,400 recovered is 55.5%.
+           Full recovery is worth €36,400.
+
+Still locked (€9 for all of them):
+  2. IT costs against budget
+```
+
+That is a real finding from a real Dutch wholesaler. The locked line names the
+subject and never the amount, because the amount is the finding.
+
+## The €90 floor is a mechanism, not a policy
+
+If the engine finds less than €90, no payment screen appears:
+
+```
+We read your file and found €0.
+
+That is below the €90 we hold ourselves to, so there is nothing to sell
+you and nothing to pay. If you want, send a different file.
+```
+
+This is the part that makes the rest honest. An engine obliged to produce
+something will produce something. Because a thin result costs us nothing to
+report, the engine is free to say a file is clean, and "we found nothing"
+becomes a shippable answer instead of a commercial failure.
+
+No refunds have to be processed, because no money moved.
+
+## What to send, per question
+
+```
+where is my margin leaking     profit and loss for the current period,
+                               plus budget or the same period last year
+
+what is my business worth      annual accounts for the last three years,
+                               including balance sheets, plus what the
+                               owner takes out of the business
+
+is this contract reasonable    the quote or agreement itself, and roughly
+                               what volume you do
+```
+
+One file is enough to start. If we need a second one to say something useful,
+we ask for it by name rather than producing a thinner answer.
+
+## The reading check comes first
+
+Before anything is analysed, every subtotal in your file is added up and
+compared with what it says. If the arithmetic closes, we read it correctly. If
+it does not, we name the cell and ask, rather than quietly deciding what you
+meant.
+
+That is not a formality. On one real set of management accounts it produced the
+largest finding of the lot: a budget that read €147,200 higher on the reporting
+tab than on the tab where it had been agreed, with every variance column hanging
+off the wrong one.
+
+The check is deterministic. No model, no judgement, the same answer every time
+for the same file. It has been run over twenty-two filed sets of statutory
+accounts and four real Dutch companies.
+
+## What we do not do
+
+No sector benchmark whose origin we cannot point at. No authoritative-looking
+percentage that came from nowhere. Where we state a limit it is one that defends
+itself, like full recovery on a cost you bill on.
+
+And no figure resting on an assumption without the assumption printed beside it.
+An amount you cannot re-derive is an amount you cannot act on.

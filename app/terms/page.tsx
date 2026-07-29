@@ -3,7 +3,12 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
-import { MINIMUM_WORTH, REPORT_PRICE } from "@/lib/reports/findings";
+import {
+  BUNDLE_PRICE,
+  BUNDLE_SIZE,
+  MINIMUM_WORTH,
+  REPORT_PRICE,
+} from "@/lib/reports/findings";
 import { seller } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -72,6 +77,13 @@ export default function TermsPage() {
             file each finding sits on, the arithmetic behind the amount, and
             what to do about it, including how far a change can go before it
             starts costing you business. That is what you pay, VAT included.
+          </p>
+          <p className="mt-2 text-muted-foreground">
+            One file can answer more than one question, and each answer is its
+            own report at €{REPORT_PRICE}. Any {BUNDLE_SIZE} reports produced
+            from the same file cost €{BUNDLE_PRICE} together. The minimum below
+            applies to each report on its own, so a bundle can never be one
+            useful report and two thin ones.
           </p>
         </div>
 

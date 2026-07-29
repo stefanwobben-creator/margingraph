@@ -43,7 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "monthly",
         // Decision pages are the commercial destination; everything else
         // exists to lead there.
-        priority: collection.id === "decisions" ? 0.9 : 0.7,
+        priority: collection.id === "reports" ? 0.9 : 0.7,
       });
     }
 
