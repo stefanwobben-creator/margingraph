@@ -71,7 +71,7 @@ def from_xlsx(path: Path, sheet: str | None) -> dict:
     except ImportError:  # pragma: no cover - environment problem, not logic
         sys.exit("openpyxl is not installed. Run: pip install openpyxl")
 
-    book = load_workbook(path, data_only=True, read_only=True)
+    book = load_workbook(path, data_only=True)
     if sheet is not None:
         try:
             worksheet = book[sheet] if sheet in book.sheetnames else book.worksheets[int(sheet) - 1]
@@ -84,6 +84,25 @@ def from_xlsx(path: Path, sheet: str | None) -> dict:
             (ws for ws in book.worksheets if ws.max_row and ws.max_row > 1),
             book.worksheets[0],
         )
+
+    # Accounting exports write a group header once, merged across the columns
+    # it covers: "Budget huidige jaar" sits in one cell above five columns and
+    # every other cell in the range is empty. Read literally, four of those five
+    # columns lose the only word that says what they are, and two different
+    # years both end up called "Period actual". Copying the value across the
+    # range is not interpretation, it is what the file already shows on screen.
+    #
+    # Horizontal merges only. A vertical merge means one label spanning several
+    # rows, and repeating it would invent lines that are not there.
+    for merged in list(worksheet.merged_cells.ranges):
+        if merged.min_row != merged.max_row:
+            continue
+        value = worksheet.cell(merged.min_row, merged.min_col).value
+        if value is None:
+            continue
+        worksheet.unmerge_cells(str(merged))
+        for column in range(merged.min_col, merged.max_col + 1):
+            worksheet.cell(merged.min_row, column).value = value
 
     rows = []
     for row in worksheet.iter_rows(values_only=True):

@@ -36,6 +36,18 @@ const num = (name: string) => {
   return value === undefined ? undefined : Number(value);
 };
 
+/**
+ * Columns are given the way they are printed: 1 for the first one.
+ *
+ * The reader works in indexes and the questions it asks quote column numbers,
+ * so a flag that took an index would answer a question about column 8 by
+ * selecting column 9. It did, once.
+ */
+const column = (name: string) => {
+  const value = num(name);
+  return value === undefined ? undefined : value - 1;
+};
+
 // Everything that is not a flag and not a flag's value.
 const consumed = new Set<number>();
 argv.forEach((a, i) => {
@@ -82,8 +94,8 @@ if (!raw.trim()) {
 
 const sheet = JSON.parse(raw) as Sheet;
 const intake = readSheet(sheet, {
-  actualColumn: num("actual"),
-  referenceColumn: num("reference"),
+  actualColumn: column("actual"),
+  referenceColumn: column("reference"),
   scale: num("scale"),
 });
 

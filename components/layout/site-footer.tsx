@@ -23,8 +23,10 @@ const links = collectionList.map((collection) => ({
  * everything else rather than in small grey type underneath.
  */
 const legal = [
+  { label: "About", href: "/about" },
   { label: "Terms", href: "/terms" },
   { label: "Privacy", href: "/privacy" },
+  { label: "Processing agreement", href: "/dpa" },
 ];
 
 export function SiteFooter() {

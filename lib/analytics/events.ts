@@ -41,6 +41,15 @@ export type AnalyticsEvents = {
 
   waitlist_joined: { source?: string };
 
+  /**
+   * A file arrived through the intake form.
+   *
+   * The most valuable number on this site. Everything else is traffic; this is
+   * the only event that means somebody was prepared to show us their figures.
+   * The count only, never a file name, a size or anything about the contents.
+   */
+  intake_submitted: { files?: number };
+
   error_occurred: {
     message: string;
     /** Next's error digest, when the error came from a boundary. */

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { UploadForm } from "@/components/intake/upload-form";
 import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
@@ -10,20 +11,24 @@ import { routes } from "@/lib/routes";
 import { seller } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Send your file",
+  title: "Send your figures",
   description:
-    "What to send, where to send it, and what happens next. No account, no form, no card details until there is something worth paying for.",
+    "Upload your profit and loss account and get the findings back by email. No account, no card details, and nothing to pay until you have seen what we found.",
   alternates: { canonical: "/send" },
 };
 
 /**
- * The intake, done by email on purpose.
+ * The intake.
  *
- * An upload widget needs storage, a queue and a key, and none of that makes the
- * first ten reports better. What it would do is put a broken form in front of
- * people before there is anything behind it. Email is the version we can
- * actually honour today, and it says so plainly rather than pretending to be
- * automated.
+ * It was an email address, on the argument that an upload widget needs storage
+ * and a queue and none of that makes the first ten reports better. That
+ * argument was about our cost and ignored the sender's: writing an email is a
+ * decision, choosing a file is a reflex, and the people who would have written
+ * the email were the ones already convinced.
+ *
+ * The widget that replaced it still stores nothing. The file goes straight into
+ * one email to us, which is what was happening anyway, minus the part where the
+ * sender had to do it themselves.
  */
 const WHAT_TO_SEND = [
   {
@@ -44,19 +49,64 @@ const WHAT_TO_SEND = [
 ];
 
 export default function SendPage() {
-  const mailto = `mailto:${seller.email}?subject=${encodeURIComponent("File for analysis")}`;
-
   return (
     <>
       <Section>
         <SectionHeader
           as="h1"
           eyebrow="Intake"
-          title="Send your file"
-          description={`Email it. No account, no form, no card details. We read it, run the analysis, and reply with what we found. Only if you want the answers is there anything to pay, and if we find less than €${MINIMUM_WORTH} there is nothing to pay at all.`}
+          title="Send your figures"
+          description={`Upload the file you already have. We read it, run the analysis, and reply with what we found. Only if you want the answers is there anything to pay, and if we find less than €${MINIMUM_WORTH} there is nothing to pay at all.`}
         />
 
-        <Container className="mt-10">
+        <Container className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+          <Card className="gap-0 p-6">
+            <UploadForm email={seller.email} />
+          </Card>
+
+          <Card className="gap-0 p-6">
+            <h2 className="text-base font-semibold">How your file is handled</h2>
+            <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+              <li>
+                <span className="text-foreground">Encrypted on the way here.</span>{" "}
+                The whole site is served over HTTPS, so the upload is encrypted
+                in transit. Your browser will not let it be anything else.
+              </li>
+              <li>
+                <span className="text-foreground">We store no copy.</span> There
+                is no database and no file store behind this form. The file is
+                held in memory just long enough to be attached to one email to{" "}
+                {seller.email}, and that mailbox is the only place it exists on
+                our side.
+              </li>
+              <li>
+                <span className="text-foreground">Deleted when we are done.</span>{" "}
+                Thirty days at the outside, sooner if you ask. One email from
+                you and it is gone, because there is only one place to delete it
+                from.
+              </li>
+              <li>
+                <span className="text-foreground">
+                  Not shared, not sold, not used to train anything.
+                </span>{" "}
+                Your figures are read to write your report. That is the only
+                thing that happens to them.
+              </li>
+            </ul>
+            <p className="mt-5 text-sm text-muted-foreground">
+              The long version is on the{" "}
+              <Link href="/privacy" className="underline underline-offset-4">
+                privacy page
+              </Link>
+              . If your policy needs a signed processing agreement before you
+              send anything, ask and you get one.
+            </p>
+          </Card>
+        </Container>
+      </Section>
+
+      <Section>
+        <Container className="grid gap-6 lg:grid-cols-2">
           <Card className="gap-0 p-6">
             <h2 className="text-base font-semibold">What to send</h2>
             <div className="mt-5 space-y-6">
@@ -69,23 +119,20 @@ export default function SendPage() {
               ))}
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              One file is enough to start. If a second one would let us say
-              something useful we ask for it by name, rather than producing a
-              thinner answer without telling you.
+              One file is enough to start. Do not tidy it first; messy exports
+              are the normal case. If a second file would let us say something
+              useful we ask for it by name, rather than producing a thinner
+              answer without telling you.
             </p>
           </Card>
-        </Container>
-      </Section>
 
-      <Section>
-        <Container className="grid gap-6 lg:grid-cols-2">
           <Card className="gap-0 p-6">
             <h2 className="text-base font-semibold">What happens, in order</h2>
             <ol className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <span className="text-foreground">1. You email the file.</span>{" "}
-                Excel, CSV or a text-based PDF. Do not tidy it first; messy
-                exports are the normal case.
+                <span className="text-foreground">1. You send the file.</span>{" "}
+                Excel, CSV or a text-based PDF, straight from your accounting
+                package.
               </li>
               <li>
                 <span className="text-foreground">2. We check we can read it.</span>{" "}
@@ -93,7 +140,9 @@ export default function SendPage() {
                 does not, we name the cell and ask, rather than guessing.
               </li>
               <li>
-                <span className="text-foreground">3. We reply with what we found.</span>{" "}
+                <span className="text-foreground">
+                  3. We reply with what we found.
+                </span>{" "}
                 The total, how many findings, and what each one is about. Free,
                 and usually the same day.
               </li>
@@ -105,33 +154,9 @@ export default function SendPage() {
                 including how far you can safely go.
               </li>
             </ol>
-            <Button asChild size="lg" className="mt-6 self-start">
-              <a href={mailto}>Email {seller.email}</a>
-            </Button>
-          </Card>
-
-          <Card className="gap-0 p-6">
-            <h2 className="text-base font-semibold">Honest about the machinery</h2>
-            <p className="mt-4 text-sm text-muted-foreground">
-              There is no upload widget yet. Building one before the first ten
-              reports would put a form in front of people with nothing behind it,
-              so the intake is an email address and a person reading it.
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              The analysis itself is not manual. The reading check and the rules
-              are code, they are deterministic, and you can watch both halves run
-              on a real company&apos;s accounts before you send anything.
-            </p>
             <Button asChild variant="outline" className="mt-6 self-start">
-              <Link href={routes.whatWeFind}>See it run</Link>
+              <Link href={routes.whatWeFind}>See it run on a real company</Link>
             </Button>
-            <p className="mt-6 text-sm text-muted-foreground">
-              Your file is used to produce your report and then deleted. The{" "}
-              <Link href="/privacy" className="underline underline-offset-4">
-                privacy page
-              </Link>{" "}
-              says exactly what that means.
-            </p>
           </Card>
         </Container>
       </Section>

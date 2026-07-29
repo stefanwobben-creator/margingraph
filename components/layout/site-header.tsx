@@ -17,6 +17,7 @@ const nav = [
   { label: "Guides", href: routes.guides },
   { label: "Blog", href: routes.blog },
   { label: "FAQ", href: routes.faq },
+  { label: "About", href: routes.about },
 ];
 
 export function SiteHeader() {
@@ -46,7 +47,7 @@ export function SiteHeader() {
           </ul>
 
           <Button asChild size="sm">
-            <Link href={routes.reports}>Browse Reports</Link>
+            <Link href={routes.send}>Send a file</Link>
           </Button>
         </nav>
       </Container>

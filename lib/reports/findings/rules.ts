@@ -227,13 +227,21 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
   const { actual, reference, costLines = [] } = input;
   if (!reference) return [];
 
+  // The floor is whichever is larger: the price of ten reports, or a quarter
+  // of a percent of turnover. On a company doing four hundred thousand a
+  // quarter the flat floor let through twenty-one overruns, most of them a few
+  // hundred euros, and a report with twenty-one items in it says nothing at
+  // all. An amount too small to be worth a conversation is not a finding.
+  const revenue = actual.values[actual.revenueKey] ?? 0;
+  const threshold = Math.max(floor, revenue * 0.0025);
+
   return costLines
     .map((line) => {
       const now = actual.values[line.key];
       const planned = reference.values[line.key];
       if (now === undefined || planned === undefined) return undefined;
       const over = now - planned;
-      if (over < floor) return undefined;
+      if (over < threshold) return undefined;
       return {
         id: `overrun-${line.key}`,
         per: actual.label,
@@ -253,13 +261,15 @@ export function findAll(input: FindingsInput): Finding[] {
   const ratio = ratioDrift(input);
   const covered = new Set(ratio.flatMap((f) => f.source));
 
-  const all = [
-    ...recoveryGap(input),
-    ...ratio,
-    // An overrun on a line a ratio finding already covers is the same money
-    // counted twice. The ratio version says more, so it wins.
-    ...budgetOverrun(input).filter((f) => !f.source.some((s) => covered.has(s))),
-  ];
+  // The weakest rule, so it is capped. Their accounting package already shows
+  // every one of these, and a report whose length comes from the dumbest rule
+  // in the set is a report padded to clear its own price.
+  const overruns = budgetOverrun(input)
+    .filter((f) => !f.source.some((s) => covered.has(s)))
+    .sort((a, b) => b.worth - a.worth)
+    .slice(0, 3);
+
+  const all = [...recoveryGap(input), ...ratio, ...overruns];
 
   return all.sort((a, b) => b.worth - a.worth || a.id.localeCompare(b.id));
 }

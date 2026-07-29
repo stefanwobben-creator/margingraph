@@ -1,3 +1,5 @@
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -83,6 +85,22 @@ export default function RootLayout({
         </main>
         <SiteFooter />
         <Analytics />
+        {/*
+          Vercel Speed Insights: real Core Web Vitals from real visitors,
+          rather than a lab score from a machine in a data centre. It sets no
+          cookie, stores nothing that can reconstruct a session, and both its
+          script and its beacon are served from this origin, so the
+          Content-Security-Policy needs no exception for it.
+        */}
+        <SpeedInsights />
+        {/*
+          Vercel Web Analytics. Cookieless, so no banner and no consent to
+          collect, which matters more here than the extra columns Google would
+          have given us: the Google tag is configured with consent denied by
+          default and there is no banner to grant it, so it has been counting
+          nothing this whole time.
+        */}
+        <VercelAnalytics />
       </body>
     </html>
   );

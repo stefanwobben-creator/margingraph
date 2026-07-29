@@ -27,7 +27,14 @@ const wordmarkFont = localFont({
 /**
  * The MarginGraph wordmark.
  *
- * "Margin" at 450, "Graph" at 850 — the weight contrast is the mark itself.
+ * All caps, MARGIN at 850 and GRAPH at 450. The weight contrast is the mark
+ * itself, and it falls on the half of the name that is the product: margin is
+ * what the customer is buying, the graph is only how it is drawn. The earlier
+ * version had the emphasis the other way round and quietly sold the packaging.
+ *
+ * The tracking is positive here where it was negative in the mixed-case
+ * version. Capitals have no descenders or ascenders to separate them, so the
+ * same negative tracking that tightens lowercase turns caps into a wall.
  *
  * `<b>` is the correct element: HTML5 defines it as text stylistically offset
  * without conveying extra importance, which is exactly this. `<strong>` would
@@ -35,18 +42,18 @@ const wordmarkFont = localFont({
  *
  * The explicit weight matters. Tailwind's preflight sets `b { font-weight:
  * bolder }`, which on a variable font resolves to roughly 700 relative to the
- * 450 parent — close enough to look deliberate and wrong enough to miss.
+ * 450 parent: close enough to look deliberate and wrong enough to miss.
  */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
         wordmarkFont.className,
-        "font-[450] tracking-[-0.02em] whitespace-nowrap text-wordmark",
+        "font-[450] tracking-[0.04em] whitespace-nowrap text-wordmark uppercase",
         className,
       )}
     >
-      Margin<b className="font-[850]">Graph</b>
+      <b className="font-[850]">Margin</b>Graph
     </span>
   );
 }

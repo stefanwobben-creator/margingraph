@@ -56,11 +56,22 @@ export const SUBTOTAL = [
   "ebitda",
   "ebit",
   "resultaat",
+  "resultaten",
+  "result",
+  "results",
   "nettowinst",
   "net profit",
   "net result",
   "winst voor belasting",
   "profit before tax",
+  "profit",
+  "winst",
+  // A bare "marge" is a subtotal of everything above it, and it arrives with a
+  // cost word attached often enough to be dangerous: "Marge voor vracht" reads
+  // as a freight line to anything matching on the word freight, and would then
+  // be counted as a cost as well as being the sum of the costs above it.
+  "marge",
+  "margin",
 ] as const;
 
 /** The rows whose ratio to turnover we want. Same words, narrower list. */
@@ -72,6 +83,22 @@ export const GROSS_MARGIN = [
   "gross profit",
   "contributiemarge",
   "contribution margin",
+] as const;
+
+/**
+ * The names a turnover *total* goes by.
+ *
+ * A profit and loss usually carries two: what was invoiced, and what is left
+ * after discounts and credit notes. Both are called turnover and only the
+ * second belongs in a ratio. "Net" is the word that separates them, and it is
+ * the same word in both languages.
+ */
+export const NET_REVENUE = [
+  "netto",
+  "net turnover",
+  "net sales",
+  "net revenue",
+  "netto omzet",
 ] as const;
 
 export const REVENUE = [
@@ -98,6 +125,44 @@ export const NOT_REVENUE = [
   "cost of",
   "cogs",
   "cost price",
+] as const;
+
+/**
+ * Deductions that are already inside net turnover.
+ *
+ * Discounts, bonuses and credit notes sit between invoiced and net turnover.
+ * Counted again as a cost they appear twice, once inside the revenue line we
+ * divide by and once as a line of its own.
+ */
+export const REVENUE_DEDUCTION = [
+  "korting",
+  "kortingen",
+  "discount",
+  "discounts",
+  "bonus",
+  "bonussen",
+  "rebate",
+  "creditnota",
+  "credit notes",
+  "retouren",
+  "returns",
+] as const;
+
+/**
+ * Below the operating line.
+ *
+ * Interest and tax are not costs an owner steers with a supplier
+ * conversation, and a budget overrun on corporation tax is not a finding. They
+ * are read and then left alone.
+ */
+export const NOT_OPERATING = [
+  "rente",
+  "interest",
+  "belasting",
+  "belastingen",
+  "tax",
+  "vennootschapsbelasting",
+  "dividend",
 ] as const;
 
 /** Lines that bill a cost back out to customers. Always credits. */
@@ -224,15 +289,50 @@ export const REFERENCE_HEADER = [
   "prognose",
   "vorig jaar",
   "vorig boekjaar",
+  "voorgaand",
+  "voorgaande",
   "prior year",
   "last year",
   "ly",
   "py",
 ] as const;
 
+/**
+ * How much time a column covers.
+ *
+ * Checked in this order, because a header like "Budget U/t period" carries
+ * both words and the cumulative one wins. Comparing a single month against a
+ * year-to-date budget makes every ratio in the report wrong by a factor of
+ * three, produces a confident page of nonsense, and nothing downstream can
+ * tell. It is the one mismatch the gate cannot catch, because both columns
+ * add up perfectly.
+ */
+export const SPAN: readonly { id: string; label: string; words: readonly string[] }[] = [
+  {
+    id: "cumulative",
+    label: "year to date",
+    words: ["u t", "ytd", "cumulatief", "cumulative", "year to date", "t m", "tm"],
+  },
+  {
+    id: "period",
+    label: "a single period",
+    words: ["period", "periode", "maand", "month", "kwartaal", "quarter"],
+  },
+  // Weakest, and last on purpose. "Dit jaar" and "Voorgaand jaar" are group
+  // headings that say which year, not how much of it, and nearly every column
+  // in a Dutch export sits under one of them.
+  { id: "year", label: "a full year", words: ["year", "jaar", "annual", "fy"] },
+];
+
+export function spanOf(header: string): { id: string; label: string } | undefined {
+  const found = SPAN.find((span) => has(header, span.words));
+  return found ? { id: found.id, label: found.label } : undefined;
+}
+
 /** Column headers that are arithmetic on other columns, never a period. */
 export const DERIVED_HEADER = [
   "verschil",
+  "var",
   "afwijking",
   "variance",
   "delta",

@@ -28,5 +28,7 @@ export const routes = {
   whatWeFind: "/what-we-find",
   /** Where every call to action ends. The only page that asks for anything. */
   send: "/send",
+  /** A name and a face, because the site asks strangers for a balance sheet. */
+  about: "/about",
   howItWorks: "/#how-it-works",
 } as const;

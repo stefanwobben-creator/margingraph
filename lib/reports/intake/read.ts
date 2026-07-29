@@ -6,7 +6,10 @@ import {
   DERIVED_HEADER,
   GROSS_MARGIN,
   NEVER_VARIABLE,
+  NET_REVENUE,
+  NOT_OPERATING,
   NOT_REVENUE,
+  REVENUE_DEDUCTION,
   RECOVERY,
   REFERENCE_HEADER,
   REVENUE,
@@ -14,6 +17,7 @@ import {
   VARIABLE,
   has,
   normalise,
+  spanOf,
 } from "./vocabulary";
 
 export type ReadOptions = {
@@ -125,7 +129,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     else if (refs.length > 1) {
       questions.push(
         `More than one column could be the comparison: ${refs
-          .map((c) => `"${headers.get(c) || `column ${c + 1}`}"`)
+          .map((c) => `column ${c + 1} "${headers.get(c) || "unnamed"}"`)
           .join(", ")}. Which one should we measure against?`,
       );
     }
@@ -145,7 +149,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     else if (candidates.length > 1) {
       questions.push(
         `More than one column could be the period that happened: ${candidates
-          .map((c) => `"${headers.get(c) || `column ${c + 1}`}"`)
+          .map((c) => `column ${c + 1} "${headers.get(c) || "unnamed"}"`)
           .join(", ")}. Which one is it?`,
       );
     }
@@ -159,6 +163,20 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     notes.push(
       "No budget or prior-year column found, so only the rules that read one period can run.",
     );
+  }
+
+  // Same arithmetic, different amounts of time. Both columns can be perfectly
+  // correct and comparing them still produces a page of confident nonsense.
+  if (referenceColumn !== undefined) {
+    const here = spanOf(headers.get(actualColumn) ?? "");
+    const there = spanOf(headers.get(referenceColumn) ?? "");
+    if (here && there && here.id !== there.id) {
+      questions.push(
+        `Column ${actualColumn + 1} covers ${here.label} and column ${referenceColumn + 1} covers ${there.label}. ` +
+          `Comparing them would make every ratio in the report wrong. Point us at two columns that cover the same stretch of time.`,
+      );
+      return { readable: false, questions, notes, rows };
+    }
   }
 
   const actualLabel = headers.get(actualColumn) || sheet.name || "this period";
@@ -200,7 +218,11 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     };
     if (kind === "subtotal") entry.because = "restates the lines above it";
     if (kind === "margin") entry.because = "used for the margin, not counted as a cost";
-    if (kind === "skip") entry.because = "no figures";
+    if (kind === "skip") {
+      entry.because = has(label, REVENUE_DEDUCTION)
+        ? "already deducted inside net turnover"
+        : "below the operating line";
+    }
     rows.push(entry);
   }
 
@@ -210,6 +232,24 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
   const revenueTotals = revenueRows.filter((row) => has(row.label, SUBTOTAL));
   let revenue = revenueTotals.length === 1 ? revenueTotals[0] : undefined;
   if (!revenue && revenueRows.length === 1) revenue = revenueRows[0];
+
+  // Invoiced turnover and net turnover are both called turnover, and only the
+  // one after discounts and credit notes belongs underneath a ratio. Taking
+  // the gross line would flatter every percentage in the report by exactly the
+  // discount rate, which is the kind of error nobody notices and everybody
+  // acts on.
+  if (!revenue) {
+    const net = revenueRows.filter((row) => has(row.label, NET_REVENUE));
+    if (net.length === 1) {
+      revenue = net[0];
+      notes.push(
+        `Two lines here name turnover. We used "${revenue.label}" rather than ${revenueRows
+          .filter((row) => row !== revenue)
+          .map((row) => `"${row.label}"`)
+          .join(", ")}, because a ratio belongs under turnover after discounts.`,
+      );
+    }
+  }
 
   if (!revenue) {
     questions.push(
@@ -383,6 +423,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
 function classify(label: string): RowKind {
   if (has(label, GROSS_MARGIN)) return "margin";
   if (has(label, RECOVERY)) return "recovery";
+  if (has(label, REVENUE_DEDUCTION) || has(label, NOT_OPERATING)) return "skip";
   if (has(label, SUBTOTAL)) {
     return has(label, REVENUE) && !has(label, NOT_REVENUE) ? "revenue" : "subtotal";
   }
