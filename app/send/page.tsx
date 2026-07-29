@@ -42,6 +42,11 @@ const WHAT_TO_SEND = [
     why: "Earnings have to be normalised for owner pay before any multiple means anything.",
   },
   {
+    question: "How long does the money last?",
+    send: "The same profit and loss account, plus what is in the bank today. One number.",
+    why: "There is no cash in a profit and loss account, which is why your accounts can never answer this and your accountant does not volunteer it.",
+  },
+  {
     question: "Is this contract reasonable?",
     send: "The quote or agreement itself, and roughly what volume you do.",
     why: "A fee that is trivial at ten thousand units is fatal at one thousand. Volume decides which one you are.",

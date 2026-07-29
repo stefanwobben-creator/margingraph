@@ -123,6 +123,36 @@ export function UploadForm({ email: address }: { email: string }) {
         </p>
       </div>
 
+      {/*
+        One number, a whole extra answer.
+
+        Runway is the question every owner actually loses sleep over and the
+        one thing a profit and loss account cannot answer, because it needs
+        cash and a P&L has none in it. Rather than send them away for a balance
+        sheet, we ask for the single figure they can read off their banking app
+        in four seconds. Optional, because a required field here would cost us
+        more submissions than the answer is worth.
+      */}
+      <div>
+        <label htmlFor="cash" className="block text-sm font-medium">
+          What is in the bank today?{" "}
+          <span className="text-muted-foreground">(optional)</span>
+        </label>
+        <input
+          id="cash"
+          name="cash"
+          type="text"
+          inputMode="numeric"
+          placeholder="e.g. 84000"
+          className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Add this and we can also tell you how long the money lasts at the rate
+          your own figures are running. Your accounts cannot answer that, because
+          there is no cash in a profit and loss account.
+        </p>
+      </div>
+
       <div>
         <label htmlFor="note" className="block text-sm font-medium">
           Anything we should know? <span className="text-muted-foreground">(optional)</span>

@@ -491,3 +491,40 @@ export const TIERS: readonly { tier: Tier; label: string; step: string; words: r
 export function tierOf(label: string): Tier | undefined {
   return TIERS.find((t) => has(label, t.words))?.tier;
 }
+
+/**
+ * Labour, wherever it sits in the accounts.
+ *
+ * Kept separate from the tiers because labour is the one cost that has to be
+ * read against gross profit rather than against turnover. Turnover is not
+ * money you have. What you bought and resold was never yours; gross profit is
+ * the first figure that is, and it is what has to pay for everybody.
+ *
+ * A trading company at fifty percent gross margin spending ten percent of
+ * turnover on people is spending twenty percent of what it actually earns.
+ * Stated against turnover that reads as a small number. It is not a small
+ * number.
+ */
+export const LABOUR = [
+  "personeel",
+  "personeels",
+  "salaris",
+  "salarissen",
+  "loon",
+  "lonen",
+  "payroll",
+  "wages",
+  "salary",
+  "staff cost",
+  "staff costs",
+  "sociale lasten",
+  "pensioen",
+  "pension",
+  "inhuur",
+  "freelance",
+  "zzp",
+  "uitzend",
+  "contractors",
+] as const;
+
+export const isLabour = (label: string) => has(label, LABOUR);

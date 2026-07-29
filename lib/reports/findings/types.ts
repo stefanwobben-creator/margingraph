@@ -142,4 +142,12 @@ export type FindingsInput = {
    * logistics are the problem when the line was actually a software licence.
    */
   tiers?: { key: string; label: string; tier: 1 | 2 | 3 | 4 }[];
+  /**
+   * Every line that pays a person, wherever the accounts filed it.
+   *
+   * Separate from the tiers because labour is read against gross profit, not
+   * against turnover. What you bought and resold was never your money; gross
+   * profit is the first figure that is, and it has to pay for everybody.
+   */
+  labourLines?: { key: string; label: string }[];
 };

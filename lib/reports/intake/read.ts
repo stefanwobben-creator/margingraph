@@ -17,6 +17,7 @@ import {
   VARIABLE,
   has,
   normalise,
+  isLabour,
   spanOf,
   tierOf,
 } from "./vocabulary";
@@ -380,6 +381,10 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
       line.tier !== undefined,
     );
 
+  const labourLines = rows
+    .filter((row) => row.kind === "cost" && row.actual !== null && isLabour(row.label))
+    .map((row) => ({ key: row.key, label: row.label }));
+
   const input: FindingsInput = {
     actual: { label: actualLabel, revenueKey: revenue.key, values: actualValues },
     reference:
@@ -394,6 +399,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     variableLines: lines(["variable"]),
     costLines: lines(["variable", "cost"]),
     tiers,
+    labourLines,
     contributionMargin,
   };
 

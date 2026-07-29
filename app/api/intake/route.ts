@@ -47,6 +47,7 @@ export async function POST(request: Request) {
 
   const email = String(form.get("email") ?? "").trim();
   const note = String(form.get("note") ?? "").trim();
+  const cash = String(form.get("cash") ?? "").trim();
   const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
 
   const problems = validate({
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
     text: [
       `From: ${email}`,
       `Files: ${files.map((f) => `${f.name} (${f.size} bytes)`).join(", ")}`,
+      cash ? `Bank balance today: ${cash}` : "No bank balance given, so no runway.",
       note ? `\nWhat they said:\n${note}` : "\nNo note.",
       `\nRun: npm run intake "<the attached file>"`,
     ].join("\n"),
