@@ -48,7 +48,7 @@ export default function WhatWeFindPage() {
           as="h1"
           eyebrow="The flow"
           title="What we find, before you pay for it"
-          description={`We read the file and run the analysis first. You see the total, the number of findings, and the largest one in full with its arithmetic. Only then is there anything to buy. If the total comes in under €${MINIMUM_WORTH}, no payment screen appears at all.`}
+          description={`We read the file and run the analysis first. You see the total, how many findings there are and what each one is about, before anything is for sale. If the total comes in under €${MINIMUM_WORTH}, no payment screen appears at all.`}
         />
 
         <Card className="mt-10 gap-0 p-6">
@@ -101,9 +101,10 @@ export default function WhatWeFindPage() {
               {teaser.text}
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
-              The largest finding is given away whole, workings included, so the
-              method can be checked on real figures before any money moves. The
-              locked line names its subject and never its amount.
+              The size and the subjects, not the answers. Which line each one
+              sits on, the arithmetic behind it and what to do about it is what
+              you are buying. You can check the method here, on a company that
+              is not yours, for nothing.
             </p>
           </Card>
 
@@ -118,9 +119,10 @@ export default function WhatWeFindPage() {
               {report.text}
             </pre>
             <p className="mt-4 text-sm text-muted-foreground">
-              {report.findings.length} findings, {money(report.found)} in total,
-              against a price of €{REPORT_PRICE}. Every figure carries the line
-              it came from.
+              Note the steps. A recovery rate of 55% is a price your customers
+              accepted, not an oversight, so the advice is not to jump to full
+              recovery. It is the smallest move worth making, what it earns, and
+              how much business it can cost before it stops being worth it.
             </p>
           </Card>
         </Container>

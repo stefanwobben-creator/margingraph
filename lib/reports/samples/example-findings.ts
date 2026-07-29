@@ -45,6 +45,10 @@ export const demoInput: FindingsInput = {
       marketing: 112_800,
     },
   },
+  // What the company keeps on the next euro of revenue. Without it the ladder
+  // can price each step but not the volume it may safely cost, which is the
+  // half an owner actually needs before touching a price.
+  contributionMargin: 0.368,
   recoveries: [
     { cost: "outbound freight", recovery: "recharged freight", label: "outbound freight" },
   ],

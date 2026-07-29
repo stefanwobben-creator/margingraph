@@ -52,13 +52,26 @@ export type Teaser = {
   text: string;
 };
 
+const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+
 function block(f: Finding, index: number): string {
   const lines = [
     `${index}. ${f.observation}`,
-    `   Worth:  ${euro(f.worth)} (${f.per}).`,
+    `   Worth:  ${euro(f.worth)} at most (${f.per}).`,
     `   Do:     ${f.action}`,
     `   Check:  ${f.workings}`,
   ];
+  if (f.ladder?.length) {
+    lines.push("   Steps:");
+    const width = Math.max(...f.ladder.map((s) => s.move.length));
+    for (const step of f.ladder) {
+      const risk =
+        step.breakEvenShare !== undefined
+          ? `  safe while you lose under ${pct(step.breakEvenShare)} of turnover`
+          : "";
+      lines.push(`     ${step.move.padEnd(width)}  ${euro(step.worth).padStart(9)}${risk}`);
+    }
+  }
   if (f.caveat) lines.push(`   Note:   ${f.caveat}`);
   return lines.join("\n");
 }
@@ -92,11 +105,17 @@ export function render(findings: Finding[]): Report {
 }
 
 /**
- * The same findings, with everything but the largest one held back.
+ * What the reader gets for nothing: the size, not the answer.
  *
- * Locked lines name the subject and never the amount. "Your outbound freight
- * recovery" tells a reader whether it is worth nine euros to them; "€36,400 on
- * outbound freight" is the finding itself, given away.
+ * An earlier version handed over the largest finding whole, workings and action
+ * included, on the argument that a reader should be able to verify the method
+ * before paying. That argument was right and the implementation was wrong: it
+ * gave away the finding to prove the method. The proof now lives on a public
+ * example page, run on a company that is not theirs, where it costs nothing.
+ *
+ * What is left here is what an owner needs to decide: we could read your file,
+ * there are N things in it, the largest is worth this much, and here is what
+ * each one is about. Which line, why, and what to do about it is the product.
  */
 export function teaser(findings: Finding[]): Teaser {
   const sorted = [...findings].sort((a, b) => b.worth - a.worth);
@@ -116,20 +135,18 @@ export function teaser(findings: Finding[]): Teaser {
     };
   }
 
-  const [sample, ...rest] = sorted;
-  const locked = rest.map((f) => f.subject);
+  const [sample] = sorted;
+  const locked = sorted.map((f) => f.subject);
+  const width = Math.max(...locked.map((l) => l.length));
 
   const head =
-    rest.length === 0
-      ? `We found ${euro(found)} in your file. Here it is in full.`
-      : `We found ${euro(found)} across ${sorted.length} findings in your file. ` +
-        `Here is the largest one in full, so you can check the arithmetic before you decide.`;
+    `We read your file and found ${euro(found)} across ` +
+    `${sorted.length} ${sorted.length === 1 ? "finding" : "findings"}. ` +
+    `The largest is worth ${euro(sample.worth)} on its own.`;
 
-  const tail =
-    rest.length === 0
-      ? ""
-      : `\n\nStill locked (€${REPORT_PRICE} for all of them):\n` +
-        rest.map((_, i) => `  ${i + 2}. ${locked[i]}`).join("\n");
+  const list = sorted
+    .map((f, i) => `  ${i + 1}. ${f.subject.padEnd(width)}  ${euro(f.worth).padStart(9)}`)
+    .join("\n");
 
   return {
     found,
@@ -137,6 +154,9 @@ export function teaser(findings: Finding[]): Teaser {
     sample,
     locked,
     unlockable: true,
-    text: `${head}\n\n${block(sample, 1)}${tail}\n`,
+    text:
+      `${head}\n\nWhat we found, and what each one is worth:\n\n${list}\n\n` +
+      `€${REPORT_PRICE} unlocks which line each of these sits on, the arithmetic ` +
+      `behind it, and what to do about it including how far you can safely go.\n`,
   };
 }

@@ -37,6 +37,7 @@ export const allc: FindingsInput = {
       marketing: 112_800,
     },
   },
+  contributionMargin: 0.368,
   recoveries: [
     {
       cost: "vracht-uitgaand",

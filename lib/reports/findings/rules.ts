@@ -1,4 +1,4 @@
-import type { Finding, FindingsInput, Period } from "./types";
+import type { Finding, FindingsInput, LadderStep, Period } from "./types";
 
 const euro = (n: number) =>
   `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
@@ -23,8 +23,56 @@ function share(period: Period, key: string): number | undefined {
  * holiday park: a number that looks authoritative and comes from nowhere. How
  * far up to go is the owner's call, and the finding gives them the ceiling.
  */
+/**
+ * A ladder of partial moves, priced.
+ *
+ * The steps are deliberately small at the bottom. A recovery rate sitting at
+ * 55% is a price the market accepted, not a clerical error, and an owner told
+ * to go straight to 100% will either ignore the advice or lose customers
+ * proving it wrong. Five points is a change most buyers absorb; the ceiling is
+ * shown last because it is the arithmetic limit, not a recommendation.
+ */
+function recoveryLadder(input: {
+  cost: number;
+  recovered: number;
+  revenue?: number;
+  contributionMargin?: number;
+}): LadderStep[] {
+  const { cost, recovered, revenue, contributionMargin } = input;
+  const rate = recovered / cost;
+  const headroom = 1 - rate;
+  const steps = [0.05, 0.1, 0.25].filter((s) => s < headroom);
+
+  return [...steps, headroom].map((step) => {
+    const worth = cost * step;
+    const breakEvenRevenue =
+      contributionMargin && contributionMargin > 0 ? worth / contributionMargin : undefined;
+    return {
+      move:
+        step === headroom
+          ? `Recover all of it (${pct(rate)} to 100%)`
+          : `Recover ${(step * 100).toFixed(0)} more points (${pct(rate)} to ${pct(rate + step)})`,
+      worth,
+      breakEvenRevenue,
+      breakEvenShare:
+        breakEvenRevenue !== undefined && revenue ? breakEvenRevenue / revenue : undefined,
+    } satisfies LadderStep;
+  });
+}
+
+/**
+ * Recovery gap.
+ *
+ * A cost you bill on to customers, and the line that bills it. If the second
+ * is smaller than the first, the difference is margin you are not charging for.
+ *
+ * The headline amount is the ceiling, not the advice. Full recovery is the only
+ * limit that does not come out of thin air, so it is what the gap is measured
+ * against, but the ladder underneath it is what an owner actually acts on.
+ */
 export function recoveryGap(input: FindingsInput): Finding[] {
-  const { actual, recoveries = [] } = input;
+  const { actual, recoveries = [], contributionMargin } = input;
+  const revenue = actual.values[actual.revenueKey];
   const out: Finding[] = [];
 
   for (const pair of recoveries) {
@@ -37,15 +85,27 @@ export function recoveryGap(input: FindingsInput): Finding[] {
     if (rate >= 0.995) continue;
 
     const gap = cost - recovered;
+    const ladder = recoveryLadder({ cost, recovered, revenue, contributionMargin });
+    const first = ladder[0];
+
+    const action =
+      first.breakEvenShare !== undefined
+        ? `${first.move}. Worth ${euro(first.worth)}, and it stays worth it as long as it costs you less than ${pct(first.breakEvenShare)} of turnover in lost business.`
+        : `${first.move}, worth ${euro(first.worth)}. Start small: this rate is a price your customers accepted, so a jump to full recovery buys an argument you do not need.`;
+
     out.push({
       id: `recovery-${pair.recovery}`,
       per: actual.label,
       subject: `How much of your ${pair.label} you recover from customers`,
       observation: `You recover ${pct(rate)} of your ${pair.label} from customers.`,
       worth: gap,
-      action: `Reprice the ${pair.label} line to cost, or set a free-shipping threshold above your current average order value.`,
-      workings: `${euro(cost)} of cost against ${euro(recovered)} recovered is ${pct(rate)}. Full recovery is worth ${euro(gap)}.`,
+      action,
+      workings: `${euro(cost)} of cost against ${euro(recovered)} recovered is ${pct(rate)}. The remaining ${euro(gap)} is the ceiling, reached only at full recovery.`,
       source: [pair.cost, pair.recovery],
+      ladder,
+      caveat: contributionMargin
+        ? undefined
+        : `We could not work out what you keep on the next euro of revenue, so the ladder shows what each step earns but not what it can safely cost. Send a gross margin figure and we will price the risk too.`,
     });
   }
 

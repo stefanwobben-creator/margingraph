@@ -179,20 +179,26 @@ describe("the teaser, which is the guarantee made mechanical", () => {
     assert.equal(round(t.found), 57_600);
     assert.equal(t.count, 2);
     assert.match(t.text, /found €57,600 across 2 findings/);
+    assert.match(t.text, /largest is worth €36,400 on its own/);
   });
 
-  test("gives the largest finding away in full, workings included", () => {
-    assert.equal(t.sample?.id, "recovery-doorberekende-vracht");
-    assert.match(t.text, /€81,800/);
-    assert.match(t.text, /Check:  /);
+  test("keeps the answer back: no source line, no arithmetic, no action", () => {
+    // These are the three things €9 buys. An earlier version handed the
+    // largest finding over whole and had nothing left to sell.
+    assert.ok(!t.text.includes("€81,800"), "the source figures are visible");
+    assert.ok(!/Check:/.test(t.text), "the arithmetic is visible");
+    assert.ok(!/Do:/.test(t.text), "the action is visible");
+    assert.ok(!/vracht-uitgaand/.test(t.text), "the line it sits on is named");
   });
 
-  test("names what is locked without pricing it", () => {
-    assert.equal(t.locked.length, 1);
-    const [locked] = t.locked;
-    assert.ok(!/€/.test(locked), `locked line leaked an amount: ${locked}`);
-    assert.ok(!t.text.includes("€21,200"), "the withheld finding's amount is visible");
-    assert.equal(locked, "Kosten IT against budget");
+  test("names every subject and prices every one of them", () => {
+    assert.equal(t.locked.length, 2);
+    assert.deepEqual(t.locked, [
+      "How much of your uitgaande vracht you recover from customers",
+      "Kosten IT against budget",
+    ]);
+    assert.match(t.text, /€36,400/);
+    assert.match(t.text, /€21,200/);
   });
 
   test("is unlockable, because there is something to sell", () => {
@@ -216,10 +222,49 @@ describe("the teaser, which is the guarantee made mechanical", () => {
     assert.equal(none.unlockable, false);
   });
 
-  test("does not offer to unlock a report with only one finding at a discount to itself", () => {
+  test("still withholds the answer when there is only one finding", () => {
+    // The single-finding case is the one most tempting to give away, because
+    // holding one thing back looks stingy. It is also the case where handing
+    // it over leaves nothing to sell at all.
     const single = teaser([findAll(allc)[0]]);
     assert.equal(single.count, 1);
-    assert.equal(single.locked.length, 0);
-    assert.match(single.text, /Here it is in full/);
+    assert.equal(single.locked.length, 1);
+    assert.match(single.text, /1 finding\b/);
+    assert.match(single.text, /€36,400/);
+    assert.ok(!/Check:/.test(single.text));
+    assert.ok(!/Do:/.test(single.text));
+  });
+});
+
+describe("the ladder, because a rate that low exists for a reason", () => {
+  const [freight] = recoveryGap(allc);
+
+  test("starts small rather than at the ceiling", () => {
+    assert.ok(freight.ladder);
+    assert.match(freight.ladder[0].move, /5 more points/);
+    assert.equal(round(freight.ladder[0].worth), 4_090);
+  });
+
+  test("ends at full recovery, labelled as the limit and not as advice", () => {
+    const last = freight.ladder!.at(-1)!;
+    assert.match(last.move, /Recover all of it/);
+    assert.equal(round(last.worth), 36_400);
+    assert.match(freight.workings, /ceiling, reached only at full recovery/);
+  });
+
+  test("prices the volume each step can safely cost", () => {
+    // €4,090 recovered at a 36.8% contribution margin pays for €11,114 of
+    // revenue walking away, which is 0.5% of this company's turnover.
+    const [first] = freight.ladder!;
+    assert.equal(round(first.breakEvenRevenue!), 11_114);
+    assert.ok(first.breakEvenShare! < 0.005);
+    assert.match(freight.action, /less than 0\.5% of turnover in lost business/);
+  });
+
+  test("says so rather than guessing when it cannot price the risk", () => {
+    const [blind] = recoveryGap({ ...allc, contributionMargin: undefined });
+    assert.equal(blind.ladder![0].breakEvenShare, undefined);
+    assert.match(blind.caveat!, /not what it can safely cost/);
+    assert.match(blind.action, /Start small/);
   });
 });

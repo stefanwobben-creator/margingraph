@@ -9,6 +9,23 @@
  * `workings` exists so the number can be checked by hand in ten seconds. A
  * figure an owner cannot re-derive is a figure they will not act on.
  */
+export type LadderStep = {
+  /** The move, in the owner's terms. */
+  move: string;
+  /** Euros per period, at the same period as the finding. */
+  worth: number;
+  /**
+   * Revenue that can be lost before this step breaks even.
+   *
+   * A price rise that nobody notices is a price rise that was too small. This
+   * says how much can walk away before the increase stops paying for itself,
+   * which is the number that decides whether the step is safe.
+   */
+  breakEvenRevenue?: number;
+  /** The same, as a share of turnover. Easier to judge than an amount. */
+  breakEvenShare?: number;
+};
+
 export type Finding = {
   id: string;
   /** One sentence: what is true about their figures. */
@@ -37,6 +54,18 @@ export type Finding = {
   workings: string;
   /** Cell ids this came from, for linking back to their own file. */
   source: string[];
+  /**
+   * What a partial move is worth, and how much volume it can cost before it
+   * stops being worth it.
+   *
+   * A situation usually exists for a reason. Outbound freight recovered at
+   * 55% is not an oversight, it is a price the market was willing to pay, and
+   * telling an owner to jump straight to full recovery is advice that ignores
+   * the customers attached to it. A ladder converts the finding into something
+   * an owner can actually do on Monday: a small step, what it earns, and how
+   * much business it may cost before the step is a wash.
+   */
+  ladder?: LadderStep[];
   /**
    * Rules that fire on a suspicion rather than a certainty mark themselves.
    * A soft finding still has to carry a euro amount; it just says out loud
@@ -81,6 +110,14 @@ export type FindingsInput = {
    * is worse than silent.
    */
   variableLines?: { key: string; label: string }[];
+  /**
+   * Margin kept on the next euro of revenue, as a fraction.
+   *
+   * Needed to answer "how much volume can this cost me". Without it a ladder
+   * still shows what each step earns, but not what it can safely cost, and the
+   * rule says so rather than guessing at a number.
+   */
+  contributionMargin?: number;
   /** Every cost line, for the plain budget comparison. */
   costLines?: { key: string; label: string }[];
 };
