@@ -217,3 +217,62 @@ describe("the rollup definition is not fitted to any one column", () => {
     }
   });
 });
+
+describe("a total that overshoots a partial reading", () => {
+  const partial: Statement = {
+    id: "filed",
+    label: "A filed balance sheet with an untagged line",
+    precision: 1,
+    cells: [
+      { id: "net-current", label: "Net current assets", value: 46_111 },
+      { id: "total", label: "Total assets less current liabilities", value: 106_078 },
+    ],
+    rollups: [
+      // The reader collected what the filing happened to tag, so it cannot
+      // claim the list is exhaustive.
+      { id: "total", parts: [{ cell: "net-current", sign: 1 }], complete: false },
+    ],
+  };
+
+  test("is a shortfall, not a contradiction", () => {
+    const verdict = reconcile(partial);
+    assert.equal(check(verdict, "total").status, "shortfall");
+    assert.equal(check(verdict, "total").drift, 59_967);
+  });
+
+  test("is amber, because the owner still has to be asked", () => {
+    assert.equal(reconcile(partial).status, "amber");
+  });
+
+  test("is not chargeable, because nothing is wrong with their figures", () => {
+    assert.equal(reconcile(partial).chargeable, false);
+  });
+
+  test("says the gap is in the file rather than in the figures", () => {
+    assert.match(reconcile(partial).summary, /never published/);
+    assert.match(reconcile(partial).summary, /gap in the file, not in the figures/);
+  });
+
+  test("offers no sign flip, because there is nothing to repair", () => {
+    assert.deepEqual(check(reconcile(partial), "total").repairs, []);
+  });
+
+  test("the same numbers under a complete reading stay a contradiction", () => {
+    const complete = {
+      ...partial,
+      rollups: [{ id: "total", parts: [{ cell: "net-current", sign: 1 as const }] }],
+    };
+    assert.equal(check(reconcile(complete), "total").status, "mismatch");
+    assert.equal(reconcile(complete).chargeable, true);
+  });
+});
+
+describe("chargeability", () => {
+  test("a clean statement is not chargeable either, because it found nothing", () => {
+    assert.equal(reconcile(q1Actual).chargeable, false);
+  });
+
+  test("a real contradiction is", () => {
+    assert.equal(reconcile(yearBudgetAsReported).chargeable, true);
+  });
+});

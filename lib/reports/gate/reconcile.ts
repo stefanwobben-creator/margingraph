@@ -115,17 +115,22 @@ function checkRollup(
   const drift = quantise(stated - total, precision);
   const ok = Math.abs(drift) <= tolerance;
 
+  // A total that overshoots the parts of an admittedly partial list is the
+  // signature of a component that was never published. Undershooting is not:
+  // an unseen part cannot make a total smaller, so that stays a mismatch.
+  const shortfall = !ok && rollup.complete === false && drift > 0;
+
   return {
     rollup: rollup.id,
     label,
-    status: ok ? "ok" : "mismatch",
+    status: ok ? "ok" : shortfall ? "shortfall" : "mismatch",
     stated,
     computed: total,
     drift,
     tolerance,
     counted,
     missing: blanks,
-    repairs: ok ? [] : repairsFor(rollup, cells, stated, precision, tolerance),
+    repairs: ok || shortfall ? [] : repairsFor(rollup, cells, stated, precision, tolerance),
   };
 }
 
@@ -140,6 +145,9 @@ function describe(status: GateStatus, checks: RollupCheck[], label: string): str
   const parts = bad.map((c) => {
     if (c.status === "incomplete") {
       return `${c.label} could not be tested (${c.missing.join(", ")} absent)`;
+    }
+    if (c.status === "shortfall") {
+      return `${c.label} is stated as ${c.stated} and the lines we could read only reach ${c.computed}, so ${c.drift} of it was never published. That is a gap in the file, not in the figures`;
     }
     const gap = c.drift ?? 0;
     const repair =
@@ -166,7 +174,8 @@ export function reconcile(statement: Statement): GateVerdict {
   const checks = statement.rollups.map((r) => checkRollup(r, cells, statement.precision));
 
   const testable = checks.filter((c) => c.status !== "incomplete");
-  const failed = checks.filter((c) => c.status === "mismatch");
+  const failed = checks.filter((c) => c.status === "mismatch" || c.status === "shortfall");
+  const contradicted = checks.filter((c) => c.status === "mismatch");
 
   const status: GateStatus =
     testable.length === 0 ? "red" : failed.length > 0 || checks.length > testable.length ? "amber" : "green";
@@ -178,6 +187,7 @@ export function reconcile(statement: Statement): GateVerdict {
   return {
     statement: statement.id,
     status,
+    chargeable: contradicted.length > 0,
     checks,
     blocking,
     summary: describe(status, checks, statement.label),

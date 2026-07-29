@@ -1,0 +1,110 @@
+---
+title: "Waarom telt mijn winst-en-verliesrekening niet op?"
+seoTitle: "Winst-en-verliesrekening telt niet op? Zo vind je de regel"
+description: "Een subtotaal dat niet volgt uit de regels erboven is bijna nooit een afrondingsfout. Vier oorzaken, en hoe je in tien minuten vindt welke het is."
+date: 2026-07-29
+author: MarginGraph
+category: Cijfers lezen
+tags:
+  - jaarrekening
+  - maandcijfers
+  - budget
+faq:
+  - question: "Hoeveel afwijking is normaal door afronding?"
+    answer: "Bij bedragen in duizendtallen met één decimaal verbergt elke regel maximaal €50. Bij elf regels is er dus tot €600 legitieme afrondingsruimte, plus de afronding van het subtotaal zelf. Alles daarboven is geen afronding."
+  - question: "Wat als het subtotaal een formule is in Excel?"
+    answer: "Dan telt hij per definitie op, tenzij het bereik van de formule niet meer klopt met de regels eronder. Dat gebeurt bij ingevoegde rijen. Controleer het bereik voordat je verder zoekt."
+  - question: "Mijn accountant zegt dat het klopt. Wie heeft gelijk?"
+    answer: "De optelling wint over de mening, maar niet over de betekenis. Als een regel ergens anders wordt meegenomen dan waar hij staat, kan het subtotaal kloppen en de presentatie niet. Vraag dan om de opbouw, niet om een bevestiging."
+---
+
+Je kijkt naar een resultatenrekening en er staat een subtotaal dat niet volgt
+uit de regels erboven. Het verschil is te groot voor afronding en te klein om
+meteen te zien waar het vandaan komt.
+
+Dat is bijna nooit een rekenfout. Het is meestal één van vier dingen.
+
+## Eerst: is het wel te groot voor afronding?
+
+Reken het uit voordat je gaat zoeken. Een bedrag dat is afgerond op één
+decimaal in duizendtallen verbergt maximaal vijftig euro. Bij `n` regels onder
+een subtotaal is de maximale legitieme afwijking dus:
+
+```
+(n + 1) x precisie / 2
+```
+
+Elf regels in duizendtallen met één decimaal geven €600 speling. Zit je verschil
+daaronder, dan is er niets aan de hand en ben je klaar.
+
+## Oorzaak 1: een creditregel als debet geboekt
+
+Verreweg de meest voorkomende. Een regel die kosten verlaagt (doorbelaste
+vracht, een ontvangen bonus, een vrijval) staat positief in plaats van negatief.
+
+Het herkenpunt is precies: **het verschil is exact twee keer die regel.** Als
+jouw gat €103.000 is en er staat ergens een regel van €51.500, heb je hem
+gevonden.
+
+Test het door van elke regel apart het teken om te draaien en te kijken of het
+subtotaal dan wél klopt. Sluit precies één omdraaiing het gat, dan is de
+diagnose zo goed als zeker. Sluit geen enkele het, ga door naar oorzaak 3.
+
+## Oorzaak 2: een lege regel die niet leeg is
+
+Een rij die er leeg uitziet maar een waarde bevat die buiten het opgetelde
+bereik valt, of andersom: een regel die wel meetelt maar niet zichtbaar is
+omdat de rij verborgen of gefilterd is.
+
+Kijk naar het aantal rijen tussen de eerste regel en het subtotaal en tel ze na.
+Bij een gefilterde lijst is dat het snelste waar je achter komt.
+
+## Oorzaak 3: het getal komt nergens vandaan
+
+Als geen enkele tekenlezing van de regels erboven het gestelde bedrag
+produceert, dan is het geen leesfout. Dan staat er een blijven staan getal: een
+waarde die ooit is ingetypt of geplakt en die daarna nooit meer is meegegroeid
+met de regels eronder.
+
+Dit is de gevaarlijkste van de vier, want alles wat eronder hangt telt keurig
+door met het foute getal. De rest van de kolom ziet er af. Daarom valt het
+niemand op.
+
+Wij zagen dit op een echt managementrapport: een begroting voor marge na vracht
+die op één tabblad €1.414.400 was en op het tabblad waar hij was vastgesteld
+€1.267.200. Verschil €147.200, dat één op één doorliep naar de nettowinst. Alle
+variantiekolommen waarop het bedrijf stuurde hingen aan de verkeerde.
+
+## Oorzaak 4: twee versies van hetzelfde bestand
+
+Als een werkboek dezelfde begroting op twee tabbladen draagt, gaan die twee
+vroeg of laat uit elkaar lopen. De vuistregel: **het tabblad dat optelt wint van
+het tabblad dat niet optelt.** Dat is geen mening maar een bewijs.
+
+## Hoe je het in tien minuten doet
+
+```
+1  bereken de afrondingsruimte              (n + 1) x precisie / 2
+2  zit het verschil eronder                 klaar
+3  is het verschil exact 2x een regel       tekenfout, oorzaak 1
+4  draai elk teken los om                   sluit er precies één? oorzaak 1
+5  sluit er geen enkele                     oorzaak 3, blijven staan getal
+6  staat hetzelfde cijfer elders anders     oorzaak 4, neem de versie die optelt
+```
+
+<Cta report="business-valuation">
+Wil je dit niet met de hand doen: gooi je maandcijfers of jaarrekening erin en
+we controleren elke optelling voor je, met de regel erbij die het gat
+veroorzaakt.
+</Cta>
+
+## Wat het je waard is
+
+Een subtotaal dat niet klopt is zelden alleen een schoonheidsfout. Het is een
+getal waar iemand op stuurt. In het voorbeeld hierboven werd er een heel jaar
+gerapporteerd tegen een begroting die €147.200 te hoog stond, wat betekent dat
+elke maandelijkse "we lopen achter op budget" een andere lading had dan
+gedacht.
+
+Zoek hem dus, ook als hij klein lijkt. Het bedrag van de fout is niet hetzelfde
+als het belang van de fout.

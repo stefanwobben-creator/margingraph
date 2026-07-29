@@ -30,6 +30,20 @@ export type Rollup = {
   /** The id of the cell holding the stated subtotal. */
   id: string;
   parts: RollupPart[];
+  /**
+   * Whether the reader knows it has every part.
+   *
+   * True for a statement built from a declared schema, where a missing line is
+   * genuinely missing. False when the parts were collected from whatever the
+   * source happened to make available, which is the normal case for a filed
+   * document: a total that overshoots its parts then means a component was
+   * never published, not that the total is wrong.
+   *
+   * The gate cannot work this out. Whether the parts list is exhaustive is a
+   * fact about the reading, and readings live at the edge. Defaults to true,
+   * because a schema-driven caller is the stricter and safer assumption.
+   */
+  complete?: boolean;
 };
 
 export type Statement = {
@@ -62,7 +76,14 @@ export type Repair = {
   to: 1 | -1;
 };
 
-export type RollupStatus = "ok" | "mismatch" | "incomplete";
+/**
+ * ok          the parts reproduce the total
+ * mismatch    the parts contradict the total. A finding, and chargeable.
+ * shortfall   the parts fall short of a total we know we have not fully read.
+ *             A question, never a finding, never charged for.
+ * incomplete  nothing testable here at all
+ */
+export type RollupStatus = "ok" | "mismatch" | "shortfall" | "incomplete";
 
 export type RollupCheck = {
   rollup: string;
@@ -97,6 +118,16 @@ export type GateStatus = "green" | "amber" | "red";
 export type GateVerdict = {
   statement: string;
   status: GateStatus;
+  /**
+   * Whether anything here could honestly be sold.
+   *
+   * A shortfall looks exactly like a finding and is worth nothing: it says a
+   * figure was not published, not that a figure is wrong. Telling an owner
+   * their accounts do not add up when the only problem is our own reading is
+   * the worst failure this product has, so the distinction is carried in the
+   * verdict rather than left to whoever renders it.
+   */
+  chargeable: boolean;
   checks: RollupCheck[];
   /** Cell ids that must be resolved before anything downstream runs. */
   blocking: string[];
