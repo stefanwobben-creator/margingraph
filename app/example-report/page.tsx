@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { CheckoutLink } from "@/components/commerce/checkout-link";
 import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
 import { ReportView } from "@/components/reports/report-view";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   buildExampleReport,
@@ -81,11 +81,14 @@ export default async function ExampleReportPage() {
             The same thing, on your figures
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Upload your P&amp;L and balance sheet. You get this report on your own
-            business, with every number traced back to a line in your file.
+            Send your P&amp;L and balance sheet. We read them, run the analysis and
+            show you what we found before anything is for sale, with every number
+            traced back to a line in your file.
           </p>
           <div className="mt-6">
-            <CheckoutLink report="business-valuation" location="example-report" />
+            <Button asChild>
+              <Link href={routes.send}>Send a file</Link>
+            </Button>
           </div>
           <p className="mt-6 text-sm text-muted-foreground">
             Not ready? The{" "}

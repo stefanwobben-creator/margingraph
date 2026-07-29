@@ -15,13 +15,25 @@ const links = collectionList.map((collection) => ({
   href: collection.basePath,
 }));
 
+/**
+ * Not derived from anything, because these are not content.
+ *
+ * The footer is where a buyer looks for them before deciding whether a site
+ * that wants their profit and loss is real, so they sit in the same row as
+ * everything else rather than in small grey type underneath.
+ */
+const legal = [
+  { label: "Terms", href: "/terms" },
+  { label: "Privacy", href: "/privacy" },
+];
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/80 py-10">
       <Container className="flex flex-col gap-6">
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            {links.map((link) => (
+            {[...links, ...legal].map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}

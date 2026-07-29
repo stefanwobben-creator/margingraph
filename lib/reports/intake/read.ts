@@ -1,0 +1,393 @@
+import type { FindingsInput } from "@/lib/reports/findings";
+
+import type { Cell, ClassifiedRow, Intake, RowKind, Sheet } from "./types";
+import {
+  ACTUAL_HEADER,
+  DERIVED_HEADER,
+  GROSS_MARGIN,
+  NEVER_VARIABLE,
+  NOT_REVENUE,
+  RECOVERY,
+  REFERENCE_HEADER,
+  REVENUE,
+  SUBTOTAL,
+  VARIABLE,
+  has,
+  normalise,
+} from "./vocabulary";
+
+export type ReadOptions = {
+  /** Override the column detection when the file is too ambiguous to decide. */
+  actualColumn?: number;
+  referenceColumn?: number;
+  /** Multiply every amount. Use 1000 for a statement printed in thousands. */
+  scale?: number;
+};
+
+const isNumber = (c: Cell): c is number => typeof c === "number" && Number.isFinite(c);
+const isText = (c: Cell): c is string => typeof c === "string" && c.trim() !== "";
+
+const slug = (label: string) =>
+  normalise(label).replace(/\s+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "line";
+
+/**
+ * Read a profit and loss account into the lines the engine works on.
+ *
+ * This was the last manual step. Everything downstream of it, the gate, the
+ * rules, the report, has been deterministic from the start, while a person sat
+ * at the front deciding which column was the budget and which line was
+ * turnover. That person was the bottleneck and, worse, the part of the product
+ * that could not be tested.
+ *
+ * The rule it is built on is the same one the gate is built on: refuse rather
+ * than guess. Every decision it does make comes back in `rows` and `notes` so
+ * it can be checked; every decision it will not make comes back in `questions`
+ * as something a human can answer in one line.
+ */
+export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
+  const questions: string[] = [];
+  const notes: string[] = [];
+  const rows: ClassifiedRow[] = [];
+  const scale = options.scale ?? 1;
+
+  const width = Math.max(0, ...sheet.rows.map((r) => r.length));
+  if (width === 0 || sheet.rows.length === 0) {
+    return { readable: false, questions: ["The sheet is empty."], notes, rows };
+  }
+
+  // The label column is wherever the words are. In practice always the first,
+  // but files exported from an accounting package sometimes carry a code
+  // column in front of it.
+  const textCount = new Array<number>(width).fill(0);
+  const numCount = new Array<number>(width).fill(0);
+  for (const row of sheet.rows) {
+    for (let c = 0; c < width; c += 1) {
+      if (isText(row[c])) textCount[c] += 1;
+      else if (isNumber(row[c])) numCount[c] += 1;
+    }
+  }
+  const labelColumn = textCount.indexOf(Math.max(...textCount));
+  const numericColumns = Array.from({ length: width }, (_, c) => c).filter(
+    (c) => c !== labelColumn && numCount[c] >= 3,
+  );
+
+  if (numericColumns.length === 0) {
+    return {
+      readable: false,
+      questions: ["No column holds enough numbers to be a set of figures."],
+      notes,
+      rows,
+    };
+  }
+
+  const firstDataRow = sheet.rows.findIndex(
+    (row) => isText(row[labelColumn]) && numericColumns.some((c) => isNumber(row[c])),
+  );
+  if (firstDataRow < 0) {
+    return {
+      readable: false,
+      questions: ["No row pairs a label with a figure."],
+      notes,
+      rows,
+    };
+  }
+
+  // Headers are stacked as often as not: a year on one row, "budget" on the
+  // next. Everything above the first data row, joined, is the column's name.
+  const headerOf = (c: number) =>
+    sheet.rows
+      .slice(0, firstDataRow)
+      .map((row) => row[c])
+      .filter(isText)
+      .map((s) => s.trim())
+      .join(" ")
+      .trim();
+
+  const headers = new Map(numericColumns.map((c) => [c, headerOf(c)]));
+  const usable = numericColumns.filter((c) => !has(headers.get(c) ?? "", DERIVED_HEADER));
+
+  if (usable.length === 0) {
+    return {
+      readable: false,
+      questions: [
+        "Every numeric column looks like a variance or a percentage. Send the columns with the amounts in them.",
+      ],
+      notes,
+      rows,
+    };
+  }
+
+  // Reference column first: "budget" is the least ambiguous word on the sheet.
+  let referenceColumn = options.referenceColumn;
+  if (referenceColumn === undefined) {
+    const refs = usable.filter((c) => has(headers.get(c) ?? "", REFERENCE_HEADER));
+    if (refs.length === 1) referenceColumn = refs[0];
+    else if (refs.length > 1) {
+      questions.push(
+        `More than one column could be the comparison: ${refs
+          .map((c) => `"${headers.get(c) || `column ${c + 1}`}"`)
+          .join(", ")}. Which one should we measure against?`,
+      );
+    }
+  }
+
+  let actualColumn = options.actualColumn;
+  if (actualColumn === undefined) {
+    // Any column calling itself a budget is out, not just the one we picked.
+    // "Budget YTD" says year to date, which is also how an actuals column
+    // announces itself, and the word budget is the one that settles it.
+    const rest = usable.filter(
+      (c) => c !== referenceColumn && !has(headers.get(c) ?? "", REFERENCE_HEADER),
+    );
+    const named = rest.filter((c) => has(headers.get(c) ?? "", ACTUAL_HEADER));
+    const candidates = named.length > 0 ? named : rest;
+    if (candidates.length === 1) actualColumn = candidates[0];
+    else if (candidates.length > 1) {
+      questions.push(
+        `More than one column could be the period that happened: ${candidates
+          .map((c) => `"${headers.get(c) || `column ${c + 1}`}"`)
+          .join(", ")}. Which one is it?`,
+      );
+    }
+  }
+
+  if (actualColumn === undefined) {
+    if (questions.length === 0) questions.push("No column holds the figures for the period.");
+    return { readable: false, questions, notes, rows };
+  }
+  if (referenceColumn === undefined && questions.length === 0) {
+    notes.push(
+      "No budget or prior-year column found, so only the rules that read one period can run.",
+    );
+  }
+
+  const actualLabel = headers.get(actualColumn) || sheet.name || "this period";
+  const referenceLabel =
+    referenceColumn === undefined ? undefined : headers.get(referenceColumn) || "comparison";
+
+  // --- rows -------------------------------------------------------------
+
+  const used = new Set<string>();
+  const keyFor = (label: string) => {
+    const base = slug(label);
+    let key = base;
+    let n = 2;
+    while (used.has(key)) key = `${base}-${n++}`;
+    used.add(key);
+    return key;
+  };
+
+  for (let r = firstDataRow; r < sheet.rows.length; r += 1) {
+    const row = sheet.rows[r];
+    const label = isText(row[labelColumn]) ? (row[labelColumn] as string).trim() : "";
+    const rawActual = isNumber(row[actualColumn]) ? (row[actualColumn] as number) : null;
+    const rawReference =
+      referenceColumn !== undefined && isNumber(row[referenceColumn])
+        ? (row[referenceColumn] as number)
+        : null;
+
+    if (!label) continue;
+    if (rawActual === null && rawReference === null) continue;
+
+    const kind = classify(label);
+    const entry: ClassifiedRow = {
+      row: r,
+      label,
+      key: kind === "skip" ? slug(label) : keyFor(label),
+      kind,
+      actual: rawActual === null ? null : rawActual * scale,
+      reference: rawReference === null ? null : rawReference * scale,
+    };
+    if (kind === "subtotal") entry.because = "restates the lines above it";
+    if (kind === "margin") entry.because = "used for the margin, not counted as a cost";
+    if (kind === "skip") entry.because = "no figures";
+    rows.push(entry);
+  }
+
+  // --- turnover ---------------------------------------------------------
+
+  const revenueRows = rows.filter((row) => row.kind === "revenue" && row.actual !== null);
+  const revenueTotals = revenueRows.filter((row) => has(row.label, SUBTOTAL));
+  let revenue = revenueTotals.length === 1 ? revenueTotals[0] : undefined;
+  if (!revenue && revenueRows.length === 1) revenue = revenueRows[0];
+
+  if (!revenue) {
+    questions.push(
+      revenueRows.length === 0
+        ? "No line in this file names turnover. Which row is it?"
+        : `Several lines could be turnover: ${revenueRows
+            .map((row) => `"${row.label}"`)
+            .join(", ")}. Which one is the total, or should we add them up?`,
+    );
+    return { readable: false, questions, notes, rows };
+  }
+  for (const row of revenueRows) {
+    if (row === revenue) continue;
+    row.kind = "skip";
+    row.because = `counted inside "${revenue.label}"`;
+  }
+
+  // --- recoveries -------------------------------------------------------
+
+  const recoveries: NonNullable<FindingsInput["recoveries"]> = [];
+  for (const credit of rows.filter((row) => row.kind === "recovery")) {
+    const stem = normalise(credit.label)
+      .split(" ")
+      .filter((t) => t.length >= 4 && !has(t, RECOVERY));
+    const match = rows
+      .filter((row) => row.kind === "variable" || row.kind === "cost")
+      .map((row) => ({
+        row,
+        overlap: stem.filter((t) => normalise(row.label).split(" ").some((u) => u.startsWith(t)))
+          .length,
+      }))
+      .filter((m) => m.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap)[0];
+
+    if (!match) {
+      credit.kind = "skip";
+      credit.because = "billed back to customers, but we could not find the cost it belongs to";
+      notes.push(
+        `"${credit.label}" looks like a cost billed back to customers, but no matching cost line was found, so it was left out.`,
+      );
+      continue;
+    }
+    // The cost side has to stay volume-variable: a freight bill that does not
+    // follow turnover is the other half of the same conversation.
+    if (match.row.kind === "cost") match.row.kind = "variable";
+    recoveries.push({
+      cost: match.row.key,
+      recovery: credit.key,
+      // The cost line's own label, because the finding will tell the owner to
+      // go and look at it. A stem like "vracht" reads like a category; the
+      // words in their own file read like an instruction.
+      label: match.row.label.toLowerCase(),
+    });
+  }
+
+  // --- signs ------------------------------------------------------------
+
+  // A supplier's name says nothing about whether their invoice follows your
+  // turnover. Unrecognised lines are treated as fixed, which is the safe error:
+  // the drift rule is the one that would otherwise announce that wages are too
+  // high in a quarter where wages came in under budget.
+  const unrecognised = rows.filter(
+    (row) => row.kind === "cost" && !has(row.label, NEVER_VARIABLE) && !has(row.label, VARIABLE),
+  );
+  for (const row of unrecognised) row.because = "no word we recognise, so treated as fixed";
+  if (unrecognised.length > 0) {
+    notes.push(
+      `We could not tell whether these move with your turnover, so we treated them as fixed: ${unrecognised
+        .map((row) => `"${row.label}"`)
+        .join(", ")}. Say which of them are, and there may be more in the file than we found.`,
+    );
+  }
+
+  const costRows = rows.filter((row) => row.kind === "variable" || row.kind === "cost");
+  const negatives = costRows.filter((row) => (row.actual ?? 0) < 0).length;
+  if (negatives > 0 && negatives < costRows.length) {
+    const odd = costRows.filter((row) =>
+      negatives > costRows.length / 2 ? (row.actual ?? 0) > 0 : (row.actual ?? 0) < 0,
+    );
+    notes.push(
+      `Costs in this file are mostly ${negatives > costRows.length / 2 ? "negative" : "positive"}, except ${odd
+        .map((row) => `"${row.label}"`)
+        .join(", ")}. We read every cost as an amount spent; if one of those is a credit, tell us.`,
+    );
+  }
+
+  // --- the input the engine reads ---------------------------------------
+
+  const values = (which: "actual" | "reference") => {
+    const out: Record<string, number> = {};
+    for (const row of rows) {
+      const raw = row[which];
+      if (raw === null) continue;
+      if (row.kind === "revenue") out[row.key] = Math.abs(raw);
+      else if (row.kind === "recovery") out[row.key] = -Math.abs(raw);
+      else if (row.kind === "variable" || row.kind === "cost") out[row.key] = Math.abs(raw);
+    }
+    return out;
+  };
+
+  const actualValues = values("actual");
+  const marginRow = rows.find((row) => row.kind === "margin" && row.actual !== null);
+  const grossMargin = marginRow
+    ? Math.abs(marginRow.actual as number) / actualValues[revenue.key]
+    : undefined;
+  const contributionMargin =
+    grossMargin !== undefined && grossMargin > 0 && grossMargin < 1 ? grossMargin : undefined;
+  if (marginRow && contributionMargin === undefined) {
+    notes.push(
+      `"${marginRow.label}" did not give a usable margin against turnover, so we could not price what a change can safely cost.`,
+    );
+  }
+
+  const lines = (kinds: RowKind[]) =>
+    rows
+      .filter((row) => kinds.includes(row.kind) && row.actual !== null)
+      .map((row) => ({ key: row.key, label: row.label }));
+
+  const input: FindingsInput = {
+    actual: { label: actualLabel, revenueKey: revenue.key, values: actualValues },
+    reference:
+      referenceColumn === undefined
+        ? undefined
+        : {
+            label: referenceLabel ?? "comparison",
+            revenueKey: revenue.key,
+            values: values("reference"),
+          },
+    recoveries,
+    variableLines: lines(["variable"]),
+    costLines: lines(["variable", "cost"]),
+    contributionMargin,
+  };
+
+  if (!actualValues[revenue.key]) {
+    questions.push(`"${revenue.label}" has no figure in ${actualLabel}, so nothing can be a ratio.`);
+    return { readable: false, questions, notes, rows };
+  }
+
+  if (actualValues[revenue.key] < 20_000) {
+    notes.push(
+      `Turnover reads as ${Math.round(actualValues[revenue.key]).toLocaleString("en-GB")}. If this statement is printed in thousands, every amount in the report is too, and the file should be read again with a scale of 1000.`,
+    );
+  }
+
+  return {
+    readable: questions.length === 0,
+    input: questions.length === 0 ? input : undefined,
+    questions,
+    notes,
+    rows,
+    columns: {
+      label: labelColumn,
+      actual: { index: actualColumn, header: actualLabel },
+      reference:
+        referenceColumn === undefined
+          ? undefined
+          : { index: referenceColumn, header: referenceLabel ?? "comparison" },
+    },
+  };
+}
+
+/**
+ * One row, one kind.
+ *
+ * The order is the whole rule. Cost of sales is checked before turnover
+ * because it contains the word turnover; the never-variable list is checked
+ * before the variable one because "personeelskosten magazijn" contains the
+ * word warehouse and payroll does not follow a bad quarter down.
+ */
+function classify(label: string): RowKind {
+  if (has(label, GROSS_MARGIN)) return "margin";
+  if (has(label, RECOVERY)) return "recovery";
+  if (has(label, SUBTOTAL)) {
+    return has(label, REVENUE) && !has(label, NOT_REVENUE) ? "revenue" : "subtotal";
+  }
+  if (has(label, REVENUE) && !has(label, NOT_REVENUE)) return "revenue";
+  if (has(label, NEVER_VARIABLE)) return "cost";
+  if (has(label, VARIABLE)) return "variable";
+  return "cost";
+}

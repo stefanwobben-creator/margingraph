@@ -162,7 +162,7 @@ you and nothing to pay. If you want, send a different file.`}
             correctly; if it does not, we name the cell rather than quietly
             deciding what you meant. That check is deterministic and has been run
             over twenty-two filed sets of statutory accounts.{" "}
-            <Link href={routes.reports} className="underline underline-offset-4">
+            <Link href={routes.send} className="underline underline-offset-4">
               See what to send
             </Link>
             .

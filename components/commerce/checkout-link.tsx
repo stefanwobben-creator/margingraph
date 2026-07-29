@@ -53,7 +53,7 @@ export function CheckoutLink({
     [product, location],
   );
 
-  if (!product || !payments.isConfigured() || !product.variant) {
+  if (!product || !payments.isConfigured() || !product.checkout) {
     // Visible failure. A silently dead buy button is the most expensive bug a
     // shop can have, because nothing in the logs says a sale did not happen.
     return (

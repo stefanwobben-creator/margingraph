@@ -26,5 +26,7 @@ export const routes = {
    * answer to the same question and one that cannot drift out of date.
    */
   whatWeFind: "/what-we-find",
+  /** Where every call to action ends. The only page that asks for anything. */
+  send: "/send",
   howItWorks: "/#how-it-works",
 } as const;

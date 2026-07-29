@@ -11,7 +11,7 @@ import { organizationJsonLd, websiteJsonLd } from "@/lib/content/seo";
 
 export const metadata: Metadata = {
   description:
-    "Upload your spreadsheet, financial report or document. MarginGraph analyzes your data and generates a decision report in minutes.",
+    "Send your spreadsheet, financial report or annual accounts. We read the figures, run the analysis, and show you what we found before anything is for sale.",
   alternates: { canonical: "/" },
 };
 

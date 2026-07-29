@@ -40,6 +40,26 @@ export const isProduction =
  */
 export const buildSha = process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
 
+/**
+ * Who is actually selling.
+ *
+ * These are the only facts on the site that cannot be worked out from the code,
+ * and they are the ones a buyer is entitled to before handing over money. They
+ * sit here rather than typed into the legal pages so there is exactly one place
+ * to be wrong, and a test fails while they are still placeholders.
+ */
+export const seller = {
+  legalName: "Stefan Wobben Advies",
+  kvk: "70889945",
+  vat: "NL001397170B41",
+  email: "info@margingraph.com",
+} as const;
+
+/** True while the seller block has not been filled in with real details. */
+export const sellerIsPlaceholder = Object.values(seller).some((value) =>
+  value.startsWith("TODO:"),
+);
+
 export const site = {
   name: "MarginGraph",
   tagline: "Business decisions, with the evidence attached.",

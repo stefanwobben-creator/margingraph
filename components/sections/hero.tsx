@@ -11,24 +11,33 @@ export function Hero() {
       <Container className="grid items-center gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
         <div>
           <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            Upload · Analyze · Decide
+            Send a file · See what is in it · Pay only if it is worth it
           </p>
 
+          {/*
+            The old headline said "every important business decision starts with
+            one question" and never named the product. A visitor has about four
+            seconds and they were spent on a sentiment. This one states the
+            outcome, the price and the guarantee before anything is asked of
+            them.
+          */}
           <h1 className="mt-6 text-display text-balance">
-            Every important business decision starts with one question.
+            We read your figures and tell you what they are worth.
           </h1>
 
           <p className="mt-6 max-w-xl text-lead text-muted-foreground">
-            Upload your spreadsheet, financial report or document. MarginGraph
-            analyzes your data and generates a decision report in minutes.
+            Send your management accounts, annual accounts or a supplier quote.
+            We check every subtotal adds up, run the analysis, and show you what
+            we found before anything is for sale. €9 for the answers, and
+            nothing at all if we find less than €90.
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg">
-              <Link href={routes.reports}>Browse Reports</Link>
+              <Link href={routes.send}>Send a file</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href={routes.exampleReport}>See Example Report</Link>
+              <Link href={routes.whatWeFind}>See it on a real company first</Link>
             </Button>
           </div>
         </div>

@@ -12,11 +12,12 @@ export const products: Record<string, Product> = {
   "business-valuation": {
     slug: "business-valuation",
     price: 9,
-    // Lemon Squeezy variant UUID, from Store → Products → Share → the /buy/
-    // URL. Trimmed for the same reason as the store name: pasted by hand into
-    // a dashboard, and a trailing space survives the paste.
-    variant: (
-      process.env.NEXT_PUBLIC_LS_VARIANT_BUSINESS_VALUATION ?? ""
+    // The whole Mollie payment link, from Dashboard → Payment links → a
+    // reusable link with the amount set to €9. Trimmed for the same reason as
+    // before: pasted by hand into a dashboard, and a trailing space survives
+    // the paste.
+    checkout: (
+      process.env.NEXT_PUBLIC_MOLLIE_LINK_BUSINESS_VALUATION ?? ""
     ).trim(),
   },
 };

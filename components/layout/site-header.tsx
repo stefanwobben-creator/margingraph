@@ -13,6 +13,7 @@ import { site } from "@/lib/site";
 const nav = [
   { label: "Reports", href: routes.reports },
   { label: "What we find", href: routes.whatWeFind },
+  { label: "Send a file", href: routes.send },
   { label: "Guides", href: routes.guides },
   { label: "Blog", href: routes.blog },
   { label: "FAQ", href: routes.faq },
