@@ -13,6 +13,14 @@ export type Finding = {
   id: string;
   /** One sentence: what is true about their figures. */
   observation: string;
+  /**
+   * What the finding is about, with no amount in it.
+   *
+   * Used for the locked lines in a teaser. A subject tells a reader whether
+   * the rest is worth nine euros to them; an observation with the number still
+   * in it is the finding itself, given away.
+   */
+  subject: string;
   /** Euros. Always read together with `per`, never annualised silently. */
   worth: number;
   /**

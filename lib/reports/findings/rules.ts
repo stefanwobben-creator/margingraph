@@ -1,8 +1,8 @@
 import type { Finding, FindingsInput, Period } from "./types";
 
 const euro = (n: number) =>
-  `€${Math.round(Math.abs(n)).toLocaleString("nl-NL")}`;
-const pct = (n: number) => `${(n * 100).toFixed(1).replace(".", ",")}%`;
+  `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
+const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
 function share(period: Period, key: string): number | undefined {
   const value = period.values[key];
@@ -40,10 +40,11 @@ export function recoveryGap(input: FindingsInput): Finding[] {
     out.push({
       id: `recovery-${pair.recovery}`,
       per: actual.label,
-      observation: `Je berekent ${pct(rate)} van je ${pair.label} door aan klanten.`,
+      subject: `How much of your ${pair.label} you recover from customers`,
+      observation: `You recover ${pct(rate)} of your ${pair.label} from customers.`,
       worth: gap,
-      action: `Zet de ${pair.label}-regel op kostprijs, of leg een gratis-verzendgrens boven je gemiddelde orderwaarde.`,
-      workings: `${euro(cost)} kosten tegen ${euro(recovered)} doorbelast is ${pct(rate)}. Volledig doorbelasten scheelt ${euro(gap)}.`,
+      action: `Reprice the ${pair.label} line to cost, or set a free-shipping threshold above your current average order value.`,
+      workings: `${euro(cost)} of cost against ${euro(recovered)} recovered is ${pct(rate)}. Full recovery is worth ${euro(gap)}.`,
       source: [pair.cost, pair.recovery],
     });
   }
@@ -124,16 +125,17 @@ export function ratioDrift(input: FindingsInput): Finding[] {
       {
         id: "ratio-cost-base",
         per: actual.label,
-        observation: `Je omzet ligt ${pct(drop)} onder ${reference.label}, en ${fired.length} van je ${tested} volume-afhankelijke kostenregels zijn niet meegegaan.`,
+        subject: `Cost lines that did not follow your turnover down`,
+        observation: `Your turnover is ${pct(drop)} below ${reference.label}, and ${fired.length} of your ${tested} volume-variable cost lines did not follow it down.`,
         worth,
-        action: `Vraag per contract welk deel vast is en of er een minimumafname in staat. Begin bij ${fired.sort((a, b) => b.worth - a.worth)[0].label}.`,
+        action: `Ask each supplier which part of the contract is fixed and whether it carries a minimum commitment. Start with ${fired.sort((a, b) => b.worth - a.worth)[0].label}.`,
         workings: `${fired
-          .map((d) => `${d.label} ${pct(d.then)} naar ${pct(d.now)}`)
-          .join(", ")}. Op de oude verhoudingen was dit samen ${euro(
+          .map((d) => `${d.label} ${pct(d.then)} to ${pct(d.now)}`)
+          .join(", ")}. At the old ratios these would together have cost ${euro(
           fired.reduce((s, d) => s + d.nowEur, 0) - worth,
-        )} geweest in plaats van ${euro(fired.reduce((s, d) => s + d.nowEur, 0))}.`,
+        )} instead of ${euro(fired.reduce((s, d) => s + d.nowEur, 0))}.`,
         source: [...fired.map((d) => d.key), actual.revenueKey],
-        caveat: `Een deel van deze kosten is per definitie vast. Dit bedrag is de omvang van het gesprek, niet de gegarandeerde besparing.`,
+        caveat: `Part of this cost is fixed by definition. The figure is the size of the conversation, not a guaranteed saving.`,
       },
     ];
   }
@@ -141,14 +143,15 @@ export function ratioDrift(input: FindingsInput): Finding[] {
   return fired.map((d) => ({
     id: `ratio-${d.key}`,
     per: actual.label,
-    observation: `${d.label} ging van ${pct(d.then)} naar ${pct(d.now)} van je omzet, terwijl het bedrag zelf nauwelijks bewoog.`,
+    subject: `${d.label} as a share of turnover`,
+    observation: `${d.label} went from ${pct(d.then)} to ${pct(d.now)} of turnover while the amount itself barely moved.`,
     worth: d.worth,
-    action: `Vraag je leverancier welk deel van dit contract vast is en of er een minimumafname in staat.`,
-    workings: `${euro(d.nowEur)} nu, maar op ${pct(d.then)} van de huidige omzet zou het ${euro(
+    action: `Ask this supplier which part of the contract is fixed and whether it carries a minimum commitment.`,
+    workings: `${euro(d.nowEur)} now, but at ${pct(d.then)} of current turnover it would be ${euro(
       d.nowEur - d.worth,
-    )} zijn. Verschil ${euro(d.worth)}.`,
+    )}. Difference ${euro(d.worth)}.`,
     source: [d.key, actual.revenueKey],
-    caveat: `Een deel van deze kosten is mogelijk vast. Dit bedrag is de omvang van het gesprek, niet de gegarandeerde besparing.`,
+    caveat: `Part of this cost may be fixed. The figure is the size of the conversation, not a guaranteed saving.`,
   }));
 }
 
@@ -174,10 +177,11 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
       return {
         id: `overrun-${line.key}`,
         per: actual.label,
-        observation: `${line.label} ligt ${euro(over)} boven ${reference.label}.`,
+        subject: `${line.label} against budget`,
+        observation: `${line.label} is ${euro(over)} over ${reference.label}.`,
         worth: over,
-        action: `Terug naar budget, of het budget bijstellen zodat je er weer op kunt sturen.`,
-        workings: `${euro(now)} werkelijk tegen ${euro(planned)} begroot.`,
+        action: `Bring it back to budget, or restate the budget so it is worth steering by again.`,
+        workings: `${euro(now)} actual against ${euro(planned)} budgeted.`,
         source: [line.key],
       } satisfies Finding;
     })

@@ -1,0 +1,101 @@
+---
+title: "Why your profit and loss does not add up"
+seoTitle: "P&L does not add up? Four causes, one method"
+description: "A subtotal that does not follow from the lines above it is almost never a rounding error. Four causes, and how to find which one in ten minutes."
+date: 2026-07-29
+author: MarginGraph
+category: Reading figures
+tags:
+  - management accounts
+  - annual accounts
+  - budget
+faq:
+  - question: "How much drift is normal from rounding?"
+    answer: "A figure printed to one decimal in thousands hides at most €50. Eleven lines under a subtotal therefore allow up to €600 of legitimate drift, plus the rounding of the subtotal itself. Anything beyond that is not rounding."
+  - question: "What if the subtotal is an Excel formula?"
+    answer: "Then it adds up by definition, unless the formula range no longer matches the rows beneath it. That happens when rows are inserted. Check the range before you look anywhere else."
+  - question: "My accountant says it is fine. Who is right?"
+    answer: "The arithmetic beats the opinion, but not the meaning. If a line is picked up somewhere other than where it is printed, the subtotal can be right and the presentation wrong. Ask for the build-up rather than for reassurance."
+---
+
+You are looking at a set of accounts and a subtotal does not follow from the
+lines above it. The gap is too large for rounding and too small to place at a
+glance.
+
+That is almost never a calculation error. It is usually one of four things.
+
+## First: is it actually too large for rounding?
+
+Work it out before you go looking. A figure rounded to one decimal in thousands
+hides at most fifty euros. For `n` lines under a subtotal the maximum legitimate
+drift is:
+
+```
+(n + 1) x precision / 2
+```
+
+Eleven lines in thousands to one decimal gives €600 of room. If your gap sits
+under that, nothing is wrong and you are finished.
+
+## Cause 1: a credit posted as a debit
+
+By far the most common. A line that reduces cost (recharged freight, a supplier
+rebate, a provision released) is sitting positive instead of negative.
+
+The tell is exact: **the gap is precisely twice that line.** If your gap is
+€103,000 and there is a line of €51,500 somewhere, you have found it.
+
+Test it by flipping the sign of each line in turn and seeing whether the subtotal
+then closes. If exactly one flip closes it, the diagnosis is close to certain. If
+none does, go to cause 3.
+
+## Cause 2: a blank line that is not blank
+
+A row that looks empty but holds a value outside the summed range, or the
+reverse: a line that is included but not visible because the row is hidden or
+filtered.
+
+Count the rows between the first line and the subtotal. On a filtered list that
+is the fastest way to find it.
+
+## Cause 3: the figure came from nowhere
+
+If no reading of the signs above produces the stated number, it is not a
+misreading. It is a stale figure: a value typed or pasted once and never updated
+as the lines beneath it moved.
+
+This is the dangerous one, because everything below it carries on adding up
+correctly with the wrong number. The rest of the column looks finished. That is
+exactly why nobody notices.
+
+We saw this on a real management report: a budget for margin after freight that
+read €1,414,400 on one tab and €1,267,200 on the tab where it had been agreed. A
+difference of €147,200 that ran straight through to net profit, with every
+variance column the company steered by hanging off the wrong one.
+
+## Cause 4: two versions of the same file
+
+When a workbook carries the same budget on two tabs, those two drift apart
+sooner or later. The rule: **the tab that adds up beats the tab that does not.**
+That is not an opinion, it is a proof.
+
+## Ten minutes, in order
+
+```
+1  work out the rounding room             (n + 1) x precision / 2
+2  gap under it                           done
+3  gap exactly 2x some line               sign error, cause 1
+4  flip each sign in turn                 exactly one closes it? cause 1
+5  none closes it                         cause 3, a stale figure
+6  same figure differs elsewhere          cause 4, take the version that adds up
+```
+
+## Why it matters more than it looks
+
+A subtotal that does not close is rarely cosmetic. It is a number somebody is
+steering by. In the example above a company reported for a full year against a
+budget that stood €147,200 too high, which means every monthly "we are behind
+plan" carried a different meaning than anyone thought.
+
+Go and find it, even when it looks small. The size of the error is not the same
+as the importance of the error.

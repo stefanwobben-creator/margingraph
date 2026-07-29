@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   MINIMUM_WORTH,
+  teaser,
   budgetOverrun,
   findAll,
   ratioDrift,
@@ -18,7 +19,7 @@ describe("recovery gap", () => {
     const [f] = recoveryGap(allc);
     assert.ok(f);
     assert.equal(round(f.worth), 36_400);
-    assert.match(f.observation, /55,5%/);
+    assert.match(f.observation, /55\.5%/);
     assert.deepEqual(f.source, ["vracht-uitgaand", "doorberekende-vracht"]);
   });
 
@@ -48,14 +49,14 @@ describe("ratio drift", () => {
     const [f] = found;
     assert.equal(f.id, "ratio-cost-base");
     assert.equal(round(f.worth), 66_076);
-    assert.match(f.observation, /45,9% onder budget Q1/);
-    assert.match(f.observation, /5 van je 5/);
+    assert.match(f.observation, /45\.9% below budget Q1/);
+    assert.match(f.observation, /5 of your 5/);
   });
 
   test("carries the caveat that part of the cost is fixed", () => {
     const [f] = ratioDrift(am);
     assert.ok(f.caveat);
-    assert.match(f.caveat, /omvang van het gesprek/);
+    assert.match(f.caveat, /size of the conversation/);
   });
 
   test("never runs over payroll, so it cannot report wages that came in under budget", () => {
@@ -125,17 +126,17 @@ describe("the report", () => {
   test("puts found against paid at the top", () => {
     const report = render(findAll(allc));
     assert.ok(report.chargeable);
-    assert.match(report.text, /^Gevonden €57\.600\. Betaald €9\./);
+    assert.match(report.text, /^Found €57,600\. Paid €9\./);
   });
 
   test("gives four lines per finding and no chapters", () => {
     const report = render(findAll(allc));
-    assert.match(report.text, /Waard: /);
-    // Never "per jaar" on a figure that is not annual.
-    assert.ok(!/per jaar/.test(report.text));
-    assert.match(report.text, /Doen: /);
-    assert.match(report.text, /Check: /);
-    assert.ok(!/confidence|hoofdstuk|methode/i.test(report.text));
+    assert.match(report.text, /Worth:  /);
+    // Never "per year" on a figure that is not annual.
+    assert.ok(!/per year/.test(report.text));
+    assert.match(report.text, /Do:     /);
+    assert.match(report.text, /Check:  /);
+    assert.ok(!/confidence|chapter|method/i.test(report.text));
   });
 
   test("refuses to charge when it found less than ten times the price", () => {
@@ -143,6 +144,7 @@ describe("the report", () => {
       {
         id: "x",
         per: "2026",
+        subject: "Something",
         observation: "Iets kleins.",
         worth: 40,
         action: "Doen.",
@@ -151,7 +153,7 @@ describe("the report", () => {
       },
     ]);
     assert.equal(report.chargeable, false);
-    assert.match(report.text, /te weinig, dus dit rapport is gratis/);
+    assert.match(report.text, /under our minimum, so this report is free/);
     assert.ok(report.found < MINIMUM_WORTH);
   });
 
@@ -165,7 +167,59 @@ describe("the report", () => {
   test("offers one line the owner can forward without their figures in it", () => {
     const report = render(findAll(allc));
     assert.ok(report.shareable);
-    assert.match(report.shareable, /€36\.400/);
-    assert.ok(!report.shareable.includes("2.389.560"));
+    assert.match(report.shareable, /€36,400/);
+    assert.ok(!report.shareable.includes("2,389,560"));
+  });
+});
+
+describe("the teaser, which is the guarantee made mechanical", () => {
+  const t = teaser(findAll(allc));
+
+  test("shows the total and the count before anything is paid", () => {
+    assert.equal(round(t.found), 57_600);
+    assert.equal(t.count, 2);
+    assert.match(t.text, /found €57,600 across 2 findings/);
+  });
+
+  test("gives the largest finding away in full, workings included", () => {
+    assert.equal(t.sample?.id, "recovery-doorberekende-vracht");
+    assert.match(t.text, /€81,800/);
+    assert.match(t.text, /Check:  /);
+  });
+
+  test("names what is locked without pricing it", () => {
+    assert.equal(t.locked.length, 1);
+    const [locked] = t.locked;
+    assert.ok(!/€/.test(locked), `locked line leaked an amount: ${locked}`);
+    assert.ok(!t.text.includes("€21,200"), "the withheld finding's amount is visible");
+    assert.equal(locked, "Kosten IT against budget");
+  });
+
+  test("is unlockable, because there is something to sell", () => {
+    assert.equal(t.unlockable, true);
+  });
+
+  test("puts up no paywall when the find is under the minimum", () => {
+    const thin = teaser([
+      { id: "x", per: "2026", subject: "Something", observation: "Something small.", worth: 40, action: "Do.", workings: "40.", source: [] },
+    ]);
+    assert.equal(thin.unlockable, false);
+    assert.equal(thin.sample, undefined);
+    assert.match(thin.text, /nothing to sell you and nothing to pay/);
+    // No refund can ever be needed, because no money changed hands.
+    assert.ok(!thin.text.includes(`€${MINIMUM_WORTH} for all`));
+  });
+
+  test("says nothing at all when the file was clean", () => {
+    const none = teaser(findAll(clean));
+    assert.equal(none.found, 0);
+    assert.equal(none.unlockable, false);
+  });
+
+  test("does not offer to unlock a report with only one finding at a discount to itself", () => {
+    const single = teaser([findAll(allc)[0]]);
+    assert.equal(single.count, 1);
+    assert.equal(single.locked.length, 0);
+    assert.match(single.text, /Here it is in full/);
   });
 });

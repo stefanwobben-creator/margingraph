@@ -2,7 +2,7 @@ import type { Disagreement, GateVerdict } from "@/lib/reports/gate";
 import type { Finding } from "./types";
 
 const euro = (n: number, scale: number) =>
-  `€${Math.round(Math.abs(n) * scale).toLocaleString("nl-NL")}`;
+  `€${Math.round(Math.abs(n) * scale).toLocaleString("en-GB")}`;
 
 /**
  * The amber verdict, turned into a finding.
@@ -31,20 +31,21 @@ export function reconciliationFindings(
       const single = c.repairs.length === 1 ? c.repairs[0] : undefined;
 
       const action = single
-        ? `Controleer het teken van ${single.cell}. Eén omdraaiing sluit het verschil precies.`
-        : `Vervang deze cel door de som van de regels erboven, of zoek de versie die wel optelt.`;
+        ? `Check the sign on ${single.cell}. Flipping that one line closes the gap exactly.`
+        : `Replace this cell with the sum of the lines above it, or find the version that does add up.`;
 
       const observation = single
-        ? `${c.label}${where} telt niet op, en het verschil is precies één omgedraaid teken.`
-        : `${c.label}${where} telt niet op met de regels erboven, en geen enkele tekenlezing sluit het.`;
+        ? `${c.label}${where} does not add up, and the gap is exactly one flipped sign.`
+        : `${c.label}${where} does not follow from the lines above it under any reading of their signs.`;
 
       return {
         id: `reconcile-${c.rollup}`,
-        per: options.periodLabel ?? "deze periode",
+        per: options.periodLabel ?? "this period",
+        subject: `${c.label} does not follow from the lines above it`,
         observation,
         worth: Math.abs(drift) * scale,
         action,
-        workings: `Er staat ${euro(c.stated ?? 0, scale)}, de regels erboven geven ${euro(c.computed ?? 0, scale)}. Verschil ${euro(drift, scale)}, tegen een afrondingsruimte van ${euro(c.tolerance, scale)}.`,
+        workings: `It states ${euro(c.stated ?? 0, scale)}; the lines above give ${euro(c.computed ?? 0, scale)}. Gap ${euro(drift, scale)}, against ${euro(c.tolerance, scale)} of legitimate rounding.`,
         source: [c.rollup, ...c.repairs.map((r) => r.cell)],
       } satisfies Finding;
     });
@@ -85,10 +86,11 @@ export function disagreementFindings(input: {
       return {
         id: `disagree-${d.cell}`,
         per: input.trustedLabel,
-        observation: `${d.label} staat in dit bestand twee keer, met ${euro(wrong ?? 0, scale)} op de ene tab en ${euro(right ?? 0, scale)} op de andere.`,
+        subject: `${d.label} carries two different values in this file`,
+        observation: `${d.label} appears twice in this file: ${euro(wrong ?? 0, scale)} on one tab and ${euro(right ?? 0, scale)} on the other.`,
         worth: gap,
-        action: `Stuur op ${input.trustedLabel}. Vervang de kolom in ${input.steeredByLabel}, want daar hangen je variantiecijfers aan.`,
-        workings: `${input.trustedLabel} telt op met de regels erboven, ${input.steeredByLabel} niet. Verschil ${euro(d.difference as number, scale)}.`,
+        action: `Steer by ${input.trustedLabel}. Replace the column in ${input.steeredByLabel}, because your variance reporting hangs off it.`,
+        workings: `${input.trustedLabel} reconciles with the lines above it; ${input.steeredByLabel} does not. Difference ${euro(d.difference as number, scale)}.`,
         source: [d.cell],
       } satisfies Finding;
     });
