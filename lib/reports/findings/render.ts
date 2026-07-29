@@ -1,4 +1,5 @@
-import type { Finding } from "./types";
+import { portrait } from "./portrait";
+import type { Finding, FindingsInput } from "./types";
 
 const euro = (n: number) => `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
 
@@ -54,9 +55,41 @@ export type Teaser = {
 
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
+/** Wrap to a readable measure. Plain text still has a right-hand edge. */
+function wrap(text: string, width: number, indent: string): string[] {
+  const out: string[] = [];
+  let line = "";
+  for (const word of text.split(/\s+/)) {
+    if (line && line.length + 1 + word.length > width) {
+      out.push(indent + line);
+      line = word;
+    } else {
+      line = line ? `${line} ${word}` : word;
+    }
+  }
+  if (line) out.push(indent + line);
+  return out;
+}
+
+/**
+ * Concept, then their case, then the money, then the move, then the sums.
+ *
+ * The order is the whole point. An owner who has never been told that freight
+ * paid and freight billed on are two different lines cannot act on "you
+ * recover 55.5% of your uitgaande vracht", however correct it is. Explaining
+ * the thing before showing their instance of it costs three lines and turns a
+ * report that proves we are clever into one that makes the reader cleverer.
+ */
 function block(f: Finding, index: number): string {
+  const lead = f.plainly
+    ? [
+        ...wrap(f.plainly, 72, "   ").map((l, i) => (i === 0 ? `${index}.${l.slice(2)}` : l)),
+        `   Yours:  ${f.observation}`,
+      ]
+    : [`${index}. ${f.observation}`];
+
   const lines = [
-    `${index}. ${f.observation}`,
+    ...lead,
     `   Worth:  ${euro(f.worth)} at most (${f.per}).`,
     `   Do:     ${f.action}`,
     `   Check:  ${f.workings}`,
@@ -117,10 +150,17 @@ export function render(findings: Finding[]): Report {
  * there are N things in it, the largest is worth this much, and here is what
  * each one is about. Which line, why, and what to do about it is the product.
  */
-export function teaser(findings: Finding[]): Teaser {
+export function teaser(findings: Finding[], input?: FindingsInput): Teaser {
   const sorted = [...findings].sort((a, b) => b.worth - a.worth);
   const found = sorted.reduce((sum, f) => sum + Math.max(0, f.worth), 0);
   const unlockable = found >= MINIMUM_WORTH && sorted.length > 0;
+
+  // Four facts about their own business, free, whatever we found. Somebody who
+  // reads this knows something about their company they did not know a minute
+  // ago, which is a better reason to keep reading than a number we are about
+  // to charge for.
+  const opening = input ? portrait(input).text : "";
+  const head = opening ? `Here is what your file says.\n\n${opening}\n\n` : "";
 
   if (!unlockable) {
     return {
@@ -129,7 +169,8 @@ export function teaser(findings: Finding[]): Teaser {
       locked: [],
       unlockable: false,
       text:
-        `We read your file and found ${euro(found)}.\n\n` +
+        head +
+        `We read it looking for money you are leaving behind, and found ${euro(found)}.\n\n` +
         `That is below the €${MINIMUM_WORTH} we hold ourselves to, so there is nothing to sell you ` +
         `and nothing to pay. If you want, send a different file.\n`,
     };
@@ -139,8 +180,8 @@ export function teaser(findings: Finding[]): Teaser {
   const locked = sorted.map((f) => f.subject);
   const width = Math.max(...locked.map((l) => l.length));
 
-  const head =
-    `We read your file and found ${euro(found)} across ` +
+  const summary =
+    `We read it and found ${euro(found)} across ` +
     `${sorted.length} ${sorted.length === 1 ? "finding" : "findings"}. ` +
     `The largest is worth ${euro(sample.worth)} on its own.`;
 
@@ -155,7 +196,7 @@ export function teaser(findings: Finding[]): Teaser {
     locked,
     unlockable: true,
     text:
-      `${head}\n\nWhat we found, and what each one is worth:\n\n${list}\n\n` +
+      `${head}${summary}\n\nWhat we found, and what each one is worth:\n\n${list}\n\n` +
       `€${REPORT_PRICE} unlocks which line each of these sits on, the arithmetic ` +
       `behind it, and what to do about it including how far you can safely go.\n`,
   };

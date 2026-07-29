@@ -268,3 +268,59 @@ describe("the ladder, because a rate that low exists for a reason", () => {
     assert.match(blind.action, /Start small/);
   });
 });
+
+describe("the portrait, which is what a reader gets before anything is found", () => {
+  const t = teaser(findAll(allc), allc);
+
+  test("opens with facts about their business, not with our number", () => {
+    // The founder sat through a meeting about his own annual accounts and
+    // understood none of it. Four true sentences about the company come first;
+    // whether anything is wrong comes second.
+    assert.match(t.text, /^Here is what your file says\./);
+    assert.match(t.text, /Turnover, trend 2026\s+€2,389,560/);
+    assert.ok(t.text.indexOf("Turnover") < t.text.indexOf("found €"));
+  });
+
+  test("says what is left after direct costs in cents, not as a ratio", () => {
+    assert.match(t.text, /Left after direct costs\s+37 cents in every euro/);
+  });
+
+  test("names the biggest cost of each kind, which most owners cannot", () => {
+    assert.match(t.text, /Biggest cost that moves with volume\s+Fulfilment, 4\.2% of turnover/);
+    assert.match(t.text, /Biggest cost that does not\s+Personeelskosten, 22\.0% of turnover/);
+  });
+
+  test("still gives the portrait when there is nothing to sell", () => {
+    // A clean file is the case where a reader has paid nothing and learned
+    // nothing. The four facts are the whole reason that visit was not wasted.
+    const none = teaser(findAll(clean), clean);
+    assert.equal(none.unlockable, false);
+    assert.match(none.text, /Here is what your file says/);
+    assert.match(none.text, /nothing to sell you and nothing to pay/);
+  });
+
+  test("says nothing about the business when it was not given the figures", () => {
+    const bare = teaser(findAll(allc));
+    assert.ok(!bare.text.includes("Here is what your file says"));
+  });
+});
+
+describe("every finding explains itself before it names their number", () => {
+  const report = render(findAll(allc));
+
+  test("leads with what the thing is, in words, with no figures in it", () => {
+    assert.match(report.text, /1\. A cost you pay and the line that bills it back/);
+    assert.match(report.text, /Yours:  You recover 55\.5%/);
+  });
+
+  test("puts the explanation above their case, not below it", () => {
+    assert.ok(report.text.indexOf("A cost you pay") < report.text.indexOf("Yours:"));
+  });
+
+  test("keeps the explanation free of their figures, so it reads the same on every file", () => {
+    for (const f of findAll(allc)) {
+      assert.ok(f.plainly, `${f.id} has no plain-language explanation`);
+      assert.ok(!/[€%]|\d/.test(f.plainly), `${f.id} put figures in its explanation`);
+    }
+  });
+});

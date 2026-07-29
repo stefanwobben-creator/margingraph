@@ -96,6 +96,11 @@ export function recoveryGap(input: FindingsInput): Finding[] {
     out.push({
       id: `recovery-${pair.recovery}`,
       per: actual.label,
+      plainly:
+        `A cost you pay and the line that bills it back to customers are two ` +
+        `separate rows. When the second is smaller than the first, the ` +
+        `difference is being paid out of your own margin, usually because a ` +
+        `rate was set years ago and the cost moved since.`,
       subject: `How much of your ${pair.label} you recover from customers`,
       observation: `You recover ${pct(rate)} of your ${pair.label} from customers.`,
       worth: gap,
@@ -185,6 +190,12 @@ export function ratioDrift(input: FindingsInput): Finding[] {
       {
         id: "ratio-cost-base",
         per: actual.label,
+        plainly:
+          `A cost that moves with volume should fall when turnover falls. ` +
+          `When several of them stay roughly the same in euros while turnover ` +
+          `drops, they are taking a bigger share of a smaller company, and ` +
+          `nothing in your accounts flags it because every line is close to ` +
+          `budget on its own.`,
         subject: `Cost lines that did not follow your turnover down`,
         observation: `Your turnover is ${pct(drop)} below ${reference.label}, and ${fired.length} of your ${tested} volume-variable cost lines did not follow it down.`,
         worth,
@@ -203,6 +214,10 @@ export function ratioDrift(input: FindingsInput): Finding[] {
   return fired.map((d) => ({
     id: `ratio-${d.key}`,
     per: actual.label,
+    plainly:
+      `A cost that moves with volume should fall when turnover falls. When ` +
+      `the amount stays roughly the same while its share of turnover jumps, ` +
+      `the contract stopped following your business.`,
     subject: `${d.label} as a share of turnover`,
     observation: `${d.label} went from ${pct(d.then)} to ${pct(d.now)} of turnover while the amount itself barely moved.`,
     worth: d.worth,
@@ -236,7 +251,7 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
   const threshold = Math.max(floor, revenue * 0.0025);
 
   return costLines
-    .map((line) => {
+    .map((line): Finding | undefined => {
       const now = actual.values[line.key];
       const planned = reference.values[line.key];
       if (now === undefined || planned === undefined) return undefined;
@@ -245,13 +260,17 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
       return {
         id: `overrun-${line.key}`,
         per: actual.label,
+        plainly:
+          `The plain comparison your accounting package already makes: what ` +
+          `you spent against what you planned to spend. It is here because a ` +
+          `budget nobody looks at is the same as no budget.`,
         subject: `${line.label} against budget`,
         observation: `${line.label} is ${euro(over)} over ${reference.label}.`,
         worth: over,
         action: `Bring it back to budget, or restate the budget so it is worth steering by again.`,
         workings: `${euro(now)} actual against ${euro(planned)} budgeted.`,
         source: [line.key],
-      } satisfies Finding;
+      };
     })
     .filter((f): f is Finding => f !== undefined);
 }

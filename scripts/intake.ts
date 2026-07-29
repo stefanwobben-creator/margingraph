@@ -136,6 +136,6 @@ if (!intake.readable) {
 const findings = findAll(intake.input!);
 
 console.log("\n--- FREE ------------------------------------------------------\n");
-console.log(teaser(findings).text);
+console.log(teaser(findings, intake.input!).text);
 console.log("--- PAID ------------------------------------------------------\n");
 console.log(render(findings).text);

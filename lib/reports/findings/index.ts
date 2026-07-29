@@ -14,5 +14,7 @@
 export { findAll, recoveryGap, ratioDrift, budgetOverrun } from "./rules";
 export { reconciliationFindings, disagreementFindings } from "./from-gate";
 export { render, teaser, REPORT_PRICE, MINIMUM_WORTH } from "./render";
+export { portrait } from "./portrait";
 export type { Report, Teaser } from "./render";
+export type { Portrait, PortraitLine } from "./portrait";
 export type { Finding, FindingsInput, Period } from "./types";

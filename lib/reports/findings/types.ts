@@ -28,6 +28,19 @@ export type LadderStep = {
 
 export type Finding = {
   id: string;
+  /**
+   * What this kind of finding is, in ordinary words and with no figures in it.
+   *
+   * The reader we are writing for is the owner who sat through a meeting about
+   * their own annual accounts and understood none of it. "You recover 55.5% of
+   * your uitgaande vracht" assumes they already know that freight paid and
+   * freight billed on are two different lines. Most do not, and the ones who
+   * do lose nothing by being told.
+   *
+   * Deliberately free of their numbers, so it reads the same on every file and
+   * can be checked once rather than argued with every time.
+   */
+  plainly?: string;
   /** One sentence: what is true about their figures. */
   observation: string;
   /**

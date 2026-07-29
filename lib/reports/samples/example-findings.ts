@@ -66,7 +66,7 @@ export const demoInput: FindingsInput = {
 
 /** What a visitor sees for free. */
 export function demoTeaser() {
-  return teaser(findAll(demoInput));
+  return teaser(findAll(demoInput), demoInput);
 }
 
 /** What €9 unlocks. */
