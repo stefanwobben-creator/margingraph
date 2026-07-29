@@ -24,10 +24,11 @@ import {
  * file is too big after a thirty second upload has learned it too late.
  */
 
-/** The four things a file can be sent for. They need different files. */
+/** The things a file can be sent for. They need different files. */
 const QUESTIONS = [
   { value: "margin", label: "Where is my margin leaking?", needs: "Profit and loss for this period, plus the budget or the same period last year." },
   { value: "runway", label: "How long does the money last?", needs: "The same profit and loss account, plus what is in the bank today." },
+  { value: "signals", label: "Is my business getting stronger or weaker?", needs: "This year's profit and loss with last year beside it. Balance sheets welcome." },
   { value: "valuation", label: "What is my business worth?", needs: "Annual accounts for the last three years including balance sheets." },
   { value: "contract", label: "Is this contract reasonable?", needs: "The quote or agreement itself, and roughly what volume you do." },
 ] as const;

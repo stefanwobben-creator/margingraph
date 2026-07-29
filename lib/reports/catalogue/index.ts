@@ -2,9 +2,20 @@ import { MINIMUM_WORTH, render } from "@/lib/reports/findings";
 import type { FindingsInput } from "@/lib/reports/findings";
 import { findAll } from "@/lib/reports/findings/rules";
 import { questionsForYourAccountant } from "@/lib/reports/questions";
+import { runwayReport } from "@/lib/reports/runway";
+import { whySignalsBlocked } from "@/lib/reports/signals";
 import { buildModel } from "@/lib/reports/whatif";
 
-export type ReportId = "margin" | "accountant" | "shock" | "pricing" | "runway" | "valuation";
+export type ReportId =
+  | "margin"
+  | "accountant"
+  | "shock"
+  | "pricing"
+  | "runway"
+  | "valuation"
+  | "inventory"
+  | "signals"
+  | "contract";
 
 /**
  * What we have, from one file.
@@ -98,13 +109,18 @@ export const REPORTS: readonly ReportDefinition[] = [
     title: "How long the money lasts",
     question: "How long does the money last?",
     needs: "The same profit and loss account, plus what is in the bank today.",
-    built: false,
+    built: true,
+    // `runwayReport` is the single arbiter of whether the result can be
+    // rebuilt from the lines we read, so the gate and the report can never
+    // disagree about whether the report is possible.
     blocked: (s) =>
       !s.input
         ? "no readable figures"
         : s.cash === undefined
           ? "no bank balance given, and there is no cash in a profit and loss account"
-          : undefined,
+          : runwayReport(s.input, { cash: s.cash }) === undefined
+            ? "we could not rebuild an operating result from these lines"
+            : undefined,
   },
   {
     id: "valuation",
@@ -114,6 +130,35 @@ export const REPORTS: readonly ReportDefinition[] = [
     built: false,
     blocked: (s) =>
       (s.years ?? 0) < 3 ? "we need three years of annual accounts, with balance sheets" : undefined,
+  },
+  {
+    id: "inventory",
+    title: "What your stock is quietly costing",
+    question: "Is my stock working for me?",
+    needs: "Annual accounts with a balance sheet: stock, plus cost of sales.",
+    built: false,
+    blocked: (s) => (!s.input ? "no readable figures" : undefined),
+  },
+  {
+    id: "signals",
+    title: "The health signals in your accounts",
+    question: "Is my business getting stronger or weaker?",
+    needs: "This year's profit and loss with last year beside it. Balance sheets complete the nine.",
+    built: true,
+    // `whySignalsBlocked` is shared with the report itself, so the gate and
+    // the report can never disagree about whether the report is possible.
+    blocked: (s) => whySignalsBlocked(s.input),
+  },
+  {
+    id: "contract",
+    title: "Is this contract reasonable",
+    question: "Should I sign this?",
+    needs: "The quote or agreement, and roughly what volume you do.",
+    // Available, not automated: a contract is prose, and prose is read by a
+    // person here. Marked built so the honest reason shows instead of the
+    // generic one, and blocked always, so the machine can never sell it.
+    built: true,
+    blocked: () => "read by a person for now; send it and we reply the same way",
   },
 ] as const;
 
@@ -177,6 +222,34 @@ function worthOf(id: ReportId, supplied: Supplied): number | undefined {
 /** How many reports this file can be sold as, for the bundle. */
 export function sellableCount(supplied: Supplied): number {
   return offer(supplied).filter((o) => o.sellable).length;
+}
+
+/**
+ * The offer as the sender reads it: a ticklist.
+ *
+ * This is the upsell, and the reason it does not feel like one is that every
+ * line is a fact about their own file. Tick what you want, €9 each, any three
+ * from the same file for €21. A report we cannot produce says why in their
+ * words, which is itself a reason to send the missing piece.
+ */
+export function renderOffer(supplied: Supplied): string {
+  const items = offer(supplied);
+  const sellable = items.filter((o) => o.sellable).length;
+
+  const lines = items.map((o) => {
+    if (o.sellable) return `  [ ] ${o.question}   €9`;
+    if (o.because?.includes("free")) return `  [x] ${o.question}   free, included`;
+    return `      ${o.question}   (${o.because})`;
+  });
+
+  const footer =
+    sellable >= 3
+      ? "\nTick what you want. €9 each, any three from this same file for €21."
+      : sellable > 0
+        ? "\nTick what you want. €9 each."
+        : "\nNothing here is for sale yet, and nothing is charged.";
+
+  return lines.join("\n") + "\n" + footer;
 }
 
 /** The questions report, so callers do not reach past the catalogue. */

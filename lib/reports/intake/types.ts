@@ -9,7 +9,13 @@ import type { FindingsInput } from "@/lib/reports/findings";
  * produces this shape from .xlsx and .csv alike.
  */
 export type Cell = string | number | null;
-export type Sheet = { name: string; rows: Cell[][] };
+export type Sheet = {
+  name: string;
+  rows: Cell[][];
+  /** Every tab in the workbook, when it came from one. Used to say "your
+   *  profit and loss may be on another tab" instead of a bare refusal. */
+  sheets?: string[];
+};
 
 /** What we decided a row is. `skip` carries the reason. */
 export type RowKind =

@@ -202,7 +202,7 @@ describe("the teaser, which is the guarantee made mechanical", () => {
     assert.equal(t.locked.length, 2);
     assert.deepEqual(t.locked, [
       "How much of your uitgaande vracht you recover from customers",
-      "Kosten IT against budget",
+      "Kosten IT against budget 2026",
     ]);
     assert.match(t.text, /€36,400/);
     assert.match(t.text, /€21,200/);

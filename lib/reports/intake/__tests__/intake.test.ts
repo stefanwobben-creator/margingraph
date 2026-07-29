@@ -249,3 +249,46 @@ describe("what it refuses to guess at", () => {
     assert.equal(intake.input?.actual.values["omzet"], 2_389_000);
   });
 });
+
+describe("a document that is not a profit and loss account", () => {
+  // A real forecast workbook: fifteen scenario rows, no cost line anywhere.
+  // The reader used to classify "Best case" as a cost of €1.57m and crown a
+  // line containing the word "sales" as turnover, and the catalogue then
+  // offered a report built on that. Refusing is the product working.
+  const forecast: Sheet = {
+    name: "Begroting",
+    sheets: ["Begroting", "Omzet historie", "Organisatie historie"],
+    rows: [
+      ["Grondslagen prognose 2017", null],
+      ["Best case", 1_575_500],
+      ["Normale case", 1_370_000],
+      ["Worst case", 1_164_500],
+      ["NC prognose op basis van laatste 5 jaar historie", 1_332_731],
+      ["NC prognose op basis van inschatting door marketing en sales", 1_438_000],
+    ],
+  };
+
+  test("refuses, and says what kind of document it thinks it is holding", () => {
+    const intake = readSheet(forecast);
+    assert.equal(intake.readable, false);
+    assert.equal(intake.input, undefined);
+    assert.match(intake.questions[0], /Nothing on the tab "Begroting" looks like a profit and loss line/);
+  });
+
+  test("points at the other tabs instead of ending the conversation", () => {
+    const intake = readSheet(forecast);
+    assert.match(intake.questions[0], /"Omzet historie", "Organisatie historie"/);
+  });
+
+  test("marks every scenario row as what it is", () => {
+    const intake = readSheet(forecast);
+    const best = intake.rows.find((r) => r.label === "Best case");
+    assert.equal(best?.kind, "skip");
+    assert.match(best?.because ?? "", /forecast or scenario/);
+  });
+
+  test("does not crown a forecast as turnover because it mentions sales", () => {
+    const intake = readSheet(forecast);
+    assert.ok(intake.rows.every((r) => r.kind !== "revenue"));
+  });
+});

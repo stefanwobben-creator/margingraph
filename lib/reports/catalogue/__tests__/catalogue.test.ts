@@ -1,18 +1,35 @@
 import { describe, test } from "vitest";
 import assert from "node:assert/strict";
 
-import { REPORTS, offer, sellableCount } from "..";
+import { REPORTS, offer, renderOffer, sellableCount } from "..";
 import { questionsForYourAccountant, renderQuestions } from "@/lib/reports/questions";
 import { allc, clean } from "@/lib/reports/findings/__tests__/fixtures";
 
 describe("what one file can be turned into", () => {
-  test("sells the four that are built, and says why the rest are not", () => {
+  test("sells what is built, and says why the rest are not", () => {
     const got = offer({ input: allc });
     const sellable = got.filter((o) => o.sellable).map((o) => o.id);
     assert.deepEqual(sellable, ["margin", "accountant", "shock", "pricing"]);
 
     const unbuilt = got.filter((o) => o.because === "not built yet").map((o) => o.id);
-    assert.deepEqual(unbuilt, ["runway", "valuation"]);
+    assert.deepEqual(unbuilt, ["valuation", "inventory"]);
+
+    // Signals is built, but allc compares against a budget, and beating a
+    // plan is not direction. The gate says that instead of "not built yet".
+    const signals = got.find((o) => o.id === "signals")!;
+    assert.equal(signals.sellable, false);
+    assert.match(signals.because!, /beating a plan is not the same as getting stronger/);
+  });
+
+  test("runway joins the offer the moment a bank balance arrives", () => {
+    // Without cash it is blocked for the honest reason, not the generic one.
+    const without = offer({ input: allc }).find((o) => o.id === "runway")!;
+    assert.equal(without.sellable, false);
+    assert.match(without.because!, /no bank balance given/);
+
+    const withCash = offer({ input: allc, cash: 100_000 }).find((o) => o.id === "runway")!;
+    assert.equal(withCash.sellable, true);
+    assert.equal(sellableCount({ input: allc, cash: 100_000 }), 5);
   });
 
   test("never offers a report the code cannot produce", () => {
@@ -41,10 +58,18 @@ describe("what one file can be turned into", () => {
     assert.equal(got.find((o) => o.id === "margin")!.sellable, true);
   });
 
+  test("renders the offer as a ticklist with the bundle line", () => {
+    const text = renderOffer({ input: allc });
+    assert.match(text, /\[ \] Where is my margin leaking\?   €9/);
+    assert.match(text, /any three from this same file for €21/);
+    assert.match(text, /read by a person for now/);
+  });
+
   test("gives the real reason, not a generic one", () => {
     const reasons = Object.fromEntries(offer({ input: allc }).map((o) => [o.id, o.because]));
     assert.equal(reasons.margin, undefined);
-    assert.match(reasons.runway ?? "not built yet", /not built yet/);
+    assert.match(reasons.runway!, /no bank balance given/);
+    assert.match(reasons.valuation!, /not built yet/);
   });
 
   test("a file that finds nothing still gets the questions, and they are free", () => {

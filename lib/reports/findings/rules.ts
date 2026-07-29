@@ -265,11 +265,14 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
           `The plain comparison your accounting package already makes: what ` +
           `you spent against what you planned to spend. It is here because a ` +
           `budget nobody looks at is the same as no budget.`,
-        subject: `${line.label} against budget`,
+        subject: `${line.label} against ${reference.label}`,
         observation: `${line.label} is ${euro(over)} over ${reference.label}.`,
         worth: over,
-        action: `Bring it back to budget, or restate the budget so it is worth steering by again.`,
-        workings: `${euro(now)} actual against ${euro(planned)} budgeted.`,
+        // "budget" was hardcoded here, so a comparison against last year read
+        // "€2,188,180 budgeted" about a number nobody ever budgeted. The
+        // reference's own name is always right, whichever kind it is.
+        action: `Bring it back to the ${reference.label} level, or decide out loud that the new level is the plan.`,
+        workings: `${euro(now)} actual against ${euro(planned)} in ${reference.label}.`,
         source: [line.key],
       };
     })

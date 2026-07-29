@@ -13,6 +13,7 @@ import {
   RECOVERY,
   REFERENCE_HEADER,
   REVENUE,
+  SCENARIO,
   SUBTOTAL,
   VARIABLE,
   has,
@@ -221,11 +222,43 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     if (kind === "subtotal") entry.because = "restates the lines above it";
     if (kind === "margin") entry.because = "used for the margin, not counted as a cost";
     if (kind === "skip") {
-      entry.because = has(label, REVENUE_DEDUCTION)
-        ? "already deducted inside net turnover"
-        : "below the operating line";
+      entry.because = has(label, SCENARIO)
+        ? "a forecast or scenario, not an amount that happened"
+        : has(label, REVENUE_DEDUCTION)
+          ? "already deducted inside net turnover"
+          : "below the operating line";
     }
     rows.push(entry);
+  }
+
+  // --- is this a profit and loss account at all? -------------------------
+  //
+  // A forecast workbook read as a P&L produces confident nonsense: scenarios
+  // become costs, and any line with a revenue word in it becomes turnover.
+  // The tell is recognition. On a real P&L the vocabulary places most lines:
+  // freight, payroll, rent, a margin subtotal. On a forecast it places none.
+  // No recognised line means we are holding the wrong kind of document, and
+  // the honest move is to say so rather than to sell a report about it.
+  const recognised = rows.filter(
+    (row) =>
+      row.kind === "margin" ||
+      row.kind === "recovery" ||
+      row.kind === "variable" ||
+      (row.kind === "cost" && (has(row.label, NEVER_VARIABLE) || has(row.label, VARIABLE))),
+  ).length;
+
+  if (recognised === 0) {
+    const others = (sheet.sheets ?? []).filter((name) => name !== sheet.name);
+    questions.push(
+      `Nothing on the tab "${sheet.name}" looks like a profit and loss line to us: no cost ` +
+        `of sales, no payroll, no freight, no margin subtotal. It reads like a forecast or ` +
+        `working sheet.` +
+        (others.length > 0
+          ? ` This workbook also has: ${others.map((name) => `"${name}"`).join(", ")}. ` +
+            `If the profit and loss account is on one of those, tell us which.`
+          : ` If the figures live in a different file, send that one.`),
+    );
+    return { readable: false, questions, notes, rows };
   }
 
   // --- turnover ---------------------------------------------------------
@@ -440,6 +473,7 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
  * word warehouse and payroll does not follow a bad quarter down.
  */
 function classify(label: string): RowKind {
+  if (has(label, SCENARIO)) return "skip";
   if (has(label, GROSS_MARGIN)) return "margin";
   if (has(label, RECOVERY)) return "recovery";
   if (has(label, REVENUE_DEDUCTION) || has(label, NOT_OPERATING)) return "skip";

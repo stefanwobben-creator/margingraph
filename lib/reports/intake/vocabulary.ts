@@ -329,6 +329,25 @@ export function spanOf(header: string): { id: string; label: string } | undefine
   return found ? { id: found.id, label: found.label } : undefined;
 }
 
+/**
+ * Rows that are forecasts or scenarios, not amounts that happened.
+ *
+ * The file that forced this was a revenue-forecast workbook: fifteen rows of
+ * "NC prognose op basis van...", a best case and a worst case. The reader
+ * classified the scenarios as costs and one forecast as turnover, because it
+ * contained the word "sales". A scenario is not a figure, and reading it as
+ * one produces a report about a company that does not exist.
+ */
+export const SCENARIO = [
+  "prognose",
+  "forecast",
+  "scenario",
+  "best case",
+  "worst case",
+  "normale case",
+  "educated guess",
+] as const;
+
 /** Column headers that are arithmetic on other columns, never a period. */
 export const DERIVED_HEADER = [
   "verschil",

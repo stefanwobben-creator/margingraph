@@ -17,15 +17,21 @@
  * Options, for the files that need an answer rather than a guess:
  *
  *   npm run intake accounts.xlsx -- --sheet "Q1" --reference 2 --scale 1000
+ *
+ * Runway needs the one number a profit and loss account cannot know:
+ *
+ *   npm run intake accounts.xlsx -- --cash 44237 --months 12
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { offer } from "@/lib/reports/catalogue";
+import { renderOffer } from "@/lib/reports/catalogue";
 import { findAll, render, teaser } from "@/lib/reports/findings";
 import { readSheet, type Sheet } from "@/lib/reports/intake";
 import { questionsForYourAccountant, renderQuestions } from "@/lib/reports/questions";
+import { runwayReport } from "@/lib/reports/runway";
+import { signalsReport } from "@/lib/reports/signals";
 import { pricingReport, shockReport } from "@/lib/reports/whatif";
 
 const argv = process.argv.slice(2);
@@ -137,12 +143,10 @@ if (!intake.readable) {
 }
 
 const findings = findAll(intake.input!);
+const cash = num("cash");
 
 console.log("\n--- WHAT THIS FILE CAN BECOME ---------------------------------\n");
-for (const item of offer({ input: intake.input })) {
-  const mark = item.sellable ? "sell" : "no  ";
-  console.log(`  ${mark}  ${item.question}${item.because ? `   (${item.because})` : ""}`);
-}
+console.log(renderOffer({ input: intake.input, cash }));
 
 console.log("\n--- FREE ------------------------------------------------------\n");
 console.log(teaser(findings, intake.input!).text);
@@ -159,5 +163,17 @@ const pricing = pricingReport(intake.input!);
 if (pricing) {
   console.log("--- PAID: WHAT A PRICE RISE CAN COST --------------------------\n");
   console.log(pricing.text);
+}
+if (cash !== undefined) {
+  const runway = runwayReport(intake.input!, { cash, months: num("months") });
+  if (runway) {
+    console.log("--- PAID: HOW LONG THE MONEY LASTS ----------------------------\n");
+    console.log(runway.text);
+  }
+}
+const signals = signalsReport(intake.input!);
+if (signals) {
+  console.log("--- PAID: STRONGER OR WEAKER ----------------------------------\n");
+  console.log(signals.text);
 }
 console.log("");
