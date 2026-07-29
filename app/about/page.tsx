@@ -88,7 +88,12 @@ export default function AboutPage() {
               prescribed sequence, and they do that job properly. Steering needs
               costs sorted by how close they sit to the sale, and measured
               against the money that is actually yours rather than against
-              turnover, which was never yours to begin with.
+              turnover, which was never yours to begin with. That idea has a
+              name here, and{" "}
+              <Link href={routes.idea} className="underline underline-offset-4">
+                its own page
+              </Link>
+              .
             </p>
             <p>
               Since then I founded srprs.me, I am building Nooch, and I have

@@ -21,6 +21,7 @@ import { site } from "@/lib/site";
  */
 const nav = [
   { label: "Reports", href: routes.reports },
+  { label: "The idea", href: routes.idea },
   { label: "Guides", href: routes.guides },
   { label: "FAQ", href: routes.faq },
   { label: "About", href: routes.about },

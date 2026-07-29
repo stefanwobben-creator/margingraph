@@ -55,6 +55,17 @@ export const allc: FindingsInput = {
     { key: "personeel", label: "Personeelskosten" },
     { key: "fulfilment", label: "Fulfilment" },
   ],
+  // Which step of the cascade each cost sits in. The reader works this out
+  // from the labels on a real file; here it is declared, because a fixture
+  // that is a special case stops being evidence about the real thing.
+  tiers: [
+    { key: "vracht-uitgaand", label: "Uitgaande vracht", tier: 2 },
+    { key: "fulfilment", label: "Fulfilment", tier: 2 },
+    { key: "marketing", label: "Marketing", tier: 3 },
+    { key: "it", label: "Kosten IT", tier: 4 },
+    { key: "personeel", label: "Personeelskosten", tier: 4 },
+  ],
+  labourLines: [{ key: "personeel", label: "Personeelskosten" }],
 };
 
 /**
@@ -111,6 +122,16 @@ export const am: FindingsInput = {
     { key: "it", label: "Kosten IT" },
     { key: "personeel", label: "Personeelskosten" },
   ],
+  tiers: [
+    { key: "husa-logistics", label: "Husa Logistics", tier: 2 },
+    { key: "dhb", label: "Dhb", tier: 2 },
+    { key: "husa-pick", label: "Husa pick", tier: 2 },
+    { key: "husa-assemblage", label: "Husa assemblage", tier: 2 },
+    { key: "vracht-uitgaand", label: "Uitgaande vracht", tier: 2 },
+    { key: "it", label: "Kosten IT", tier: 4 },
+    { key: "personeel", label: "Personeelskosten", tier: 4 },
+  ],
+  labourLines: [{ key: "personeel", label: "Personeelskosten" }],
 };
 
 /** A company where nothing is wrong. The rules must stay quiet. */

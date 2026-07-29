@@ -29,6 +29,8 @@ export const routes = {
   send: "/send",
   /** A name and a face, because the site asks strangers for a balance sheet. */
   about: "/about",
+  /** The concept the product is named after. The whitepaper, without the PDF. */
+  idea: "/idea",
   /**
    * One page for one kind of company, and where every advertisement lands.
    *

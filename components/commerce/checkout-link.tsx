@@ -71,7 +71,7 @@ export function CheckoutLink({
   return (
     <Button asChild>
       <a href={href} onClick={onClick} rel="nofollow">
-        {label ?? `Generate report — €${product.price}`}
+        {label ?? `Unlock the report — €${product.price}`}
       </a>
     </Button>
   );

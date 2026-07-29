@@ -45,7 +45,7 @@ export function BusinessValuationPreview() {
       <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-6 sm:px-8">
         <div>
           <p className="text-xs tracking-widest text-muted-foreground uppercase">
-            Decision report
+            Report
           </p>
           <p className="mt-1.5 font-medium">Business Valuation</p>
         </div>

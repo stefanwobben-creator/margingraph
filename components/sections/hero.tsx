@@ -71,6 +71,10 @@ export function Hero() {
               to train anything.{" "}
               <Link href={routes.about} className="underline underline-offset-4">
                 Who that is
+              </Link>
+              ,{" "}
+              <Link href={routes.idea} className="underline underline-offset-4">
+                the idea behind it
               </Link>{" "}
               and{" "}
               <Link href="/privacy" className="underline underline-offset-4">

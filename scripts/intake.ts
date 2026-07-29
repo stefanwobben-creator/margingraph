@@ -22,8 +22,11 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { offer } from "@/lib/reports/catalogue";
 import { findAll, render, teaser } from "@/lib/reports/findings";
 import { readSheet, type Sheet } from "@/lib/reports/intake";
+import { questionsForYourAccountant, renderQuestions } from "@/lib/reports/questions";
+import { pricingReport, shockReport } from "@/lib/reports/whatif";
 
 const argv = process.argv.slice(2);
 const at = (name: string) => argv.indexOf(`--${name}`);
@@ -135,7 +138,26 @@ if (!intake.readable) {
 
 const findings = findAll(intake.input!);
 
+console.log("\n--- WHAT THIS FILE CAN BECOME ---------------------------------\n");
+for (const item of offer({ input: intake.input })) {
+  const mark = item.sellable ? "sell" : "no  ";
+  console.log(`  ${mark}  ${item.question}${item.because ? `   (${item.because})` : ""}`);
+}
+
 console.log("\n--- FREE ------------------------------------------------------\n");
 console.log(teaser(findings, intake.input!).text);
 console.log("--- PAID ------------------------------------------------------\n");
 console.log(render(findings).text);
+console.log("--- PAID: QUESTIONS FOR YOUR ACCOUNTANT -----------------------\n");
+console.log(renderQuestions(questionsForYourAccountant(intake.input!)));
+const shock = shockReport(intake.input!);
+if (shock) {
+  console.log("\n--- PAID: WHAT A 20% DROP WOULD DO ----------------------------\n");
+  console.log(shock.text);
+}
+const pricing = pricingReport(intake.input!);
+if (pricing) {
+  console.log("--- PAID: WHAT A PRICE RISE CAN COST --------------------------\n");
+  console.log(pricing.text);
+}
+console.log("");
