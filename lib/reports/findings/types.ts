@@ -54,6 +54,18 @@ export type Finding = {
   /** Euros. Always read together with `per`, never annualised silently. */
   worth: number;
   /**
+   * What the move we would actually advise is worth, when that is less than
+   * the ceiling.
+   *
+   * The freight finding is the case that forced this. Its `worth` is €36,400,
+   * which is the arithmetic limit at full recovery, and the step we recommend
+   * is five points and €4,090. Leading a report with the ceiling and then
+   * recommending a fourteenth of it teaches the most engaged reader that our
+   * headline is inflated, which is a worse outcome than a smaller honest
+   * number. Absent means the two are the same.
+   */
+  recommended?: number;
+  /**
    * The period the amount belongs to, in the source's own words.
    *
    * A quarterly figure printed as "per jaar" is a four-fold overstatement and

@@ -100,7 +100,7 @@ describe("reading a profit and loss account", () => {
   test("produces a report worth more than the price of one", () => {
     const report = render(findAll(intake.input!));
     assert.equal(report.chargeable, true);
-    assert.match(report.text, /^Found €57,600\./);
+    assert.match(report.text, /^Found €57,600 of exposure\./);
   });
 });
 

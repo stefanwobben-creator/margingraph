@@ -1,4 +1,10 @@
-import { findAll, render, teaser, type FindingsInput } from "@/lib/reports/findings";
+import {
+  findAll,
+  portrait,
+  render,
+  teaser,
+  type FindingsInput,
+} from "@/lib/reports/findings";
 
 /**
  * The figures behind the demo, and why they are the real ones.
@@ -62,7 +68,23 @@ export const demoInput: FindingsInput = {
     { key: "payroll", label: "Payroll" },
     { key: "fulfilment", label: "Fulfilment" },
   ],
+  // Which step of the cascade each cost belongs to. On a real file the reader
+  // works this out from the labels; here it is declared, because the demo has
+  // to be the same shape as a real intake rather than a special case.
+  tiers: [
+    { key: "outbound freight", label: "Outbound freight", tier: 2 },
+    { key: "fulfilment", label: "Fulfilment", tier: 2 },
+    { key: "marketing", label: "Marketing", tier: 3 },
+    { key: "IT costs", label: "IT costs", tier: 4 },
+    { key: "payroll", label: "Payroll", tier: 4 },
+  ],
+  labourLines: [{ key: "payroll", label: "Payroll" }],
 };
+
+/** Where every euro goes, for the hero. Real figures, produced by the engine. */
+export function demoPortrait() {
+  return portrait(demoInput);
+}
 
 /** What a visitor sees for free. */
 export function demoTeaser() {

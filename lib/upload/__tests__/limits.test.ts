@@ -50,8 +50,11 @@ describe("what it says when it says no", () => {
       ...ok,
       files: [{ name: "annual accounts.pdf", size: MAX_BYTES_PER_FILE + 1 }],
     });
-    assert.match(problem, /"annual accounts\.pdf" is 3\.5 MB/);
-    assert.match(problem, /info@margingraph\.com/);
+    // The limit and the offending file must never round to the same number.
+    // They did, and the message read "is 3.5 MB, and we can accept 3.5 MB".
+    assert.match(problem, /"annual accounts\.pdf" is 3\.6 MB/);
+    assert.match(problem, /most we can take through the form is 3\.5 MB/);
+    assert.match(problem, /Export the same report as Excel or CSV/);
   });
 
   test("catches the total as well as the parts", () => {
@@ -65,6 +68,7 @@ describe("what it says when it says no", () => {
     });
     assert.equal(problems.length, 1, "neither file is over the per-file limit on its own");
     assert.match(problems[0], /limit for one submission/);
+    assert.match(problems[0], /send another file/);
   });
 
   test("does not complain about a total when there is only one file", () => {
@@ -82,6 +86,10 @@ describe("what it says when it says no", () => {
   });
 
   test("rejects an empty file rather than reporting that it found nothing in it", () => {
-    assert.match(validate({ ...ok, files: [{ name: "a.xlsx", size: 0 }] })[0], /is empty/);
+    const [problem] = validate({ ...ok, files: [{ name: "a.xlsx", size: 0 }] });
+    assert.match(problem, /came through with nothing in it/);
+    // "is empty" gives an owner nothing to do. The cause is nearly always a
+    // cloud-storage placeholder that never downloaded to the device.
+    assert.match(problem, /OneDrive, iCloud or Google Drive/);
   });
 });

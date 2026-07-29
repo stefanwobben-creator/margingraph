@@ -23,6 +23,7 @@ const links = collectionList.map((collection) => ({
  * everything else rather than in small grey type underneath.
  */
 const legal = [
+  { label: "For companies that ship things", href: "/for/ecommerce" },
   { label: "About", href: "/about" },
   { label: "Terms", href: "/terms" },
   { label: "Privacy", href: "/privacy" },

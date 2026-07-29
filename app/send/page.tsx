@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { UploadForm } from "@/components/intake/upload-form";
-import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -64,7 +63,7 @@ export default function SendPage() {
           description={`Upload the file you already have. We read it, run the analysis, and reply with what we found. Only if you want the answers is there anything to pay, and if we find less than €${MINIMUM_WORTH} there is nothing to pay at all.`}
         />
 
-        <Container className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+        <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
           <Card className="gap-0 p-6">
             <UploadForm email={seller.email} />
           </Card>
@@ -107,11 +106,11 @@ export default function SendPage() {
               send anything, ask and you get one.
             </p>
           </Card>
-        </Container>
+        </div>
       </Section>
 
       <Section>
-        <Container className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card className="gap-0 p-6">
             <h2 className="text-base font-semibold">What to send</h2>
             <div className="mt-5 space-y-6">
@@ -163,7 +162,7 @@ export default function SendPage() {
               <Link href={routes.whatWeFind}>See it run on a real company</Link>
             </Button>
           </Card>
-        </Container>
+        </div>
       </Section>
     </>
   );

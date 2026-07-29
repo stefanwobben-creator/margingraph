@@ -50,6 +50,17 @@ export type AnalyticsEvents = {
    */
   intake_submitted: { files?: number };
 
+  /**
+   * The three ways the intake does not end in a submission.
+   *
+   * Without these, a page where everybody tries and half of them time out is
+   * indistinguishable from a page nobody reaches, and you cannot prioritise a
+   * fix you cannot see.
+   */
+  intake_file_chosen: { files?: number };
+  intake_rejected: { reason?: string };
+  intake_failed: { status?: number };
+
   error_occurred: {
     message: string;
     /** Next's error digest, when the error came from a boundary. */

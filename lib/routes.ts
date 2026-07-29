@@ -30,5 +30,12 @@ export const routes = {
   send: "/send",
   /** A name and a face, because the site asks strangers for a balance sheet. */
   about: "/about",
+  /**
+   * One page for one kind of company, and where every advertisement lands.
+   *
+   * Sending paid traffic to a homepage written for anybody with figures is how
+   * a budget is spent proving that "anybody" is not a person.
+   */
+  ecommerce: "/for/ecommerce",
   howItWorks: "/#how-it-works",
 } as const;

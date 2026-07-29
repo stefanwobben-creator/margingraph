@@ -79,6 +79,17 @@ export default function AboutPage() {
               often not. Nothing about a good week tells you what happened to
               the share of your turnover that a supplier is quietly taking.
             </p>
+            <p className="text-foreground">
+              The other thing I learned is the reason this exists at all: the
+              figures you need in order to steer a company are not the figures
+              your bookkeeper gives you. Not worse figures and not wrong ones.
+              Different ones, in a different order, measured against a different
+              base. Your accounts are built to arrive at a taxable profit in a
+              prescribed sequence, and they do that job properly. Steering needs
+              costs sorted by how close they sit to the sale, and measured
+              against the money that is actually yours rather than against
+              turnover, which was never yours to begin with.
+            </p>
             <p>
               Since then I founded srprs.me, I am building Nooch, and I have
               helped dozens of companies, large and small, with strategy and

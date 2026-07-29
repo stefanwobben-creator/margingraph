@@ -28,7 +28,7 @@ export default function ThanksPage() {
         as="h1"
         eyebrow="Paid"
         title="Thank you. Your report is on its way."
-        description="It comes by email, as a reply to the message you sent your file with, within a few hours and usually much sooner."
+        description="It comes by email, to the address you gave when you sent your file, within a few hours and usually much sooner."
       />
 
       <Container className="mt-10 max-w-2xl">
@@ -42,14 +42,15 @@ export default function ThanksPage() {
 
           <h2 className="mt-6 text-base font-semibold">If it does not arrive</h2>
           <p className="mt-3 text-muted-foreground">
-            Check spam first, then reply to your own email or write to{" "}
+            Check spam first, then write to{" "}
             <a
               href={`mailto:${seller.email}?subject=${encodeURIComponent("Report not received")}`}
               className="underline underline-offset-4"
             >
               {seller.email}
             </a>
-            . A report that does not turn up gets refunded without an argument.
+            {" "}and we resend it. A report that does not turn up gets refunded
+            without an argument.
           </p>
 
           <h2 className="mt-6 text-base font-semibold">If a figure is wrong</h2>

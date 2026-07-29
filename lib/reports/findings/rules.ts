@@ -104,6 +104,7 @@ export function recoveryGap(input: FindingsInput): Finding[] {
       subject: `How much of your ${pair.label} you recover from customers`,
       observation: `You recover ${pct(rate)} of your ${pair.label} from customers.`,
       worth: gap,
+      recommended: first.worth,
       action,
       workings: `${euro(cost)} of cost against ${euro(recovered)} recovered is ${pct(rate)}. The remaining ${euro(gap)} is the ceiling, reached only at full recovery.`,
       source: [pair.cost, pair.recovery],

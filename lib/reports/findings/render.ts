@@ -19,7 +19,10 @@ export const MINIMUM_WORTH = REPORT_PRICE * 10;
 export type Report = {
   /** True when we found enough to charge for. */
   chargeable: boolean;
+  /** The total exposure, at the ceiling of every finding. */
   found: number;
+  /** What the moves we would actually advise add up to. Never larger. */
+  recommended: number;
   findings: Finding[];
   /** One line the owner can forward without giving anything away. */
   shareable?: string;
@@ -40,8 +43,10 @@ export type Report = {
  * anything. What is withheld is the other findings, not the proof.
  */
 export type Teaser = {
-  /** Total found across every finding, always shown. */
+  /** Total exposure across every finding, always shown. */
   found: number;
+  /** What the moves we would actually advise add up to. Never larger. */
+  recommended: number;
   /** How many findings there are, always shown. */
   count: number;
   /** The largest finding, complete. Absent when nothing was found. */
@@ -117,11 +122,18 @@ function block(f: Finding, index: number): string {
  */
 export function render(findings: Finding[]): Report {
   const found = findings.reduce((sum, f) => sum + Math.max(0, f.worth), 0);
-  const chargeable = found >= MINIMUM_WORTH;
+  const recommended = findings.reduce(
+    (sum, f) => sum + Math.max(0, f.recommended ?? f.worth),
+    0,
+  );
+  // Charged against what we would actually advise, not against the ceiling.
+  // A guarantee measured on the bigger number is a guarantee measured on a
+  // number nobody is going to collect.
+  const chargeable = recommended >= MINIMUM_WORTH;
 
   const header = chargeable
-    ? `Found ${euro(found)}. Paid €${REPORT_PRICE}.`
-    : `Found ${euro(found)}. That is under our minimum, so this report is free.`;
+    ? `Found ${euro(found)} of exposure. The moves we would actually recommend inside it are worth ${euro(recommended)}. Paid €${REPORT_PRICE}.`
+    : `Found ${euro(recommended)} worth acting on. That is under our minimum, so this report is free.`;
 
   const biggest = findings[0];
   const shareable = biggest
@@ -131,6 +143,7 @@ export function render(findings: Finding[]): Report {
   return {
     chargeable,
     found,
+    recommended,
     findings,
     shareable,
     text: [header, ...findings.map((f, i) => block(f, i + 1))].join("\n\n").trimEnd() + "\n",
@@ -153,7 +166,11 @@ export function render(findings: Finding[]): Report {
 export function teaser(findings: Finding[], input?: FindingsInput): Teaser {
   const sorted = [...findings].sort((a, b) => b.worth - a.worth);
   const found = sorted.reduce((sum, f) => sum + Math.max(0, f.worth), 0);
-  const unlockable = found >= MINIMUM_WORTH && sorted.length > 0;
+  const recommended = sorted.reduce(
+    (sum, f) => sum + Math.max(0, f.recommended ?? f.worth),
+    0,
+  );
+  const unlockable = recommended >= MINIMUM_WORTH && sorted.length > 0;
 
   // Four facts about their own business, free, whatever we found. Somebody who
   // reads this knows something about their company they did not know a minute
@@ -165,12 +182,13 @@ export function teaser(findings: Finding[], input?: FindingsInput): Teaser {
   if (!unlockable) {
     return {
       found,
+      recommended,
       count: sorted.length,
       locked: [],
       unlockable: false,
       text:
         head +
-        `We read it looking for money you are leaving behind, and found ${euro(found)}.\n\n` +
+        `We read it looking for money you are leaving behind, and found ${euro(recommended)} worth acting on.\n\n` +
         `That is below the €${MINIMUM_WORTH} we hold ourselves to, so there is nothing to sell you ` +
         `and nothing to pay. If you want, send a different file.\n`,
     };
@@ -180,10 +198,16 @@ export function teaser(findings: Finding[], input?: FindingsInput): Teaser {
   const locked = sorted.map((f) => f.subject);
   const width = Math.max(...locked.map((l) => l.length));
 
+  // Two numbers, and the smaller one is the promise. The exposure is what is
+  // at stake if everything went perfectly; the recommended figure is what we
+  // would actually tell you to do on Monday, and it is the one the guarantee
+  // is measured against.
   const summary =
-    `We read it and found ${euro(found)} across ` +
+    `We read it and found ${euro(found)} of exposure across ` +
     `${sorted.length} ${sorted.length === 1 ? "finding" : "findings"}. ` +
-    `The largest is worth ${euro(sample.worth)} on its own.`;
+    (recommended < found
+      ? `The moves we would actually recommend inside that are worth ${euro(recommended)}.`
+      : `The largest is worth ${euro(sample.worth)} on its own.`);
 
   const list = sorted
     .map((f, i) => `  ${i + 1}. ${f.subject.padEnd(width)}  ${euro(f.worth).padStart(9)}`)
@@ -191,6 +215,7 @@ export function teaser(findings: Finding[], input?: FindingsInput): Teaser {
 
   return {
     found,
+    recommended,
     count: sorted.length,
     sample,
     locked,

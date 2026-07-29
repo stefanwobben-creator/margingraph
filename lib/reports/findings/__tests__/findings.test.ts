@@ -123,10 +123,16 @@ describe("the whole set, on the second company", () => {
 });
 
 describe("the report", () => {
-  test("puts found against paid at the top", () => {
+  test("leads with what we would actually recommend, not with the ceiling", () => {
+    // The freight finding's ceiling is €36,400 and the step we advise is
+    // €4,090. A headline of €57,600 followed by advice worth a fourteenth of
+    // it teaches the most engaged reader that our numbers are inflated.
     const report = render(findAll(allc));
     assert.ok(report.chargeable);
-    assert.match(report.text, /^Found €57,600\. Paid €9\./);
+    assert.equal(round(report.found), 57_600);
+    assert.equal(round(report.recommended), 25_290);
+    assert.match(report.text, /^Found €57,600 of exposure\./);
+    assert.match(report.text, /actually recommend inside it are worth €25,290\. Paid €9\./);
   });
 
   test("gives four lines per finding and no chapters", () => {
@@ -175,11 +181,12 @@ describe("the report", () => {
 describe("the teaser, which is the guarantee made mechanical", () => {
   const t = teaser(findAll(allc));
 
-  test("shows the total and the count before anything is paid", () => {
+  test("shows both totals and the count before anything is paid", () => {
     assert.equal(round(t.found), 57_600);
+    assert.equal(round(t.recommended), 25_290);
     assert.equal(t.count, 2);
-    assert.match(t.text, /found €57,600 across 2 findings/);
-    assert.match(t.text, /largest is worth €36,400 on its own/);
+    assert.match(t.text, /found €57,600 of exposure across 2 findings/);
+    assert.match(t.text, /actually recommend inside that are worth €25,290/);
   });
 
   test("keeps the answer back: no source line, no arithmetic, no action", () => {

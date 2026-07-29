@@ -97,64 +97,57 @@ export function portrait(input: FindingsInput): Portrait {
   const steps = cascade(actual, input.tiers ?? []);
   const before = reference ? cascade(reference, input.tiers ?? []) : undefined;
 
-  const drain: PortraitLine[] = steps.steps.map((step) => {
-    const was = before?.steps.find((s) => s.tier === step.tier);
-    return {
-      label: step.label,
-      value:
-        `${Math.round(step.share * 100)} cents` +
-        (was ? ` (was ${Math.round(was.share * 100)})` : ""),
-    };
-  });
-
-  if (drain.length > 0) {
-    const kept = steps.steps[steps.steps.length - 1].remaining;
-    drain.push({ label: "Left over", value: `${Math.round(kept * 100)} cents` });
-  }
-
-  // The same costs against gross profit instead of against turnover.
+  // One cascade, one denominator.
   //
-  // This is the view experienced operators build by hand and no accountant
-  // produces, and the reason they build it is that turnover is not money you
-  // have. What you bought and resold was never yours. Gross profit is the
-  // first figure that is, so every cost should be read against that, and read
-  // that way the numbers roughly double for a trading company: five percent of
-  // turnover on freight at a fifty percent gross margin is ten percent of
-  // everything you actually earn.
+  // Both were printed for a day: the same costs against turnover and again
+  // against gross profit, one table under the other. Twenty-two cents in the
+  // first and thirty-seven in the second, and anybody reading quickly
+  // concludes their costs went up between two tables that describe the same
+  // money. Two views of one thing is not twice as informative, it is a reader
+  // deciding which of us made the mistake.
   //
-  // Why the statutory accounts do not do it: a profit and loss account exists
-  // to arrive at taxable profit in a prescribed order, and its percentages are
-  // taken against turnover because turnover is the one line that means the
-  // same thing at every company. What belongs in cost of sales is a choice, so
-  // gross margin is not comparable between two businesses. That makes this
-  // view better than the accountant's for steering your own company over time,
-  // and useless for comparing it to anybody else's. Both halves of that are
-  // true and only the first one usually gets said.
+  // Gross profit wins where there is a real cost of sales. It is the number
+  // that changes behaviour: five percent of turnover on freight sounds like
+  // rounding, and ten percent of everything you actually earn is a meeting.
+  // It is also the only one they cannot already get, since every accounting
+  // package prints percentages of turnover for free.
+  //
+  // Where buying takes almost nothing, a services company, the two are within
+  // a few points and turnover is the familiar denominator, so it wins by
+  // default.
   const grossCost = steps.steps.find((s) => s.tier === 1)?.cost ?? 0;
   const gross = revenue - grossCost;
-  const grossBefore = before ? (before.revenue - (before.steps.find((s) => s.tier === 1)?.cost ?? 0)) : 0;
-  const ofGross: PortraitLine[] = [];
+  const grossBefore = before
+    ? before.revenue - (before.steps.find((s) => s.tier === 1)?.cost ?? 0)
+    : 0;
+  const onGross = gross > 0 && grossCost / revenue >= 0.05;
+  const base = onGross ? gross : revenue;
+  const baseBefore = onGross ? grossBefore : (before?.revenue ?? 0);
 
-  // Only worth a second block when buying actually takes something. In a
-  // services business gross profit is within a few points of turnover and this
-  // would just print the same table twice.
-  if (gross > 0 && grossCost / revenue >= 0.05) {
-    for (const step of steps.steps.filter((s) => s.tier !== 1)) {
+  const drain: PortraitLine[] = steps.steps
+    .filter((step) => !(onGross && step.tier === 1))
+    .map((step) => {
       const was = before?.steps.find((s) => s.tier === step.tier);
-      ofGross.push({
+      return {
         label: step.label,
         value:
-          `${Math.round((step.cost / gross) * 100)} cents` +
-          (was && grossBefore > 0 ? ` (was ${Math.round((was.cost / grossBefore) * 100)})` : ""),
-      });
-    }
-    if (ofGross.length > 0) {
-      const kept = steps.steps[steps.steps.length - 1].remaining;
-      ofGross.push({
-        label: "Left over",
-        value: `${Math.round((kept * revenue / gross) * 100)} cents`,
-      });
-    }
+          `${Math.round((step.cost / base) * 100)} cents` +
+          (was && baseBefore > 0 ? ` (was ${Math.round((was.cost / baseBefore) * 100)})` : ""),
+      };
+    });
+
+  // "Left over" is only true when every step above it is visible. Where the
+  // file gives a gross margin subtotal but no itemised cost of sales, the
+  // buying step is missing from the tiers and a remainder computed without it
+  // reports sixty-four cents left over at a company that keeps thirty-seven.
+  // Cheaper to show three true lines than four with a false total.
+  const complete = steps.steps.some((step) => step.tier === 1);
+  if (drain.length > 0 && complete) {
+    const kept = steps.steps[steps.steps.length - 1].remaining;
+    drain.push({
+      label: "Left over",
+      value: `${Math.round(((kept * revenue) / base) * 100)} cents`,
+    });
   }
 
   // Gross profit per euro of labour cost. Crabtree's labour efficiency ratio,
@@ -183,15 +176,16 @@ export function portrait(input: FindingsInput): Portrait {
     });
   }
 
-  const width = Math.max(...[...lines, ...drain, ...ofGross].map((l) => l.label.length));
+  const width = Math.max(...[...lines, ...drain].map((l) => l.label.length));
   const render = (rows: PortraitLine[]) =>
     rows.map((l) => `  ${l.label.padEnd(width)}   ${l.value}`).join("\n");
 
+  const heading = onGross
+    ? "  Of every euro you keep after buying, which is the first money that is\n  actually yours:"
+    : "  Of every euro of turnover:";
+
   const parts = [render(lines)];
-  if (drain.length > 0) parts.push(`  Of every euro of turnover:\n\n${render(drain)}`);
-  if (ofGross.length > 0) {
-    parts.push(`  Of every euro of gross profit, which is the money you keep:\n\n${render(ofGross)}`);
-  }
+  if (drain.length > 0) parts.push(`${heading}\n\n${render(drain)}`);
 
   return { lines, cascade: drain, text: parts.join("\n\n") };
 }

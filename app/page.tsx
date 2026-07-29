@@ -25,13 +25,19 @@ export default function Home() {
       */}
       <JsonLd schemas={[organizationJsonLd(), websiteJsonLd()]} />
 
+      {/*
+        The call to action comes before the reading list, not after it.
+        Two sections of well-written guide and blog headlines used to sit
+        between the visitor and the closing CTA, and they are good enough to
+        win the click. For a nine euro decision that is an expensive place to
+        be interesting.
+      */}
       <Hero />
-      <PopularReports />
       <HowItWorks />
+      <PopularReports />
       <Comparison />
-      <LatestDocs collection="guides" title="Latest decision guides" />
-      <LatestDocs collection="blog" title="Latest from the blog" />
       <FooterCta />
+      <LatestDocs collection="guides" title="If you would rather work it out yourself" />
     </>
   );
 }

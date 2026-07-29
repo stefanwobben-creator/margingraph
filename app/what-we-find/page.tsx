@@ -3,8 +3,9 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { MINIMUM_WORTH, REPORT_PRICE } from "@/lib/reports/findings";
 import {
   DEMO_COMPANY,
@@ -150,6 +151,32 @@ you and nothing to pay. If you want, send a different file.`}
               No refund is ever processed, because no money moved. The guarantee
               is the order of operations rather than a policy.
             </p>
+          </Card>
+        </Container>
+      </Section>
+
+      {/*
+        The page that does the selling used to end on a full stop.
+        A visitor arriving from the hero's "see it on a real company first"
+        finishes here fully convinced and was handed no next step, which is
+        warm traffic routed into a dead end.
+      */}
+      <Section bordered>
+        <Container>
+          <Card className="gap-0 p-8">
+            <h2 className="text-heading text-balance">
+              That was somebody else&apos;s file
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Send yours and you get the same two halves back: what we found and
+              what each one is about, free, before anything is for sale. Under
+              €{MINIMUM_WORTH} found and there is nothing to pay at all.
+            </p>
+            <div className="mt-6">
+              <Button asChild size="lg">
+                <Link href={routes.send}>Send your figures</Link>
+              </Button>
+            </div>
           </Card>
         </Container>
       </Section>

@@ -26,7 +26,21 @@ export const ACCEPTED: Record<string, string> = {
   ".pdf": "PDF",
 };
 
-export const ACCEPT_ATTRIBUTE = Object.keys(ACCEPTED).join(",");
+/**
+ * Extensions and MIME types both.
+ *
+ * Android's file picker filters on MIME type and greys out everything when it
+ * is given extensions alone, at which point the sender concludes they have no
+ * valid file and leaves.
+ */
+export const ACCEPT_ATTRIBUTE = [
+  ...Object.keys(ACCEPTED),
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "text/csv",
+  "text/tab-separated-values",
+  "application/pdf",
+].join(",");
 
 export type Candidate = {
   name: string;
@@ -36,6 +50,17 @@ export type Candidate = {
 
 export const megabytes = (bytes: number) =>
   `${(bytes / 1_000_000).toFixed(bytes < 1_000_000 ? 2 : 1)} MB`;
+
+/**
+ * The offending size rounded up, the limit rounded down.
+ *
+ * Both rounded the same way produced `"annual accounts.pdf" is 3.5 MB, and we
+ * can accept 3.5 MB per file`, for every file between 3,500,001 and 3,549,999
+ * bytes. A rejection that contradicts itself does not read as a big file, it
+ * reads as a broken website, and nobody debugs a form on your behalf.
+ */
+const tooBig = (bytes: number) => `${(Math.ceil(bytes / 100_000) / 10).toFixed(1)} MB`;
+const atMost = (bytes: number) => `${(Math.floor(bytes / 100_000) / 10).toFixed(1)} MB`;
 
 export function extensionOf(name: string): string {
   const at = name.lastIndexOf(".");
@@ -78,16 +103,23 @@ export function validate(input: {
     if (!(extension in ACCEPTED)) {
       problems.push(
         `"${file.name}" is not a format we read. Send ${[...new Set(Object.values(ACCEPTED))].join(", ")}, ` +
-          `and export from your accounting package rather than screenshotting it.`,
+          `and export from your accounting package rather than screenshotting it. ` +
+          `A .ods or .numbers file needs re-exporting as Excel or CSV first.`,
       );
     }
     if (file.size === 0) {
-      problems.push(`"${file.name}" is empty.`);
+      problems.push(
+        `"${file.name}" came through with nothing in it. If it lives in OneDrive, ` +
+          `iCloud or Google Drive, open it once on this device so it downloads properly, ` +
+          `then choose it again.`,
+      );
     }
     if (file.size > MAX_BYTES_PER_FILE) {
       problems.push(
-        `"${file.name}" is ${megabytes(file.size)}, and we can accept ${megabytes(MAX_BYTES_PER_FILE)} per file. ` +
-          `Email it to info@margingraph.com instead and we will pick it up there.`,
+        `"${file.name}" is ${tooBig(file.size)} and the most we can take through the form ` +
+          `is ${atMost(MAX_BYTES_PER_FILE)}. A file that size is usually a scan, and we cannot ` +
+          `read scans anyway. Export the same report as Excel or CSV from your accounting ` +
+          `package and it will be under a megabyte.`,
       );
     }
   }
@@ -95,8 +127,9 @@ export function validate(input: {
   const total = files.reduce((sum, f) => sum + f.size, 0);
   if (files.length > 1 && total > MAX_BYTES_TOTAL) {
     problems.push(
-      `Together these are ${megabytes(total)}, and the limit for one submission is ${megabytes(MAX_BYTES_TOTAL)}. ` +
-        `Send them in two goes, or email them to info@margingraph.com.`,
+      `Together these are ${tooBig(total)} and the limit for one submission is ` +
+        `${atMost(MAX_BYTES_TOTAL)}. Send the most important one now; there is a "send another ` +
+        `file" button afterwards, and using the same address both times pairs them up.`,
     );
   }
 
