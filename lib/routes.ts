@@ -20,5 +20,11 @@ export const routes = {
   faq: collections.faq.basePath,
   /** A real generated report, not a screenshot. */
   exampleReport: "/example-report",
+  /**
+   * How it works used to be an anchor on the homepage. It is now a page that
+   * renders both halves of the flow from the shipped engine, which is a better
+   * answer to the same question and one that cannot drift out of date.
+   */
+  whatWeFind: "/what-we-find",
   howItWorks: "/#how-it-works",
 } as const;

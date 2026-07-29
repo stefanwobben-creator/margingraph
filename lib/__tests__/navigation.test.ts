@@ -48,3 +48,23 @@ describe("navigation reaches every collection", () => {
     expect(routes.exampleReport).toBe("/example-report");
   });
 });
+
+describe("the flow page", () => {
+  // How it works used to be `#how-it-works`, an anchor that resolved against
+  // whatever page you happened to be on. It is now a page that renders both
+  // halves of the flow from the shipped engine.
+  it("is linked from the header", () => {
+    expect(read("components", "layout", "site-header.tsx")).toContain(
+      "routes.whatWeFind",
+    );
+  });
+
+  it("is a real path, so it works from anywhere on the site", () => {
+    expect(routes.whatWeFind).toBe("/what-we-find");
+    expect(routes.whatWeFind).not.toContain("#");
+  });
+
+  it("has a page file behind it", () => {
+    expect(read("app", "what-we-find", "page.tsx")).toContain("demoTeaser");
+  });
+});

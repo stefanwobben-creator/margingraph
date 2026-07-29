@@ -12,7 +12,7 @@ import { site } from "@/lib/site";
  */
 const nav = [
   { label: "Reports", href: routes.reports },
-  { label: "How it works", href: routes.howItWorks },
+  { label: "What we find", href: routes.whatWeFind },
   { label: "Guides", href: routes.guides },
   { label: "Blog", href: routes.blog },
   { label: "FAQ", href: routes.faq },
