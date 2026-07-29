@@ -9,10 +9,10 @@ export function FooterCta() {
     <section className="border-t border-border py-24 sm:py-32">
       <Container className="flex flex-col items-start gap-8 sm:items-center sm:text-center">
         <h2 className="max-w-2xl text-title text-balance">
-          Ready to make better decisions?
+          Send a file and see what is in it.
         </h2>
         <Button asChild size="lg">
-          <Link href={routes.reports}>Browse all reports</Link>
+          <Link href={routes.send}>Send a file</Link>
         </Button>
       </Container>
     </section>

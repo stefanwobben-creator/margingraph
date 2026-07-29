@@ -47,7 +47,7 @@ export function DocCard({
         <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
           <span className="font-mono text-sm tabular-nums">€{doc.price}</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-accent-brand">
-            Generate Report
+            See what we find
             <ArrowRight
               aria-hidden
               className="size-4 transition-transform group-hover:translate-x-0.5"

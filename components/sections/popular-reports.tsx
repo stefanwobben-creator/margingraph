@@ -15,7 +15,7 @@ export function PopularReports() {
       <SectionHeader
         eyebrow="Reports"
         title="Popular reports"
-        description="One question, one report, one price. Upload the file you already have and get an answer you can act on."
+        description="One question, one report, one price. Send the file you already have, and see what is in it before you decide whether the answer is worth nine euros."
       />
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
