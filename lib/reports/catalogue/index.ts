@@ -225,29 +225,26 @@ export function sellableCount(supplied: Supplied): number {
 }
 
 /**
- * The offer as the sender reads it: a ticklist.
+ * The offer as the sender reads it: the chapters of one report.
  *
- * This is the upsell, and the reason it does not feel like one is that every
- * line is a fact about their own file. Tick what you want, €9 each, any three
- * from the same file for €21. A report we cannot produce says why in their
- * words, which is itself a reason to send the missing piece.
+ * There is one product and one price, so this is not a ticklist any more, it
+ * is a table of contents. A chapter the file can carry is marked in; a
+ * chapter it cannot says what to send, which is itself the reason to send it,
+ * because adding a chapter later reissues the report for nothing.
  */
 export function renderOffer(supplied: Supplied): string {
   const items = offer(supplied);
-  const sellable = items.filter((o) => o.sellable).length;
+  const included = items.filter((o) => o.sellable || o.because?.includes("free")).length;
 
   const lines = items.map((o) => {
-    if (o.sellable) return `  [ ] ${o.question}   €9`;
-    if (o.because?.includes("free")) return `  [x] ${o.question}   free, included`;
-    return `      ${o.question}   (${o.because})`;
+    if (o.sellable || o.because?.includes("free")) return `  [x] ${o.question}`;
+    return `  [ ] ${o.question}   (${o.because})`;
   });
 
   const footer =
-    sellable >= 3
-      ? "\nTick what you want. €9 each, any three from this same file for €21."
-      : sellable > 0
-        ? "\nTick what you want. €9 each."
-        : "\nNothing here is for sale yet, and nothing is charged.";
+    included > 0
+      ? `\nOne report, €9, containing every marked chapter. Send what the open lines ask for and we add those chapters and reissue it, at no charge.`
+      : "\nNothing here can run yet, and nothing is charged.";
 
   return lines.join("\n") + "\n" + footer;
 }

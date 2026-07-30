@@ -9,6 +9,7 @@ import {
   NET_REVENUE,
   NOT_OPERATING,
   NOT_REVENUE,
+  OTHER_INCOME,
   REVENUE_DEDUCTION,
   RECOVERY,
   REFERENCE_HEADER,
@@ -150,11 +151,33 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
     const candidates = named.length > 0 ? named : rest;
     if (candidates.length === 1) actualColumn = candidates[0];
     else if (candidates.length > 1) {
-      questions.push(
-        `More than one column could be the period that happened: ${candidates
-          .map((c) => `column ${c + 1} "${headers.get(c) || "unnamed"}"`)
-          .join(", ")}. Which one is it?`,
-      );
+      // Columns headed by nothing but years: the printed shape of a set of
+      // annual accounts, where this year stands beside last year. The later
+      // year is the period that happened and the earlier one the comparison.
+      // That is not a guess about the file, it is how statements are printed;
+      // a budget column would say budget, and then this path never runs.
+      const yearOf = (c: number) => {
+        const m = (headers.get(c) ?? "").trim().match(/^(19|20)\d{2}$/);
+        return m ? Number(m[0]) : undefined;
+      };
+      const years = candidates.map(yearOf);
+      if (years.every((y) => y !== undefined) && new Set(years).size === years.length) {
+        const ordered = [...candidates].sort((a, b) => yearOf(b)! - yearOf(a)!);
+        actualColumn = ordered[0];
+        if (referenceColumn === undefined && ordered.length > 1) {
+          referenceColumn = ordered[1];
+          notes.push(
+            `The columns are headed by years, so we read ${yearOf(ordered[0])} as the period ` +
+              `that happened and ${yearOf(ordered[1])} as the comparison.`,
+          );
+        }
+      } else {
+        questions.push(
+          `More than one column could be the period that happened: ${candidates
+            .map((c) => `column ${c + 1} "${headers.get(c) || "unnamed"}"`)
+            .join(", ")}. Which one is it?`,
+        );
+      }
     }
   }
 
@@ -226,7 +249,9 @@ export function readSheet(sheet: Sheet, options: ReadOptions = {}): Intake {
         ? "a forecast or scenario, not an amount that happened"
         : has(label, REVENUE_DEDUCTION)
           ? "already deducted inside net turnover"
-          : "below the operating line";
+          : has(label, OTHER_INCOME)
+            ? "income, not a cost, and not turnover; left out of the ratios"
+            : "below the operating line";
     }
     rows.push(entry);
   }
@@ -476,7 +501,8 @@ function classify(label: string): RowKind {
   if (has(label, SCENARIO)) return "skip";
   if (has(label, GROSS_MARGIN)) return "margin";
   if (has(label, RECOVERY)) return "recovery";
-  if (has(label, REVENUE_DEDUCTION) || has(label, NOT_OPERATING)) return "skip";
+  if (has(label, REVENUE_DEDUCTION) || has(label, NOT_OPERATING) || has(label, OTHER_INCOME))
+    return "skip";
   if (has(label, SUBTOTAL)) {
     return has(label, REVENUE) && !has(label, NOT_REVENUE) ? "revenue" : "subtotal";
   }

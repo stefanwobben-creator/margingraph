@@ -3,24 +3,19 @@ import type { Finding, FindingsInput } from "./types";
 
 const euro = (n: number) => `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
 
-/** The price of one report. Every headline compares it to what was found. */
-export const REPORT_PRICE = 9;
-
 /**
- * Three reports from the same file, for the price of a bit over two.
+ * The price of the report. One file, one report, one price.
  *
- * One upload can answer several different questions, and the marginal cost of
- * the second answer is nothing: the file is already read, the gate has already
- * passed, the lines are already classified. Charging full price for work that
- * costs nothing extra is how a fair price becomes a greedy one, and the
- * discount is small enough to stay a nudge rather than a fire sale.
- *
- * The guarantee stays per report. Each one still has to clear the minimum on
- * its own, so a bundle can never be three reports where two of them are
- * padding.
+ * There used to be a catalogue here: six reports at €9 each, any three for
+ * €21. Then we printed them. Four of the six were a single page carrying a
+ * single computation, and a one-formula page sold as a separate product is
+ * how a fair machine starts to feel like a fee schedule. The marginal cost
+ * of every extra chapter is zero once the file is read, so the honest shape
+ * is one report that contains everything the file can carry, and one price
+ * on it. The questions the catalogue asked are still asked; they are now
+ * chapters, not invoices.
  */
-export const BUNDLE_SIZE = 3;
-export const BUNDLE_PRICE = 21;
+export const REPORT_PRICE = 9;
 
 /**
  * The threshold under which we do not charge.

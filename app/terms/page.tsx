@@ -4,8 +4,6 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Section, SectionHeader } from "@/components/layout/section";
 import {
-  BUNDLE_PRICE,
-  BUNDLE_SIZE,
   MINIMUM_WORTH,
   REPORT_PRICE,
 } from "@/lib/reports/findings";
@@ -79,11 +77,13 @@ export default function TermsPage() {
             starts costing you business. That is what you pay, VAT included.
           </p>
           <p className="mt-2 text-muted-foreground">
-            One file can answer more than one question, and each answer is its
-            own report at €{REPORT_PRICE}. Any {BUNDLE_SIZE} reports produced
-            from the same file cost €{BUNDLE_PRICE} together. The minimum below
-            applies to each report on its own, so a bundle can never be one
-            useful report and two thin ones.
+            One file, one report, one price. The report contains every chapter
+            your file supports: where the margin leaks, what a downturn would
+            do, what a price change can cost, how long the money lasts, whether
+            the business is getting stronger, and what to ask your accountant.
+            Chapters your file cannot carry are named in the report along with
+            what to send to add them, and adding them later costs nothing: we
+            reissue the report.
           </p>
         </div>
 

@@ -102,10 +102,10 @@ export function runwayReport(input: FindingsInput, options: RunwayOptions): Runw
     const monthsLeft = cash / monthlyBurn;
     const when =
       monthsLeft >= 24
-        ? "more than two years away at this pace"
+        ? "more than two years from now"
         : monthsLeft >= 1
-          ? `about ${monthsLeft.toFixed(1).replace(/\.0$/, "")} months away at this pace`
-          : "less than one month away at this pace";
+          ? `about ${monthsLeft.toFixed(1).replace(/\.0$/, "")} months from now`
+          : "in less than one month";
     lines.push(
       `Cash in the bank: ${euro(cash)}. Cash leaving, at the pace of ${actual.label}: about ` +
         `${euro(monthlyBurn)} per month.`,

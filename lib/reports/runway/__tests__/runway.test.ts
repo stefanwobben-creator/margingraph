@@ -55,7 +55,7 @@ describe("how long the money lasts", () => {
     // Cash out €493,521 over twelve months.
     assert.equal(Math.round(got.monthlyBurn), 41_127);
     assert.ok(got.monthsLeft! > 1.0 && got.monthsLeft! < 1.2, `got ${got.monthsLeft}`);
-    assert.match(got.text, /about 1\.1 months away at this pace/);
+    assert.match(got.text, /about 1\.1 months from now/);
   });
 
   test("takes depreciation out of the burn, and shows the working", () => {

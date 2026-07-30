@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "intake": "npx --yes vite-node --config vitest.config.ts scripts/intake.ts",
+    "reply": "npx --yes vite-node --config vitest.config.ts scripts/reply.ts",
+    "report": "npx --yes vite-node --config vitest.config.ts scripts/report.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "verify:live": "LOCAL_SHA=$(git rev-parse HEAD) node scripts/verify-live.mjs",

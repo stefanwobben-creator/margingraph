@@ -17,8 +17,6 @@ export {
   render,
   teaser,
   REPORT_PRICE,
-  BUNDLE_SIZE,
-  BUNDLE_PRICE,
   MINIMUM_WORTH,
 } from "./render";
 export { portrait } from "./portrait";

@@ -6,8 +6,6 @@ import { Section, SectionHeader } from "@/components/layout/section";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  BUNDLE_PRICE,
-  BUNDLE_SIZE,
   MINIMUM_WORTH,
   REPORT_PRICE,
 } from "@/lib/reports/findings";
@@ -159,11 +157,11 @@ export default function SendPage() {
                 <span className="text-foreground">
                   4. €{REPORT_PRICE} if you want the answers.
                 </span>{" "}
-                Which line each finding sits on, the arithmetic, and what to do
-                including how far you can safely go. One file usually answers
-                more than one of the questions above, and each answer is its own
-                report: €{REPORT_PRICE} each, or any {BUNDLE_SIZE} from the same
-                file for €{BUNDLE_PRICE}.
+                One report with every chapter your file supports: the leaks,
+                the downturn, the price change, the runway, the direction, and
+                the questions for your accountant. Which line each finding sits
+                on, the arithmetic, and what to do including how far you can
+                safely go.
               </li>
             </ol>
             <Button asChild variant="outline" className="mt-6 self-start">

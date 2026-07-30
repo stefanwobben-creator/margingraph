@@ -1,4 +1,14 @@
+import { has } from "@/lib/reports/intake/vocabulary";
+
 import type { Finding, FindingsInput, LadderStep, Period } from "./types";
+
+/**
+ * Words that mean the comparison column is a plan rather than a period that
+ * happened. The overrun rule reads them because the two comparisons mean
+ * different things: a budget already contains the volume you expected, while
+ * last year contains the volume you had.
+ */
+const PLAN = ["budget", "begroot", "begroting", "plan", "forecast", "prognose"] as const;
 
 const euro = (n: number) =>
   `€${Math.round(Math.abs(n)).toLocaleString("en-GB")}`;
@@ -240,7 +250,7 @@ export function ratioDrift(input: FindingsInput): Finding[] {
  * the interesting rules find nothing.
  */
 export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
-  const { actual, reference, costLines = [] } = input;
+  const { actual, reference, costLines = [], variableLines = [], tiers = [] } = input;
   if (!reference) return [];
 
   // The floor is whichever is larger: the price of ten reports, or a quarter
@@ -251,13 +261,58 @@ export function budgetOverrun(input: FindingsInput, floor = 90): Finding[] {
   const revenue = actual.values[actual.revenueKey] ?? 0;
   const threshold = Math.max(floor, revenue * 0.0025);
 
+  // Against last year, a volume-linked cost is allowed to grow with the
+  // volume. "Cost of sales is €1,060,001 over 2021" at a company whose
+  // turnover grew 29% is not a finding, it is a description of growth, and
+  // the advice it produces — bring it back to last year's level — is advice
+  // to shrink the company. For those lines the comparison is last year's
+  // amount grown at the same rate as turnover, so the finding is only the
+  // part the volume does not explain: the rate. Against a budget nothing is
+  // adjusted, because the budget already contains the volume you expected.
+  const priorPeriod = !has(reference.label, PLAN);
+  const revenueThen = reference.values[reference.revenueKey];
+  const growth = priorPeriod && revenueThen ? revenue / revenueThen : undefined;
+  const volumeLinked = new Set([
+    ...variableLines.map((l) => l.key),
+    ...tiers.filter((t) => t.tier <= 3).map((t) => t.key),
+  ]);
+
   return costLines
     .map((line): Finding | undefined => {
       const now = actual.values[line.key];
-      const planned = reference.values[line.key];
-      if (now === undefined || planned === undefined) return undefined;
+      const then = reference.values[line.key];
+      if (now === undefined || then === undefined) return undefined;
+
+      const adjusted = growth !== undefined && volumeLinked.has(line.key);
+      const planned = adjusted ? then * growth! : then;
       const over = now - planned;
       if (over < threshold) return undefined;
+
+      if (adjusted) {
+        const lineGrowth = then > 0 ? now / then - 1 : undefined;
+        return {
+          id: `overrun-${line.key}`,
+          per: actual.label,
+          plainly:
+            `A cost that moves with your volume is allowed to grow when you ` +
+            `grow. What is measured here is only the part that grew faster ` +
+            `than your turnover did — the change in the rate, with the volume ` +
+            `already paid for.`,
+          subject: `${line.label}, beyond what your growth explains`,
+          observation:
+            lineGrowth !== undefined
+              ? `${line.label} grew ${pct(lineGrowth)} while your turnover grew ${pct(growth! - 1)}.`
+              : `${line.label} is ${euro(over)} above what your turnover growth explains.`,
+          worth: over,
+          action:
+            `The volume is accounted for, so this is a rate conversation: supplier ` +
+            `prices, product mix, or a leak. Name which of the three it was — "it grew" ` +
+            `is the question restated.`,
+          workings: `${euro(now)} actual against ${euro(planned)} — the ${reference.label} amount grown with your turnover (${growth! >= 1 ? "+" : "−"}${pct(Math.abs(growth! - 1))}).`,
+          source: [line.key, actual.revenueKey],
+        };
+      }
+
       return {
         id: `overrun-${line.key}`,
         per: actual.label,

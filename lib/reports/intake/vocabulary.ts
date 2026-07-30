@@ -165,6 +165,25 @@ export const NOT_OPERATING = [
   "dividend",
 ] as const;
 
+/**
+ * Income that is not turnover and not a recovery.
+ *
+ * "Overige bedrijfsopbrengsten" can be positive one year and negative the
+ * next (a subsidy repaid, a book gain reversed). Read as a cost its sign is
+ * flattened and a €431,547 windfall becomes a €431,547 expense, which is the
+ * largest single misreading this vocabulary has produced. It is income, it is
+ * not the trading the ratios are about, and it is left out and said so.
+ */
+export const OTHER_INCOME = [
+  "bedrijfsopbrengsten",
+  "overige opbrengsten",
+  "other operating income",
+  "other income",
+  "boekwinst",
+  "subsidie",
+  "subsidies",
+] as const;
+
 /** Lines that bill a cost back out to customers. Always credits. */
 export const RECOVERY = [
   "doorberekend",
@@ -502,6 +521,14 @@ export const TIERS: readonly { tier: Tier; label: string; step: string; words: r
       "reiskosten",
       "travel",
       "auto",
+      // The cost of existing includes the cost of things bought earlier.
+      // Left off this list, depreciation silently vanished from the cascade
+      // and a company burning cash showed 80 cents lost where 124 were.
+      "afschrijving",
+      "afschrijvingen",
+      "depreciation",
+      "amortisation",
+      "amortization",
     ],
   },
 ];

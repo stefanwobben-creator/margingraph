@@ -144,9 +144,13 @@ export function portrait(input: FindingsInput): Portrait {
   const complete = steps.steps.some((step) => step.tier === 1);
   if (drain.length > 0 && complete) {
     const kept = steps.steps[steps.steps.length - 1].remaining;
+    const cents = Math.round(((kept * revenue) / base) * 100);
     drain.push({
       label: "Left over",
-      value: `${Math.round(((kept * revenue) / base) * 100)} cents`,
+      value:
+        cents < 0
+          ? `−${Math.abs(cents)} cents: the steps above spend more than there is`
+          : `${cents} ${cents === 1 ? "cent" : "cents"}`,
     });
   }
 

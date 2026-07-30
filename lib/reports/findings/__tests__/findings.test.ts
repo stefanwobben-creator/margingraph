@@ -1,6 +1,8 @@
 import { describe, test } from "vitest";
 import assert from "node:assert/strict";
 
+import type { FindingsInput } from "../types";
+
 import {
   MINIMUM_WORTH,
   teaser,
@@ -329,5 +331,79 @@ describe("every finding explains itself before it names their number", () => {
       assert.ok(f.plainly, `${f.id} has no plain-language explanation`);
       assert.ok(!/[€%]|\d/.test(f.plainly), `${f.id} put figures in its explanation`);
     }
+  });
+});
+
+describe("overruns against last year, at a company that grew", () => {
+  // srprs.me 2022 against 2021: turnover up 29.2%, cost of sales up 48.4%.
+  // The absolute difference is €1,060,001 and quoting it as a finding is
+  // advice to shrink the company. Only the part growth does not explain is
+  // a finding, and for cost of sales that is €420,089: the rate, not the
+  // volume.
+  const grew: FindingsInput = {
+    actual: {
+      label: "2022",
+      revenueKey: "omzet",
+      values: {
+        omzet: 3_861_609,
+        inkoopwaarde: 3_248_181,
+        verkoopkosten: 405_120,
+        "overige-personeelsbeloningen": 173_864,
+      },
+    },
+    reference: {
+      label: "2021",
+      revenueKey: "omzet",
+      values: {
+        omzet: 2_987_843,
+        inkoopwaarde: 2_188_180,
+        verkoopkosten: 229_229,
+        "overige-personeelsbeloningen": 121_904,
+      },
+    },
+    costLines: [
+      { key: "inkoopwaarde", label: "Inkoopwaarde van de omzet" },
+      { key: "verkoopkosten", label: "Verkoopkosten" },
+      { key: "overige-personeelsbeloningen", label: "Overige personeelsbeloningen" },
+    ],
+    variableLines: [{ key: "inkoopwaarde", label: "Inkoopwaarde van de omzet" }],
+    tiers: [
+      { key: "inkoopwaarde", label: "Inkoopwaarde van de omzet", tier: 1 },
+      { key: "verkoopkosten", label: "Verkoopkosten", tier: 3 },
+      { key: "overige-personeelsbeloningen", label: "Overige personeelsbeloningen", tier: 4 },
+    ],
+  };
+
+  test("charges growth to the volume and reports only the rate", () => {
+    const overruns = budgetOverrun(grew);
+    const inkoop = overruns.find((f) => f.id === "overrun-inkoopwaarde")!;
+    assert.ok(inkoop, "the cost of sales overrun should still fire");
+    assert.equal(Math.round(inkoop.worth), 420_089);
+    assert.match(inkoop.observation, /grew 48\.4% while your turnover grew 29\.2%/);
+    assert.match(inkoop.action, /rate conversation/);
+    assert.match(inkoop.workings, /grown with your turnover \(\+29\.2%\)/);
+  });
+
+  test("a marketing line is measured the same way", () => {
+    const vk = budgetOverrun(grew).find((f) => f.id === "overrun-verkoopkosten")!;
+    assert.equal(Math.round(vk.worth), 108_855);
+  });
+
+  test("a fixed cost stays a plain comparison", () => {
+    const fixed = budgetOverrun(grew).find(
+      (f) => f.id === "overrun-overige-personeelsbeloningen",
+    )!;
+    assert.equal(Math.round(fixed.worth), 51_960);
+    assert.match(fixed.observation, /€51,960 over 2021/);
+  });
+
+  test("a budget is never volume-adjusted, because it already contains the volume", () => {
+    const against = {
+      ...grew,
+      reference: { ...grew.reference!, label: "budget 2022" },
+    };
+    const inkoop = budgetOverrun(against).find((f) => f.id === "overrun-inkoopwaarde")!;
+    assert.equal(Math.round(inkoop.worth), 3_248_181 - 2_188_180);
+    assert.match(inkoop.observation, /over budget 2022/);
   });
 });

@@ -58,11 +58,12 @@ describe("what one file can be turned into", () => {
     assert.equal(got.find((o) => o.id === "margin")!.sellable, true);
   });
 
-  test("renders the offer as a ticklist with the bundle line", () => {
+  test("renders the offer as the chapters of one report", () => {
     const text = renderOffer({ input: allc });
-    assert.match(text, /\[ \] Where is my margin leaking\?   €9/);
-    assert.match(text, /any three from this same file for €21/);
+    assert.match(text, /\[x\] Where is my margin leaking\?/);
+    assert.match(text, /One report, €9, containing every marked chapter/);
     assert.match(text, /read by a person for now/);
+    assert.doesNotMatch(text, /€21/);
   });
 
   test("gives the real reason, not a generic one", () => {

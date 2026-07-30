@@ -10,10 +10,15 @@ decision nobody can test.
     python3 scripts/sheet-to-rows.py "Q1 2026.xlsx" > /tmp/rows.json
     python3 scripts/sheet-to-rows.py accounts.csv --sheet 2
 
-Reads .xlsx (openpyxl) and .csv. Formula cells come back as their last cached
-value, which is what the sender saw on their screen; a workbook saved by
-something that does not cache values will show blanks there, and the reader
-will say so rather than inventing figures.
+Reads .xlsx (openpyxl), .csv, and .pdf (pdfplumber). Formula cells come back
+as their last cached value, which is what the sender saw on their screen; a
+workbook saved by something that does not cache values will show blanks there,
+and the reader will say so rather than inventing figures.
+
+A PDF is read by finding the page that calls itself the profit and loss
+account and turning each printed line into label-plus-numbers. A scanned PDF
+has no text to find, and the script says that instead of returning an empty
+grid that would fail somewhere less explicable.
 """
 
 from __future__ import annotations
@@ -21,6 +26,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -55,7 +61,19 @@ def cell_value(raw: str):
             else cleaned.replace(",", "")
         )
     elif "," in cleaned:
-        cleaned = cleaned.replace(",", ".")
+        # "2,987,843" is thousands; "843,50" is a decimal. Groups of three
+        # after the first say which one this is.
+        cleaned = (
+            cleaned.replace(",", "")
+            if re.fullmatch(r"-?\d{1,3}(,\d{3})+", cleaned)
+            else cleaned.replace(",", ".")
+        )
+    elif "." in cleaned:
+        # "3.861.609" is how a Dutch statement writes three million. Read as
+        # a decimal it becomes three euros and a rounding error, which is the
+        # single worst misreading this bridge can produce.
+        if re.fullmatch(r"-?\d{1,3}(\.\d{3})+", cleaned):
+            cleaned = cleaned.replace(".", "")
     try:
         number = float(cleaned)
     except ValueError:
@@ -117,6 +135,176 @@ def from_xlsx(path: Path, sheet: str | None) -> dict:
     return {"name": worksheet.title, "rows": rows, "sheets": book.sheetnames}
 
 
+# The names a profit and loss account goes by on its own page. The negative
+# check matters: "Toelichting op de winst-en-verliesrekening" introduces the
+# detail pages, and reading those as well would count every line twice.
+PNL_HEADING = re.compile(
+    r"winst[\s-]*en[\s-]*verliesrekening|profit\s+and\s+loss|staat\s+van\s+baten\s+en\s+lasten|income\s+statement",
+    re.IGNORECASE,
+)
+PNL_DETAIL = re.compile(r"toelichting", re.IGNORECASE)
+
+
+def pdf_number(token: str):
+    """A numeric token as printed in accounts, or None if it is not one.
+
+    Dutch statements write thousands with dots and sometimes hang the minus
+    after the number. Parentheses are a minus written as punctuation. A year
+    is a number too, which is fine: the reader treats a header row of years
+    as headers because they sit above the first label-with-figures row.
+    """
+    text = token.strip()
+    trailing_minus = text.endswith("-") and len(text) > 1
+    if trailing_minus:
+        text = text[:-1]
+    if not re.fullmatch(r"\(?-?€?\s*[\d.,]+\)?", text):
+        return None
+    value = cell_value(text)
+    if not isinstance(value, (int, float)):
+        return None
+    return -value if trailing_minus and value > 0 else value
+
+
+def from_pdf(path: Path) -> dict:
+    try:
+        import pdfplumber
+    except ImportError:  # pragma: no cover - environment problem, not logic
+        sys.exit("pdfplumber is not installed. Run: pip install pdfplumber")
+
+    with pdfplumber.open(path) as book:
+        texts = [(page.extract_text() or "") for page in book.pages]
+
+        if not any(text.strip() for text in texts):
+            sys.exit(
+                f"{path.name} has no text layer, so it is a scan or a photo. "
+                "We cannot read figures out of pixels without guessing. Send the "
+                "spreadsheet, or a PDF exported from the accounting package."
+            )
+
+        # The first page that is the statement itself, not the notes on it.
+        page_index = next(
+            (
+                i
+                for i, text in enumerate(texts)
+                if PNL_HEADING.search(text)
+                and not PNL_DETAIL.search(text.splitlines()[0] if text.splitlines() else "")
+                and not any(
+                    PNL_DETAIL.search(line) and PNL_HEADING.search(line)
+                    for line in text.splitlines()[:4]
+                )
+            ),
+            None,
+        )
+        if page_index is None:
+            pages_with_text = sum(1 for t in texts if t.strip())
+            sys.exit(
+                f"No page in {path.name} calls itself a profit and loss account "
+                f"(read {pages_with_text} pages of text). If the statement is in "
+                "there under another name, send the spreadsheet instead."
+            )
+
+        page = book.pages[page_index]
+        words = page.extract_words(use_text_flow=False)
+
+    # Words into printed lines: same baseline, left to right.
+    lines: dict[float, list] = {}
+    for word in sorted(words, key=lambda w: (round(w["top"] / 3) * 3, w["x0"])):
+        lines.setdefault(round(word["top"] / 3) * 3, []).append(word)
+
+    # First pass: per line, split the right-hand numeric tail off the label,
+    # keeping each number's right edge. A printed statement is a table drawn
+    # with alignment instead of cells, and the right edge is the alignment.
+    parsed = []
+    for _, tokens in sorted(lines.items()):
+        remaining = list(tokens)
+        values = []  # (right edge, value)
+        while remaining and (value := pdf_number(remaining[-1]["text"])) is not None:
+            values.insert(0, (remaining[-1]["x1"], value))
+            remaining.pop()
+        label = " ".join(t["text"] for t in remaining).strip() or None
+        if label is None and not values:
+            continue
+        # "Winst-en-verliesrekening over 2022" ends in a number that is part
+        # of the title, not a figure. Left as a figure it becomes the first
+        # data row, and the real year headers below it stop being headers.
+        if (
+            label
+            and PNL_HEADING.search(label)
+            and values
+            and all(1990 <= v <= 2100 and float(v).is_integer() for _, v in values)
+        ):
+            label = f"{label} {' '.join(str(int(v)) for _, v in values)}"
+            values = []
+        parsed.append((label, values))
+
+    # Cluster the right edges into columns, so a line that only prints one
+    # figure still puts it under the year it belongs to. Without this, a
+    # subtotal with a single amount would land in the first numeric column
+    # and quietly become last year's figure.
+    edges = sorted({edge for _, values in parsed for edge, _ in values})
+    columns: list[float] = []
+    for edge in edges:
+        if not columns or edge - columns[-1] > 18:
+            columns.append(edge)
+        else:
+            columns[-1] = edge  # widen the cluster to its rightmost member
+    place = lambda edge: min(range(len(columns)), key=lambda i: abs(columns[i] - edge))
+
+    grid = []
+    for label, values in parsed:
+        row = [label] + [None] * len(columns)
+        for edge, value in values:
+            row[1 + place(edge)] = value
+        grid.append(row)
+
+    # A column of note references — small integers pointing into the
+    # toelichting — is layout, not figures, and the reader would otherwise
+    # have to ask which column is the period. Dropped only when another
+    # column plainly holds the amounts.
+    def is_note_column(index: int) -> bool:
+        cells = [row[index] for row in grid if row[index] is not None]
+        return (
+            len(cells) > 0
+            and all(isinstance(c, (int, float)) and float(c).is_integer() and abs(c) < 100 for c in cells)
+            and any(
+                any(isinstance(row[other], (int, float)) and abs(row[other]) >= 1000 for row in grid)
+                for other in range(1, len(columns) + 1)
+                if other != index
+            )
+        )
+
+    keep = [0] + [i for i in range(1, len(columns) + 1) if not is_note_column(i)]
+    grid = [[row[i] for i in keep] for row in grid]
+
+    # A header line of bare years ("2022  2021") arrives as numbers, and the
+    # reader only reads text as a header. What is printed as a column heading
+    # should reach the reader as one. Only lines above the first real data
+    # line qualify — a year amid the figures is a figure.
+    first_data = next(
+        (
+            i
+            for i, row in enumerate(grid)
+            if row[0] is not None and any(isinstance(c, (int, float)) for c in row[1:])
+        ),
+        len(grid),
+    )
+    for row in grid[:first_data]:
+        if all(
+            isinstance(c, (int, float)) and 1990 <= c <= 2100 and float(c).is_integer()
+            for c in row[1:]
+            if c is not None
+        ) and any(c is not None for c in row[1:]):
+            for i in range(1, len(row)):
+                if row[i] is not None:
+                    row[i] = str(int(row[i]))
+
+    return {
+        "name": f"page {page_index + 1} of {path.name}",
+        "rows": grid,
+        "sheets": [f"page {i + 1}" for i, text in enumerate(texts) if text.strip()],
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("file")
@@ -127,7 +315,13 @@ def main() -> None:
     if not path.exists():
         sys.exit(f"no such file: {path}")
 
-    data = from_csv(path) if path.suffix.lower() == ".csv" else from_xlsx(path, args.sheet)
+    suffix = path.suffix.lower()
+    if suffix == ".csv":
+        data = from_csv(path)
+    elif suffix == ".pdf":
+        data = from_pdf(path)
+    else:
+        data = from_xlsx(path, args.sheet)
     json.dump(data, sys.stdout, ensure_ascii=False, indent=1)
     sys.stdout.write("\n")
 
